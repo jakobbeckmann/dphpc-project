@@ -129,6 +129,58 @@ std::vector<Point> graham_scan(std::vector<Point>& points) {
 }
 
 
+/*
+    Returns the index of the point in the list that sits such that each other point
+    in the list is on the left of the line from said point to the base point given in
+    the arguments.
+    @param points: vector of points forming a convex polygon.
+    @param base: base point
+*/
+int tangent_index(std::vector<Point> points, Point base) {
+    int lower_bound = 0;
+    int uppper_bound = points.size();
+
+    // Find orientation of turns for points right before and after the lower bound.
+    int lb_turn_before = orientation(base, points[0], points[points.size() - 1]);
+    int lb_turn_after = orientation(base, points[0], points[1]);
+
+    // Check if first point is the point lying to the right of all other points.
+    if(lb_turn_before != RIGHT_TURN && lb_turn_after == LEFT_TURN) {
+        return 0;
+    }
+
+    // First point is not the right most point.
+    while(lower_bound < upper_bound) {
+        // Find index of point in between the two bounds.
+        int mid = (upper_bound + lower_bound) / 2;
+
+        // Compute its turns.
+        int mid_turn_before = orientation(base, points[mid], points[(mid - 1) % points.size()]);
+        int mid_turn_after = orientation(base, points[mid], points[(mid + 1) % points.size()]);
+
+        // Check in which direction the next cut should be based on the position relative to
+        // the lower_bound point.
+        int cut_direction = orientation(base, points[lower_bound], points[mid]);
+
+        if(mid_turn_before != RIGHT_TURN && mid_turn_after == LEFT_TURN) {
+            // All points lie to the right of 'mid'
+            return mid;
+        } else if((cut_direction != RIGHT_TURN && lb_turn_after != LEFT_TURN) ||
+                  (cut_direction == RIGHT_TURN && mid_turn_before == RIGHT_TURN)) {
+            // The leftmost point lies to the right of the cut (line between 'lower_bound' and 'mid')
+            upper_bound = mid;
+        } else {
+            // The leftmost point lies to the left of the cut.
+            lower_bound = mid + 1;
+        }
+        lb_turn_after = orientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
+    }
+    return lower_bound;
+}
+
+
+
+
 int main(int argc, char const *argv[]) {
     int POINT_COUNT = 0;
     double x = 0, y = 0;
