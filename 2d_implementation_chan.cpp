@@ -138,7 +138,7 @@ std::vector<Point> graham_scan(std::vector<Point>& points) {
 */
 int tangent_index(std::vector<Point> points, Point base) {
     int lower_bound = 0;
-    int uppper_bound = points.size();
+    int upper_bound = points.size();
 
     // Find orientation of turns for points right before and after the lower bound.
     int lb_turn_before = orientation(base, points[0], points[points.size() - 1]);
