@@ -2,7 +2,17 @@
 2d_implementation_chan.cpp
 08-10-2017
 
-@Description: 2D implementation of Chan's algorithm.
+@Description: 2D implementation of Chan's algorithm. Note that we do not consider a point to be part of the hull if it
+is the middle point of 3 collinear points. Hence no three points in a hull (either global or local/Graham) will ever
+be collinear.  The reason for this design choice is that colinear points only add computation for hull mergers.
+They do output a different polygon but the shape of this output and the one with all collinear points is exacly
+the same.
+Note that this adds the restrinction that we require the level of parallelism to be less than a third of the points.
+Otherwise at least one subset of the points being analysed by Graham's algorithm will of size 2 and as we do not consider
+collinear points to be part of hulls, Graham's scan returns an empty hull.
+By extension we assume that the points have general position and hence no subset of points being analysed by Graham's
+algorithm contains only collinear points.
+
 @Author: Jakob Beckmann
 */
 
@@ -10,6 +20,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <vector>
+#include <utility>
 
 #define RIGHT_TURN -1
 #define LEFT_TURN 1
@@ -136,7 +147,7 @@ std::vector<Point> graham_scan(std::vector<Point>& points) {
     @param points: vector of points forming a convex polygon.
     @param base: base point
 */
-int tangent_index(std::vector<Point> points, Point base) {
+int tangent_idx(std::vector<Point> points, Point base) {
     int lower_bound = 0;
     int upper_bound = points.size();
 
@@ -179,14 +190,101 @@ int tangent_index(std::vector<Point> points, Point base) {
 }
 
 
+/*
+    Returns a pair representing the hull number and point index inside that hull. The represented
+    point is the point with lowest y coordinate across all hulls.
+    @param hulls: vector of hulls (vectors of points)
+*/
+std::pair<int, int> lowest_point(std::vector<std::vector<Point> > hulls) {
+    int hull = 0, point = 0;
+    double lowest_y = hulls[0][0].y;
+    for(int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
+        for(int point_idx = 0; point_idx < hulls[hull_idx].size(); point_idx++) {
+            if(hulls[hull_idx][point_idx].y < lowest_y) {
+                hull = hull_idx;
+                point = point_idx;
+            }
+        }
+    }
+    return std::make_pair(hull, point);
+}
+
+
+/*
+    Returns the hull-point pair that will be used as the next point for the hull merge.
+    @param hulls: vector of hulls (vectors of points)
+    @param base_pair: base point (the last added point from the hull merge)
+*/
+std::pair<int, int> next_merge_point(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair) {
+    int hull = 0, point = 0;
+    Point base = hulls[base_pair.first][base_pair.second];
+    // Select next point on the same hull as the next point for the merge
+    std::pair<int, int> result = std::make_pair(base_pair.first, (base_pair.second + 1) % hulls[base_pair.first].size());
+    for(int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
+        if(hull_idx != base_pair.first) {
+            int candidate_idx = tangent_idx(hulls[hull_idx], base);
+            Point previous = hulls[result.first][result.second];
+            Point candidate = hulls[hull_idx][candidate_idx];
+            int linearity = orientation(base, previous, candidate);
+            if(linearity == RIGHT_TURN || (linearity == COLLINEAR && distance(base, previous) < distance(base, candidate))) {
+                result = std::make_pair(hull_idx, candidate_idx);
+            }
+        }
+    }
+    return result;
+}
+
+
+
+/*
+    Returns the 2D convex hull of the points given in the argument. The parallelism index determines how many subsets of
+    points should be analysed in parallel using Graham's scan.
+    @param points: vector of points the be analysed
+    @param parallel_idx: parallelism index determining the amount of parallel computation
+*/
+std::vector<Point> chan(std::vector<Point> points, int parallel_idx) {
+    std::vector<std::vector<Point> > hulls;
+    /*
+        TODO The following sode snipped will need to be parallelised using mpi in order to achieve real parallelism.
+    */
+    for(int idx = 0; idx < parallel_idx; idx++) {
+        std::vector<Point> subset;
+        for(int point_idx = idx; point_idx < points.size(); point_idx += parallel_idx) {
+            subset.push_back(points[point_idx]);
+        }
+        hulls.push_back(graham_scan(subset));
+    }
+    /*
+        TODO END
+    */
+    std::pair<int, int> next_point = lowest_point(hulls);
+    std::vector<Point> result;
+    result.push_back(hulls[next_point.first][next_point.second]);
+    do {
+        next_point = next_merge_point(hulls, next_point);
+        result.push_back(hulls[next_point.first][next_point.second]);
+    } while(result[0] != result[result.size() - 1]);
+    result.pop_back();
+    return result;
+}
+
+
 
 
 int main(int argc, char const *argv[]) {
-    int POINT_COUNT = 0;
+    int POINT_COUNT = 0, PARALLELISM_IDX = 1;
     double x = 0, y = 0;
+
+    std::cout << "Please enter the parallelism index:" << std::endl;
+    std::cin >> PARALLELISM_IDX;
+    if(PARALLELISM_IDX < 1) return -1;
+
     std::cout << "Please enter the total number of points:" << std::endl;
     std::cin >> POINT_COUNT;
-    if(POINT_COUNT < 1) return -1;
+    if(POINT_COUNT < PARALLELISM_IDX * 3) {
+        std::cout << "Please need more points or less parallelism." << std::endl;
+        return -1;
+    }
 
     std::vector<Point> points;
     for(int idx = 0; idx < POINT_COUNT; idx++) {
@@ -195,7 +293,8 @@ int main(int argc, char const *argv[]) {
         points.push_back(Point(x, y));
     }
 
-    std::vector<Point> result = graham_scan(points);
+    // std::vector<Point> result = graham_scan(points);
+    std::vector<Point> result = chan(points, PARALLELISM_IDX);
     std::cout << "=========Result=========" << std::endl;
     for(Point point: result) {
         std::cout << point << " ";
