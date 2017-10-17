@@ -4,6 +4,8 @@
  */
 
 #include <cmath>
+#include <random>
+#include <fstream>
 
 #include "utility.h"
 
@@ -48,4 +50,25 @@ int compare(const void* vpp1, const void* vpp2) {
         return (distance(p0, *pp1) <= distance(p0, *pp2))? 1: -1;
     }
     return (orient == RIGHT_TURN)? 1: -1;
+}
+
+std::vector<Point> createPoints(double pointCount) {
+    std::vector<Point> points;
+
+    for(int idx = 0; idx < pointCount; idx++) {
+        double x = (double) rand() / (RAND_MAX);
+        double y = (double) rand() / (RAND_MAX);
+        points.emplace_back(Point(x, y));
+    }
+    return points;
+
+}
+
+void pointsVectorToFile(std::vector<Point> pointVector, std::string fileName) {
+    std::ofstream allPointsFile;
+    allPointsFile.open(fileName);
+    for (Point point : pointVector) {
+        allPointsFile << point.x << "," << point.y << std::endl;
+    }
+    allPointsFile.close();
 }

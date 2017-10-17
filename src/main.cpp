@@ -4,14 +4,19 @@
 
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <random>
 
 #include "Point.h"
+#include "utility.h"
 #include "chan2d.h"
+
+
 
 int main(int argc, char const *argv[]) {
     int POINT_COUNT = 0, PARALLELISM_IDX = 1;
-    double x = 0, y = 0;
 
+    //TODO: Parallel implementation
     std::cout << "Please enter the parallelism index:" << std::endl;
     std::cin >> PARALLELISM_IDX;
     if(PARALLELISM_IDX < 1) return -1;
@@ -23,13 +28,8 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
-    //TODO: Random point generator
-    std::vector<Point> points;
-    for(int idx = 0; idx < POINT_COUNT; idx++) {
-        std::cout << "Coordinates of point " << idx + 1 << ": ";
-        std::cin >> x >> y;
-        points.push_back(Point(x, y));
-    }
+    std::vector<Point> points = createPoints(POINT_COUNT);
+    pointsVectorToFile(points, "all_points.dat");
 
     // std::vector<Point> result = graham_scan(points);
     std::vector<Point> result = chan(points, PARALLELISM_IDX);
@@ -38,5 +38,8 @@ int main(int argc, char const *argv[]) {
         std::cout << point << " ";
     }
     std::cout << std::endl;
+
+    pointsVectorToFile(result, "hull_points.dat");
+
     return 0;
 }
