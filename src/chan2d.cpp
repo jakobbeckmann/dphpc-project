@@ -1,5 +1,5 @@
-/*
-2d_implementation_chan.cpp
+/**
+chan2d.cpp
 08-10-2017
 
 @Description: 2D implementation of Chan's algorithm. Note that we do not consider a point to be part of the hull if it
@@ -17,85 +17,14 @@ algorithm contains only collinear points.
 */
 
 #include <iostream>
-#include <cstdlib>
 #include <cmath>
 #include <vector>
-#include <utility>
 
-#define RIGHT_TURN -1
-#define LEFT_TURN 1
-#define COLLINEAR 0
-#define EPSILON 0.0001
+#include "constants.h"
+#include "utility.h"
 
 
-/*
-    Class handling 2D point objects.
-*/
-class Point {
-public:
-    double x, y;
-
-    // Constructor
-    Point(double x=0, double y=0) {
-        this->x = x;
-        this->y = y;
-    }
-
-    // Overload operators
-    friend bool operator== (const Point& p1, const Point& p2) {
-        return (fabs(p1.x - p2.x) < EPSILON) && (fabs(p1.y - p2.y) < EPSILON);
-    }
-    friend bool operator!= (const Point& p1, const Point& p2) {
-        return (fabs(p1.x - p2.x) > EPSILON) || (fabs(p1.y - p2.y) > EPSILON);
-    }
-    friend std::ostream& operator<< (std::ostream& output, const Point& point) {
-        output << "(" << point.x << ", " << point.y << ")";
-        return output;
-    }
-}p0;
-
-/*
-    Returns the orientation of the angle between three points.
-    Returns -1: Right turn
-             1: Left turn
-             0: Collinear
-    @param p1: first point
-    @param p2: second point
-    @param p3: third point
-*/
-int orientation(Point p1, Point p2, Point p3) {
-    double cross_product = (p1.y - p2.y) * (p3.x - p2.x) - (p1.x - p2.x) * (p3.y - p2.y);
-    if(fabs(cross_product) < EPSILON) return COLLINEAR;
-    return (cross_product > 0)? LEFT_TURN: RIGHT_TURN;
-}
-
-/*
-    Returns square of the distance between two 2D points.
-    @param point1: first point.
-    @param point2: second point.
-*/
-double distance(Point p1, Point p2) {
-    return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
-}
-
-
-/*
-    Function used when sorting using qsort().
-    Returns the point with lowest polar angle w.r.t p0(0, 0) and the x-axis.
-    @param vpp1: pointer to first point
-    @param vpp2: pointer to second point
-*/
-int compare(const void* vpp1, const void* vpp2) {
-    Point* pp1 = (Point*) vpp1;
-    Point* pp2 = (Point*) vpp2;
-    int orient = orientation(p0, *pp1, *pp2);
-    if(orient == COLLINEAR) {
-        return (distance(p0, *pp1) <= distance(p0, *pp2))? 1: -1;
-    }
-    return (orient == RIGHT_TURN)? 1: -1;
-}
-
-/*
+/**
     Finds the clockwise hull of a vector of points. If the base does not lie inside the hull, it is added to the hull.
     In essence, this extends the hull by the base point and corrects it for convexity.
     Returns a vector of points.
@@ -115,7 +44,7 @@ std::vector<Point> hull_check(std::vector<Point>& points, Point base) {
 }
 
 
-/*
+/**
     Performs a Graham Scan on input vector of points.
     Returns a vector of points contained in the convex hull of the input.
     @param points: vector of points
@@ -140,7 +69,7 @@ std::vector<Point> graham_scan(std::vector<Point>& points) {
 }
 
 
-/*
+/**
     Returns the index of the point in the list that sits such that each other point
     in the list is on the left of the line from said point to the base point given in
     the arguments.
@@ -190,7 +119,7 @@ int tangent_idx(std::vector<Point> points, Point base) {
 }
 
 
-/*
+/**
     Returns a pair representing the hull number and point index inside that hull. The represented
     point is the point with lowest y coordinate across all hulls.
     @param hulls: vector of hulls (vectors of points)
@@ -210,7 +139,7 @@ std::pair<int, int> lowest_point(std::vector<std::vector<Point> > hulls) {
 }
 
 
-/*
+/**
     Returns the hull-point pair that will be used as the next point for the hull merge.
     @param hulls: vector of hulls (vectors of points)
     @param base_pair: base point (the last added point from the hull merge)
@@ -236,7 +165,7 @@ std::pair<int, int> next_merge_point(std::vector<std::vector<Point> > hulls, std
 
 
 
-/*
+/**
     Returns the 2D convex hull of the points given in the argument. The parallelism index determines how many subsets of
     points should be analysed in parallel using Graham's scan.
     @param points: vector of points the be analysed
@@ -269,36 +198,3 @@ std::vector<Point> chan(std::vector<Point> points, int parallel_idx) {
 }
 
 
-
-
-int main(int argc, char const *argv[]) {
-    int POINT_COUNT = 0, PARALLELISM_IDX = 1;
-    double x = 0, y = 0;
-
-    std::cout << "Please enter the parallelism index:" << std::endl;
-    std::cin >> PARALLELISM_IDX;
-    if(PARALLELISM_IDX < 1) return -1;
-
-    std::cout << "Please enter the total number of points:" << std::endl;
-    std::cin >> POINT_COUNT;
-    if(POINT_COUNT < PARALLELISM_IDX * 3) {
-        std::cout << "Please need more points or less parallelism." << std::endl;
-        return -1;
-    }
-
-    std::vector<Point> points;
-    for(int idx = 0; idx < POINT_COUNT; idx++) {
-        std::cout << "Coordinates of point " << idx + 1 << ": ";
-        std::cin >> x >> y;
-        points.push_back(Point(x, y));
-    }
-
-    // std::vector<Point> result = graham_scan(points);
-    std::vector<Point> result = chan(points, PARALLELISM_IDX);
-    std::cout << "=========Result=========" << std::endl;
-    for(Point point: result) {
-        std::cout << point << " ";
-    }
-    std::cout << std::endl;
-    return 0;
-}
