@@ -1,2 +1,5 @@
-*.pyc
-cmake-build-debug
+.DS_Store
+.idea/dphpc-project.iml
+.idea/modules.xml
+.idea/workspace.xml
+src/.idea/

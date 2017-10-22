@@ -6,24 +6,25 @@
 #include <cmath>
 #include <random>
 #include <fstream>
+#include <iostream>
 
 #include "utility.h"
 
 
 /**
     Returns the orientation of the angle between three points.
-    Returns -1: Right turn
-             1: Left turn
+    Returns -1: Anticlockwise
+             1: Clockwise
              0: Collinear
     @param p1: first point
     @param p2: second point
     @param p3: third point
 */
-int orientation(Point p1, Point p2, Point p3) {
-    double cross_product = (p1.y - p2.y) * (p3.x - p2.x) - (p1.x - p2.x) * (p3.y - p2.y);
+int getOrientation(Point p1, Point p2, Point p3) {
+    double cross_product = (p2.y - p1.y) * (p3.x - p2.x) - (p3.y - p2.y) * (p2.x - p1.x);
     if (fabs(cross_product) < EPSILON)
         return COLLINEAR;
-    return (cross_product > 0)? LEFT_TURN: RIGHT_TURN;
+    return (cross_product > 0)? CLOCKWISE: ANTICLOCKWISE;
 }
 
 /**
@@ -31,7 +32,7 @@ int orientation(Point p1, Point p2, Point p3) {
     @param point1: first point.
     @param point2: second point.
 */
-double distance(Point p1, Point p2) {
+double getDistance(Point p1, Point p2) {
     return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
 }
 
@@ -41,33 +42,47 @@ double distance(Point p1, Point p2) {
     @param vpp1: pointer to first point
     @param vpp2: pointer to second point
 */
-int compare(const void* vpp1, const void* vpp2) {
+int lowestAngleSort(const void *vpp1, const void *vpp2) {
     Point p0 = Point();
     Point* pp1 = (Point*) vpp1;
     Point* pp2 = (Point*) vpp2;
-    int orient = orientation(p0, *pp1, *pp2);
+    int orient = getOrientation(p0, *pp1, *pp2);
     if(orient == COLLINEAR) {
-        return (distance(p0, *pp1) <= distance(p0, *pp2))? 1: -1;
+        return (getDistance(p0, *pp1) <= getDistance(p0, *pp2))? 1: -1;
     }
-    return (orient == RIGHT_TURN)? 1: -1;
+    return (orient == CLOCKWISE)? 1: -1;
 }
 
-std::vector<Point> createPoints(double pointCount) {
+/**
+ * Generates random points for given min and max x/y coordinates.
+ * @param count number of random points
+ * @param min minimum possible value of x/y coordinate
+ * @param max maximum possible value of x/y coordinate
+ * @return
+ */
+std::vector<Point> createPoints(int count, double min, double max) {
     std::vector<Point> points;
-
-    for(int idx = 0; idx < pointCount; idx++) {
-        double x = (double) rand() / (RAND_MAX);
-        double y = (double) rand() / (RAND_MAX);
+    std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_real_distribution<> dis(min, max);
+    for(int idx = 0; idx < count; idx++) {
+        double x = (double) dis(gen);
+        double y = (double) dis(gen);
         points.emplace_back(Point(x, y));
     }
     return points;
 
 }
 
-void pointsVectorToFile(std::vector<Point> pointVector, std::string fileName) {
+/**
+ * Writes given set of points to a file with a given filename.
+ * @param points
+ * @param fileName
+ */
+void writePointsToFile(std::vector<Point> points, std::string fileName) {
     std::ofstream allPointsFile;
     allPointsFile.open(fileName);
-    for (Point point : pointVector) {
+    for (Point point : points) {
         allPointsFile << point.x << "," << point.y << std::endl;
     }
     allPointsFile.close();

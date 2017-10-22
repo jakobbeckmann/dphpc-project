@@ -11,8 +11,6 @@
 #include "utility.h"
 #include "chan2d.h"
 
-
-
 int main(int argc, char const *argv[]) {
     int POINT_COUNT = 0, PARALLELISM_IDX = 1;
 
@@ -28,8 +26,8 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
-    std::vector<Point> points = createPoints(POINT_COUNT);
-    pointsVectorToFile(points, "all_points.dat");
+    std::vector<Point> points = createPoints(POINT_COUNT, -10.0, 10.0);
+    writePointsToFile(points, "all_points.dat");
 
     // std::vector<Point> result = graham_scan(points);
     std::vector<Point> result = chan(points, PARALLELISM_IDX);
@@ -39,7 +37,7 @@ int main(int argc, char const *argv[]) {
     }
     std::cout << std::endl;
 
-    pointsVectorToFile(result, "hull_points.dat");
+    writePointsToFile(result, "hull_points.dat");
 
     return 0;
 }

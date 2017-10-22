@@ -33,7 +33,7 @@ algorithm contains only collinear points.
 */
 std::vector<Point> hull_check(std::vector<Point>& points, Point base) {
     int last_idx = points.size() - 1;
-    while(points.size() > 1 && orientation(points[last_idx - 1], points[last_idx], base) != LEFT_TURN) {
+    while(points.size() > 1 && getOrientation(points[last_idx - 1], points[last_idx], base) != ANTICLOCKWISE) {
         points.pop_back();
         last_idx = points.size() - 1;
     }
@@ -54,7 +54,7 @@ std::vector<Point> graham_scan(std::vector<Point>& points) {
         return points;
     }
     // Sort the points based on polar angles w.r.t. p0
-    std::qsort(&points[0], points.size(), sizeof(Point), compare);
+    std::qsort(&points[0], points.size(), sizeof(Point), lowestAngleSort);
 
     // Find the hull
     std::vector<Point> hull;
@@ -80,12 +80,12 @@ int tangent_idx(std::vector<Point> points, Point base) {
     int lower_bound = 0;
     int upper_bound = points.size();
 
-    // Find orientation of turns for points right before and after the lower bound.
-    int lb_turn_before = orientation(base, points[0], points[points.size() - 1]);
-    int lb_turn_after = orientation(base, points[0], points[1]);
+    // Find getOrientation of turns for points right before and after the lower bound.
+    int lb_turn_before = getOrientation(base, points[0], points[points.size() - 1]);
+    int lb_turn_after = getOrientation(base, points[0], points[1]);
 
     // Check if first point is the point lying to the right of all other points.
-    if(lb_turn_before != RIGHT_TURN && lb_turn_after == LEFT_TURN) {
+    if(lb_turn_before != CLOCKWISE && lb_turn_after == ANTICLOCKWISE) {
         return 0;
     }
 
@@ -95,25 +95,25 @@ int tangent_idx(std::vector<Point> points, Point base) {
         int mid = (upper_bound + lower_bound) / 2;
 
         // Compute its turns.
-        int mid_turn_before = orientation(base, points[mid], points[(mid - 1) % points.size()]);
-        int mid_turn_after = orientation(base, points[mid], points[(mid + 1) % points.size()]);
+        int mid_turn_before = getOrientation(base, points[mid], points[(mid - 1) % points.size()]);
+        int mid_turn_after = getOrientation(base, points[mid], points[(mid + 1) % points.size()]);
 
         // Check in which direction the next cut should be based on the position relative to
         // the lower_bound point.
-        int cut_direction = orientation(base, points[lower_bound], points[mid]);
+        int cut_direction = getOrientation(base, points[lower_bound], points[mid]);
 
-        if(mid_turn_before != RIGHT_TURN && mid_turn_after == LEFT_TURN) {
+        if(mid_turn_before != CLOCKWISE && mid_turn_after == ANTICLOCKWISE) {
             // All points lie to the right of 'mid'
             return mid;
-        } else if((cut_direction != RIGHT_TURN && lb_turn_after != LEFT_TURN) ||
-                  (cut_direction == RIGHT_TURN && mid_turn_before == RIGHT_TURN)) {
+        } else if((cut_direction != CLOCKWISE && lb_turn_after != ANTICLOCKWISE) ||
+                  (cut_direction == CLOCKWISE && mid_turn_before == CLOCKWISE)) {
             // The leftmost point lies to the right of the cut (line between 'lower_bound' and 'mid')
             upper_bound = mid;
         } else {
             // The leftmost point lies to the left of the cut.
             lower_bound = mid + 1;
         }
-        lb_turn_after = orientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
+        lb_turn_after = getOrientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
     }
     return lower_bound;
 }
@@ -154,8 +154,9 @@ std::pair<int, int> next_merge_point(std::vector<std::vector<Point> > hulls, std
             int candidate_idx = tangent_idx(hulls[hull_idx], base);
             Point previous = hulls[result.first][result.second];
             Point candidate = hulls[hull_idx][candidate_idx];
-            int linearity = orientation(base, previous, candidate);
-            if(linearity == RIGHT_TURN || (linearity == COLLINEAR && distance(base, previous) < distance(base, candidate))) {
+            int linearity = getOrientation(base, previous, candidate);
+            if(linearity == CLOCKWISE || (linearity == COLLINEAR && getDistance(base, previous) <
+                                                                            getDistance(base, candidate))) {
                 result = std::make_pair(hull_idx, candidate_idx);
             }
         }
