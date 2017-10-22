@@ -12,7 +12,7 @@
 #include "chan2d.h"
 
 int main(int argc, char const *argv[]) {
-    int POINT_COUNT = 0, PARALLELISM_IDX = 1;
+    int POINT_COUNT = 0, PARALLELISM_IDX = 1, MIN = -10, MAX = 10;
 
     //TODO: Parallel implementation
     std::cout << "Please enter the parallelism index:" << std::endl;
@@ -26,11 +26,15 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
-    std::vector<Point> points = createPoints(POINT_COUNT, -10.0, 10.0);
+    std::cout << "Please enter the possible min and max value for x/y coordinates." << std::endl;
+    std::cin >> MIN;
+    std::cin >> MAX;
+
+    std::vector<Point> points = createPoints(POINT_COUNT, MIN, MAX);
     writePointsToFile(points, "all_points.dat");
 
-    // std::vector<Point> result = graham_scan(points);
-    std::vector<Point> result = chan(points, PARALLELISM_IDX);
+    // std::vector<Point> result = doGrahamScan(points);
+    std::vector<Point> result = doChan(points, PARALLELISM_IDX);
     std::cout << "=========Result=========" << std::endl;
     for(Point point: result) {
         std::cout << point << " ";

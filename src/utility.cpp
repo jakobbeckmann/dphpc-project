@@ -37,23 +37,6 @@ double getDistance(Point p1, Point p2) {
 }
 
 /**
-    Function used when sorting using qsort().
-    Returns the point with lowest polar angle w.r.t p0(0, 0) and the x-axis.
-    @param vpp1: pointer to first point
-    @param vpp2: pointer to second point
-*/
-int lowestAngleSort(const void *vpp1, const void *vpp2) {
-    Point p0 = Point();
-    Point* pp1 = (Point*) vpp1;
-    Point* pp2 = (Point*) vpp2;
-    int orient = getOrientation(p0, *pp1, *pp2);
-    if(orient == COLLINEAR) {
-        return (getDistance(p0, *pp1) <= getDistance(p0, *pp2))? 1: -1;
-    }
-    return (orient == CLOCKWISE)? 1: -1;
-}
-
-/**
  * Generates random points for given min and max x/y coordinates.
  * @param count number of random points
  * @param min minimum possible value of x/y coordinate
@@ -70,6 +53,16 @@ std::vector<Point> createPoints(int count, double min, double max) {
         double y = (double) dis(gen);
         points.emplace_back(Point(x, y));
     }
+
+    /*points.emplace_back(Point(1, 1));
+    points.emplace_back(Point(1, 3));
+    points.emplace_back(Point(3, 2));
+    points.emplace_back(Point(3, 5));
+    points.emplace_back(Point(5, 3));
+    points.emplace_back(Point(5, 1));
+    points.emplace_back(Point(6, 1));
+    points.emplace_back(Point(2.5, 3.95));*/
+
     return points;
 
 }

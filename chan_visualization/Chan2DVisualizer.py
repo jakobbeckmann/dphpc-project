@@ -2,6 +2,7 @@ import os
 import numpy as np
 # import matplotlib as mpl
 import matplotlib.pyplot as plt
+import itertools
 
 
 class Chan2DVisualizer:
@@ -17,8 +18,8 @@ class Chan2DVisualizer:
         ax.scatter(self.all_points[0], self.all_points[1], s=10, c='red', alpha=0.7)
         ax.scatter(self.hull_points[0], self.hull_points[1], s=20, c='blue')
 
-        for axis in [ax.get_xaxis(), ax.get_yaxis()]:
-            axis.set_ticks([])
+        '''for axis in [ax.get_xaxis(), ax.get_yaxis()]:
+            axis.set_ticks([])'''
 
         plt.show()
 
