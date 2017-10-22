@@ -12,10 +12,10 @@
 
 /**
     Returns the orientation of the angle between three points.
-    Returns -1: Right turn
-             1: Left turn
+    Returns  1: Right turn (negative abs(cross_prod)
+             -1: Left turn (positive abs(cross_prod)
              0: Collinear
-    @param p1: first point
+    @param p1: first point (origin for both vectors going to p2 and p3)
     @param p2: second point
     @param p3: third point
 */
@@ -31,7 +31,7 @@ int orientation(Point p1, Point p2, Point p3) {
     @param point1: first point.
     @param point2: second point.
 */
-double distance(Point p1, Point p2) {
+double dist_square(Point p1, Point p2) {
     return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
 }
 
@@ -41,13 +41,14 @@ double distance(Point p1, Point p2) {
     @param vpp1: pointer to first point
     @param vpp2: pointer to second point
 */
-int compare(const void* vpp1, const void* vpp2) {
-    Point p0 = Point();
-    Point* pp1 = (Point*) vpp1;
-    Point* pp2 = (Point*) vpp2;
-    int orient = orientation(p0, *pp1, *pp2);
+int check_orientation(const void *vpp1, const void *vpp2) {
+    Point origin = Point();
+    auto* pp1 = (Point*) vpp1;
+    auto* pp2 = (Point*) vpp2;
+
+    int orient = orientation(origin, *pp1, *pp2);
     if(orient == COLLINEAR) {
-        return (distance(p0, *pp1) <= distance(p0, *pp2))? 1: -1;
+        return (dist_square(origin, *pp1) <= dist_square(origin, *pp2))? 1: -1;
     }
     return (orient == RIGHT_TURN)? 1: -1;
 }

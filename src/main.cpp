@@ -14,12 +14,19 @@
 
 
 int main(int argc, char const *argv[]) {
-    int POINT_COUNT = 0, PARALLELISM_IDX = 1;
+    int POINT_COUNT = 0, PARALLELISM_IDX = 3;
+
+    FileWriter fileWriter;
+    fileWriter.setBaseName("graham_history");
+    fileWriter.updateFileName();
+
 
     //TODO: Parallel implementation
+    /*
     std::cout << "Please enter the parallelism index:" << std::endl;
     std::cin >> PARALLELISM_IDX;
     if(PARALLELISM_IDX < 1) return -1;
+    */
 
     std::cout << "Please enter the total number of points:" << std::endl;
     std::cin >> POINT_COUNT;
@@ -32,7 +39,7 @@ int main(int argc, char const *argv[]) {
     pointsVectorToFile(points, "all_points.dat");
 
     // std::vector<Point> result = graham_scan(points);
-    std::vector<Point> result = chan(points, PARALLELISM_IDX);
+    std::vector<Point> result = chan(points, PARALLELISM_IDX, fileWriter);
     std::cout << "=========Result=========" << std::endl;
     for(Point point: result) {
         std::cout << point << " ";

@@ -20,7 +20,7 @@ algorithm contains only collinear points.
 #include <cmath>
 #include <vector>
 
-#include "constants.h"
+#include "chan2d.h"
 #include "utility.h"
 
 
@@ -31,14 +31,16 @@ algorithm contains only collinear points.
     @param points: vector of points
     @param base: point
 */
-std::vector<Point> hull_check(std::vector<Point>& points, Point base) {
+std::vector<Point> hull_check(std::vector<Point>& points, Point base, FileWriter& fileWriter) {
     int last_idx = points.size() - 1;
     while(points.size() > 1 && orientation(points[last_idx - 1], points[last_idx], base) != LEFT_TURN) {
+        fileWriter.appendPointToFile(points[last_idx], RIGHT_TURN);
         points.pop_back();
         last_idx = points.size() - 1;
     }
     if(points.size() == 0 || points[last_idx] != base) {
         points.push_back(base);
+        fileWriter.appendPointToFile(base, LEFT_TURN);
     }
     return points;
 }
@@ -49,20 +51,21 @@ std::vector<Point> hull_check(std::vector<Point>& points, Point base) {
     Returns a vector of points contained in the convex hull of the input.
     @param points: vector of points
 */
-std::vector<Point> graham_scan(std::vector<Point>& points) {
+std::vector<Point> graham_scan(std::vector<Point>& points, FileWriter& fileWriter) {
     if(points.size() <= 1) {
         return points;
     }
     // Sort the points based on polar angles w.r.t. p0
-    std::qsort(&points[0], points.size(), sizeof(Point), compare);
+    std::qsort(&points[0], points.size(), sizeof(Point), check_orientation);
 
     // Find the hull
     std::vector<Point> hull;
     for(int idx = 0; idx < points.size(); idx++) {
-        hull = hull_check(hull, points[idx]);
+        hull = hull_check(hull, points[idx], fileWriter);
     }
     // Check closure of hull
-    hull = hull_check(hull, points[0]);
+    hull = hull_check(hull, points[1], fileWriter);
+    //TODO: Which point to pop
     hull.pop_back();
 
     return hull;
@@ -155,7 +158,8 @@ std::pair<int, int> next_merge_point(std::vector<std::vector<Point> > hulls, std
             Point previous = hulls[result.first][result.second];
             Point candidate = hulls[hull_idx][candidate_idx];
             int linearity = orientation(base, previous, candidate);
-            if(linearity == RIGHT_TURN || (linearity == COLLINEAR && distance(base, previous) < distance(base, candidate))) {
+            if(linearity == RIGHT_TURN || (linearity == COLLINEAR && dist_square(base, previous) <
+                                                                             dist_square(base, candidate))) {
                 result = std::make_pair(hull_idx, candidate_idx);
             }
         }
@@ -171,17 +175,20 @@ std::pair<int, int> next_merge_point(std::vector<std::vector<Point> > hulls, std
     @param points: vector of points the be analysed
     @param parallel_idx: parallelism index determining the amount of parallel computation
 */
-std::vector<Point> chan(std::vector<Point> points, int parallel_idx) {
+std::vector<Point> chan(std::vector<Point> points, int parallel_idx, FileWriter& fileWriter) {
     std::vector<std::vector<Point> > hulls;
     /*
-        TODO The following sode snipped will need to be parallelised using mpi in order to achieve real parallelism.
+        TODO The following sode snipped will need to be parallelized using mpi in order to achieve real parallelism.
     */
+    int hull_count = 0;
+
     for(int idx = 0; idx < parallel_idx; idx++) {
         std::vector<Point> subset;
         for(int point_idx = idx; point_idx < points.size(); point_idx += parallel_idx) {
             subset.push_back(points[point_idx]);
         }
-        hulls.push_back(graham_scan(subset));
+        fileWriter.setGrahamSubsetIdx(idx);
+        hulls.push_back(graham_scan(subset, fileWriter));
     }
     /*
         TODO END
