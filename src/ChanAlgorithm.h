@@ -2,18 +2,20 @@
 
 #include "FileWriter.h"
 
+using namespace std;
+
 class ChanAlgorithm {
 private:
-    FileWriter fileWriter;
 
-private:
-    std::vector<Point> hull_check(std::vector<Point>& points, Point base);
-    std::vector<Point> graham_scan(std::vector<Point>& points);
-    int tangent_idx(std::vector<Point> points, Point base);
-    std::pair<int, int> lowest_point(std::vector<std::vector<Point> > hulls);
-    std::pair<int, int> next_merge_point(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair);
+    Point origin;
+
+    int findTangentIndex(vector<Point> points, Point base);
+    vector<Point> checkHull(vector<Point>& points, Point base, int baseIdx, FileWriter& fileWriter);
+    vector<Point> grahamScan(vector<Point>& points, int subsetIdx);
+    pair<int, int> findLowestPoint(vector<vector<Point> > hulls);
+    pair<int, int> findNextMergePoint(vector<vector<Point> > hulls, pair<int, int> base_pair);
 public:
-    std::vector<Point> chan(std::vector<Point> points, int parallel_idx);
+    vector<Point> run(vector<Point> points, int parallel_idx);
 
 };
 

@@ -3,29 +3,30 @@
  * to a file where the information about left/right
  */
 
-#ifndef DPHPC_PROJECT_FILEWRITER_H
-#define DPHPC_PROJECT_FILEWRITER_H
+#pragma once
 
 #include <string>
 #include <fstream>
+#include <vector>
 
 #include "Point.h"
+
 
 
 class FileWriter {
 
 public:
-    void appendPointToFile(Point& point, int direction) {
-        std::ofstream pointsFile;
-        pointsFile.open(fileName, std::ios_base::app);
-        pointsFile << point.x << "," << point.y << "," << direction << std::endl;
-        pointsFile.close();
+    void writeGrahamStep(int baseIdx, int lastIdx, int secLastIdx, int addedIdx, int removedIdx, int orientation) {
+        using namespace std;
+        ofstream file;
+        file.open(fileName, std::ios_base::app);
+        file << to_string(baseIdx) << "," << to_string(lastIdx) << "," << to_string(secLastIdx) << ","
+             << to_string(addedIdx) << "," << to_string(removedIdx) << "," << to_string(orientation) << endl;
+        file.close();
     }
 
     void updateFileName() {
         fileName = baseName + "_" + std::to_string(grahamSubsetIdx) + ".dat";
-        std::cout << "Writing graham scan subset " << grahamSubsetIdx << " to new file: " << fileName << std::endl;
-
     }
 
     void setBaseName(const char* name) {
@@ -38,12 +39,18 @@ public:
         updateFileName();
     }
 
+    static void writePointsToFile(std::vector<Point> points, const std::string& fileName) {
+        std::ofstream allPointsFile;
+        allPointsFile.open(fileName);
+        for (int i = 0; i < points.size(); i++) {
+            allPointsFile << points[i].x << "," << points[i].y << std::endl;
+        }
+        allPointsFile.close();
+    }
+
 private:
     int grahamSubsetIdx = 0;
     std::string baseName = "";
     std::string fileName = "";
 
 };
-
-
-#endif //DPHPC_PROJECT_FILEWRITER_H

@@ -17,12 +17,53 @@ algorithm contains only collinear points.
 */
 
 #include <iostream>
-#include <cmath>
 #include <vector>
 
 #include "ChanAlgorithm.h"
 #include "utility.h"
 
+
+/**
+    Performs a Graham Scan on input vector of points.
+    Returns a vector of points contained in the convex hull of the input.
+    @param points: vector of points in the graham subset.
+*/
+vector<Point> ChanAlgorithm::grahamScan(vector<Point> &points, int subsetIdx) {
+    FileWriter grahamWriter;
+    grahamWriter.setGrahamSubsetIdx(subsetIdx);
+    grahamWriter.setBaseName("graham_sub");
+    grahamWriter.updateFileName();
+    //grahamWriter.cleanExistingFiles();
+
+    if (points.size() <= 1) {
+        return points;
+    }
+
+    Point startPoint;
+    int bottomLeftPointIdx = findLowestLeftmostPointIndex(points);
+    startPoint = points[bottomLeftPointIdx];
+    swapPoints(points, bottomLeftPointIdx, 0);
+
+    // Sort the points based on polar angles w.r.t. p0
+    qsort(&points[1], points.size() - 1, sizeof(Point), lowestAngleSort);
+    FileWriter::writePointsToFile(points, "all_sorted.dat");
+
+    // Find the hull
+    vector<Point> hull;
+    hull.push_back(startPoint);  // Adding first point to hull.
+
+    // Graham algorithm core
+    for (int idx = 1; idx < points.size(); idx++) {
+        hull = checkHull(hull, points[idx], idx, grahamWriter);
+    }
+
+    // Check closure of hull
+    // hull = checkHull(hull, points[1]);
+    //TODO: Which point to pop
+    // hull.pop_back();
+
+    return hull;
+}
 
 /**
     Finds the clockwise hull of a vector of points. If the base does not lie inside the hull, it is added to the hull.
@@ -31,92 +72,22 @@ algorithm contains only collinear points.
     @param points: vector of points
     @param base: point
 */
-std::vector<Point> ChanAlgorithm::checkHull(std::vector<Point> &points, Point base) {
+vector<Point> ChanAlgorithm::checkHull(vector<Point> &points, Point base, int baseIdx, FileWriter& fileWriter) {
     int last_idx = points.size() - 1;
+
     while (points.size() > 1 && getOrientation(points[last_idx - 1], points[last_idx], base) != ANTICLOCKWISE) {
         points.pop_back();
+        fileWriter.writeGrahamStep(baseIdx, last_idx, last_idx - 1, -1, last_idx, CLOCKWISE);
         last_idx = points.size() - 1;
     }
-    if (points.size() == 0 || points[last_idx] != base) {
+
+    if (points.empty() || points[last_idx] != base) {
+        fileWriter.writeGrahamStep(baseIdx, last_idx, last_idx - 1, baseIdx, -1, ANTICLOCKWISE);
         points.push_back(base);
     }
     return points;
 }
 
-/**
- * Finds the index of the most bottom left point.
- * @param points
- * @return
- */
-int findLowestLeftmostPointIndex(std::vector<Point> &points) {
-    int result = 0;
-    double lowest = points[0].y;
-    for (int idx = 1; idx < points.size(); idx++) {
-        if (points[idx].y < lowest || (points[idx].y == lowest && points[idx].x < points[result].x)) {
-            lowest = points[idx].y;
-            result = idx;
-        }
-    }
-    return result;
-}
-
-void swapPoints(std::vector<Point> &points, int indx1, int indx2) {
-    Point p = points[indx2];
-    points[indx2] = points[indx1];
-    points[indx1] = p;
-}
-
-Point mainPoint;
-
-/**
-    Function used when sorting using qsort().
-    Returns the point with lowest polar angle w.r.t p0(0, 0) and the x-axis.
-    @param vpp1: pointer to first point
-    @param vpp2: pointer to second point
-*/
-int lowestAngleSort(const void *vpp1, const void *vpp2) {
-    Point p0 = mainPoint;
-    Point* pp1 = (Point*) vpp1;
-    Point* pp2 = (Point*) vpp2;
-    int orient = getOrientation(p0, *pp1, *pp2);
-    if(orient == COLLINEAR) {
-        return (getDistance(p0, *pp1) <= getDistance(p0, *pp2))? -1: 1;
-    }
-    return (orient == CLOCKWISE)? 1: -1;
-}
-
-/**
-    Performs a Graham Scan on input vector of points.
-    Returns a vector of points contained in the convex hull of the input.
-    @param points: vector of points
-*/
-std::vector<Point> ChanAlgorithm::graham_scan(std::vector<Point> &points) {
-    if (points.size() <= 1) {
-std::vector<Point> doGrahamScan(std::vector<Point> &points) {
-    if(points.size() <= 1) {
-        return points;
-    }
-
-    int bottomLeftPointIdx = findLowestLeftmostPointIndex(points);
-    mainPoint = points[bottomLeftPointIdx];
-    swapPoints(points, bottomLeftPointIdx, 0);
-
-    // Sort the points based on polar angles w.r.t. p0
-    std::qsort(&points[1], points.size() - 1, sizeof(Point), lowestAngleSort);
-
-    // Find the hull
-    std::vector<Point> hull;
-    hull.push_back(mainPoint);
-    for (int idx = 1; idx < points.size(); idx++) {
-        hull = checkHull(hull, points[idx]);
-    }
-    // Check closure of hull
-   // hull = checkHull(hull, points[1]);
-    //TODO: Which point to pop
-   // hull.pop_back();
-
-    return hull;
-}
 
 
 /**
@@ -126,7 +97,7 @@ std::vector<Point> doGrahamScan(std::vector<Point> &points) {
     @param points: vector of points forming a convex polygon.
     @param base: base point
 */
-int findTangentIndex(std::vector<Point> points, Point base) {
+int ChanAlgorithm::findTangentIndex(vector<Point> points, Point base) {
     int lower_bound = 0;
     int upper_bound = points.size();
 
@@ -174,7 +145,7 @@ int findTangentIndex(std::vector<Point> points, Point base) {
     point is the point with lowest y coordinate across all hulls.
     @param hulls: vector of hulls (vectors of points)
 */
-std::pair<int, int> findLowestPoint(std::vector<std::vector<Point> > hulls) {
+pair<int, int> ChanAlgorithm::findLowestPoint(vector<vector<Point> > hulls) {
     int hull = 0, point = 0;
     double lowest_y = hulls[0][0].y;
     for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
@@ -185,7 +156,7 @@ std::pair<int, int> findLowestPoint(std::vector<std::vector<Point> > hulls) {
             }
         }
     }
-    return std::make_pair(hull, point);
+    return make_pair(hull, point);
 }
 
 
@@ -194,11 +165,11 @@ std::pair<int, int> findLowestPoint(std::vector<std::vector<Point> > hulls) {
     @param hulls: vector of hulls (vectors of points)
     @param base_pair: base point (the last added point from the hull merge)
 */
-std::pair<int, int> findNextMergePoint(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair) {
+pair<int, int> ChanAlgorithm::findNextMergePoint(vector<vector<Point> > hulls, pair<int, int> base_pair) {
     int hull = 0, point = 0;
     Point base = hulls[base_pair.first][base_pair.second];
     // Select next point on the same hull as the next point for the merge
-    std::pair<int, int> result = std::make_pair(base_pair.first,
+    pair<int, int> result = make_pair(base_pair.first,
                                                 (base_pair.second + 1) % hulls[base_pair.first].size());
     for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
         if (hull_idx != base_pair.first) {
@@ -208,7 +179,7 @@ std::pair<int, int> findNextMergePoint(std::vector<std::vector<Point> > hulls, s
             int linearity = getOrientation(base, previous, candidate);
             if(linearity == CLOCKWISE || (linearity == COLLINEAR && getDistance(base, previous) <
                                                                             getDistance(base, candidate))) {
-                result = std::make_pair(hull_idx, candidate_idx);
+                result = make_pair(hull_idx, candidate_idx);
             }
         }
     }
@@ -222,25 +193,26 @@ std::pair<int, int> findNextMergePoint(std::vector<std::vector<Point> > hulls, s
     @param points: vector of points the be analysed
     @param parallel_idx: parallelism index determining the amount of parallel computation
 */
-std::vector<Point> doChan(std::vector<Point> points, int parallel_idx) {
-    std::vector<std::vector<Point> > hulls;
+vector<Point> ChanAlgorithm::run(vector<Point> points, int parallel_idx) {
+    vector<vector<Point> > hulls;
     /*
         TODO The following sode snipped will need to be parallelized using mpi in order to achieve real parallelism.
     */
-    int hull_count = 0;
+    int currentSubsetIdx = 0;
 
     for (int idx = 0; idx < parallel_idx; idx++) {
-        std::vector<Point> subset;
+        vector<Point> subset;
         for (int point_idx = idx; point_idx < points.size(); point_idx += parallel_idx) {
             subset.push_back(points[point_idx]);
         }
-        hulls.push_back(doGrahamScan(subset));
+        hulls.push_back(grahamScan(subset, currentSubsetIdx));
+        currentSubsetIdx++;
     }
     /*
         TODO END
     */
-    std::pair<int, int> next_point = findLowestPoint(hulls);
-    std::vector<Point> result;
+    pair<int, int> next_point = findLowestPoint(hulls);
+    vector<Point> result;
     result.push_back(hulls[next_point.first][next_point.second]);
     do {
         next_point = findNextMergePoint(hulls, next_point);
@@ -249,4 +221,5 @@ std::vector<Point> doChan(std::vector<Point> points, int parallel_idx) {
     result.pop_back();
     return result;
 }
+
 

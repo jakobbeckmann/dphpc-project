@@ -2,8 +2,7 @@
     Point class representing a 2D point and some operators.
  */
 
-#ifndef DPHPC_PROJECT_POINT_H
-#define DPHPC_PROJECT_POINT_H
+#pragma once
 
 #include <cmath>
 #include <iostream>
@@ -36,6 +35,3 @@ public:
         return output;
     }
 };
-
-
-#endif //DPHPC_PROJECT_POINT_H

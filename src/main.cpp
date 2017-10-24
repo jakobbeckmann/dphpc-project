@@ -16,6 +16,10 @@
 int main(int argc, char const *argv[]) {
     int POINT_COUNT = 0, PARALLELISM_IDX = 1, MIN = -10, MAX = 10;
 
+
+    ChanAlgorithm chanAlgo;
+
+
     //TODO: Parallel implementation
     std::cout << "Please enter the parallelism index:" << std::endl;
     std::cin >> PARALLELISM_IDX;
@@ -33,17 +37,16 @@ int main(int argc, char const *argv[]) {
     std::cin >> MAX;
 
     std::vector<Point> points = createPoints(POINT_COUNT, MIN, MAX);
-    writePointsToFile(points, "all_points.dat");
 
     // std::vector<Point> result = doGrahamScan(points);
-    std::vector<Point> result = doChan(points, PARALLELISM_IDX);
+    std::vector<Point> result = chanAlgo.run(points, PARALLELISM_IDX);
     std::cout << "=========Result=========" << std::endl;
     for(Point point: result) {
         std::cout << point << " ";
     }
     std::cout << std::endl;
 
-    writePointsToFile(result, "hull_points.dat");
+    FileWriter::writePointsToFile(result, "hull_points.dat");
 
     return 0;
 }
