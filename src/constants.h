@@ -10,4 +10,7 @@ const int CLOCKWISE = -1;
 const int ANTICLOCKWISE = 1;
 const int COLLINEAR = 0;
 
+const int REMOVE = -1;
+const int ADD = 1;
+
 #endif //DPHPC_PROJECT_CONSTANTS_H

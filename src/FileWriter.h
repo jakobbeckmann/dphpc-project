@@ -25,6 +25,17 @@ public:
         file.close();
     }
 
+    void writeGraham(Point last, Point secLast, Point base, int orientation) {
+        using namespace std;
+        ofstream file;
+        file.open(fileName, std::ios_base::app);
+        file << last.x << "," << secLast.x << "," << base.x << ","
+             << last.y << "," << secLast.y << "," << base.y << ","
+             << orientation << endl;
+
+        file.close();
+    }
+
     void updateFileName() {
         fileName = baseName + "_" + std::to_string(grahamSubsetIdx) + ".dat";
     }

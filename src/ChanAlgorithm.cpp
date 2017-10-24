@@ -54,7 +54,7 @@ vector<Point> ChanAlgorithm::grahamScan(vector<Point> &points, int subsetIdx) {
 
     // Graham algorithm core
     for (int idx = 1; idx < points.size(); idx++) {
-        hull = checkHull(hull, points[idx], idx, grahamWriter);
+        hull = checkHull(hull, points[idx], grahamWriter);
     }
 
     // Check closure of hull
@@ -72,20 +72,26 @@ vector<Point> ChanAlgorithm::grahamScan(vector<Point> &points, int subsetIdx) {
     @param points: vector of points
     @param base: point
 */
-vector<Point> ChanAlgorithm::checkHull(vector<Point> &points, Point base, int baseIdx, FileWriter& fileWriter) {
-    int last_idx = points.size() - 1;
+vector<Point> ChanAlgorithm::checkHull(vector<Point> &hull_points, Point base, FileWriter& fileWriter) {
+    int last_idx = hull_points.size() - 1;
 
-    while (points.size() > 1 && getOrientation(points[last_idx - 1], points[last_idx], base) != ANTICLOCKWISE) {
-        points.pop_back();
-        fileWriter.writeGrahamStep(baseIdx, last_idx, last_idx - 1, -1, last_idx, CLOCKWISE);
-        last_idx = points.size() - 1;
+    while (hull_points.size() > 1 && getOrientation(hull_points[last_idx - 1], hull_points[last_idx], base) != ANTICLOCKWISE) {
+
+        fileWriter.writeGraham(hull_points[last_idx-1], hull_points[last_idx], base, CLOCKWISE);
+
+
+        hull_points.pop_back();
+        last_idx = hull_points.size() - 1;
+
+        fileWriter.writeGraham(hull_points[last_idx-1], hull_points[last_idx], base, CLOCKWISE);
+
     }
 
-    if (points.empty() || points[last_idx] != base) {
-        fileWriter.writeGrahamStep(baseIdx, last_idx, last_idx - 1, baseIdx, -1, ANTICLOCKWISE);
-        points.push_back(base);
+    if (hull_points.empty() || hull_points[last_idx] != base) {
+        fileWriter.writeGraham(hull_points[last_idx-1], hull_points[last_idx], base, ANTICLOCKWISE);
+        hull_points.push_back(base);
     }
-    return points;
+    return hull_points;
 }
 
 

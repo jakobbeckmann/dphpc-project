@@ -5,6 +5,7 @@ Loads data output from the C++ output files into python dictionary for easy acce
 import numpy as np
 from os.path import join as join_paths
 from glob import glob
+import pandas as pd
 
 
 class DataLoader:
@@ -25,7 +26,7 @@ class DataLoader:
 
         graham_dict = {}
         for idx, graham_file in enumerate(graham_sub_files):
-            graham_dict[idx] = self.load_csv_file(graham_file.format(idx)).astype(int)
+            graham_dict[idx] = self.load_csv_file(graham_file.format(idx), skip_rows=1)
 
         return graham_dict
 
@@ -40,8 +41,8 @@ class DataLoader:
         return all_data_dict
 
     @staticmethod
-    def load_csv_file(file_path):
-        return np.loadtxt(file_path, delimiter=',')
+    def load_csv_file(file_path, skip_rows=0):
+        return pd.read_csv(file_path, skiprows=skip_rows).as_matrix()
 
 if __name__ == '__main__':
     loader = DataLoader('C:\Users\mathee\CLionProjects\dphpc-project\cmake-build-debug')
