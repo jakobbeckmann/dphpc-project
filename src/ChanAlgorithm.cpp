@@ -4,10 +4,10 @@ chan2d.cpp
 
 @Description: 2D implementation of Chan's algorithm. Note that we do not consider a point to be part of the hull if it
 is the middle point of 3 collinear points. Hence no three points in a hull (either global or local/Graham) will ever
-be collinear.  The reason for this design choice is that colinear points only add computation for hull mergers.
-They do output a different polygon but the shape of this output and the one with all collinear points is exacly
+be collinear.  The reason for this design choice is that collinear points only add computation for hull mergers.
+They do output a different polygon but the shape of this output and the one with all collinear points is exactly
 the same.
-Note that this adds the restrinction that we require the level of parallelism to be less than a third of the points.
+Note that this adds the restriction that we require the level of parallelism to be less than a third of the points.
 Otherwise at least one subset of the points being analysed by Graham's algorithm will of size 2 and as we do not consider
 collinear points to be part of hulls, Graham's scan returns an empty hull.
 By extension we assume that the points have general position and hence no subset of points being analysed by Graham's
@@ -31,9 +31,9 @@ algorithm contains only collinear points.
     @param points: vector of points
     @param base: point
 */
-std::vector<Point> ChanAlgorithm::hull_check(std::vector<Point> &points, Point base) {
+std::vector<Point> ChanAlgorithm::checkHull(std::vector<Point> &points, Point base) {
     int last_idx = points.size() - 1;
-    while (points.size() > 1 && orientation(points[last_idx - 1], points[last_idx], base) != LEFT_TURN) {
+    while (points.size() > 1 && getOrientation(points[last_idx - 1], points[last_idx], base) != ANTICLOCKWISE) {
         points.pop_back();
         last_idx = points.size() - 1;
     }
@@ -43,6 +43,47 @@ std::vector<Point> ChanAlgorithm::hull_check(std::vector<Point> &points, Point b
     return points;
 }
 
+/**
+ * Finds the index of the most bottom left point.
+ * @param points
+ * @return
+ */
+int findLowestLeftmostPointIndex(std::vector<Point> &points) {
+    int result = 0;
+    double lowest = points[0].y;
+    for (int idx = 1; idx < points.size(); idx++) {
+        if (points[idx].y < lowest || (points[idx].y == lowest && points[idx].x < points[result].x)) {
+            lowest = points[idx].y;
+            result = idx;
+        }
+    }
+    return result;
+}
+
+void swapPoints(std::vector<Point> &points, int indx1, int indx2) {
+    Point p = points[indx2];
+    points[indx2] = points[indx1];
+    points[indx1] = p;
+}
+
+Point mainPoint;
+
+/**
+    Function used when sorting using qsort().
+    Returns the point with lowest polar angle w.r.t p0(0, 0) and the x-axis.
+    @param vpp1: pointer to first point
+    @param vpp2: pointer to second point
+*/
+int lowestAngleSort(const void *vpp1, const void *vpp2) {
+    Point p0 = mainPoint;
+    Point* pp1 = (Point*) vpp1;
+    Point* pp2 = (Point*) vpp2;
+    int orient = getOrientation(p0, *pp1, *pp2);
+    if(orient == COLLINEAR) {
+        return (getDistance(p0, *pp1) <= getDistance(p0, *pp2))? -1: 1;
+    }
+    return (orient == CLOCKWISE)? 1: -1;
+}
 
 /**
     Performs a Graham Scan on input vector of points.
@@ -51,20 +92,28 @@ std::vector<Point> ChanAlgorithm::hull_check(std::vector<Point> &points, Point b
 */
 std::vector<Point> ChanAlgorithm::graham_scan(std::vector<Point> &points) {
     if (points.size() <= 1) {
+std::vector<Point> doGrahamScan(std::vector<Point> &points) {
+    if(points.size() <= 1) {
         return points;
     }
+
+    int bottomLeftPointIdx = findLowestLeftmostPointIndex(points);
+    mainPoint = points[bottomLeftPointIdx];
+    swapPoints(points, bottomLeftPointIdx, 0);
+
     // Sort the points based on polar angles w.r.t. p0
-    std::qsort(&points[0], points.size(), sizeof(Point), check_orientation);
+    std::qsort(&points[1], points.size() - 1, sizeof(Point), lowestAngleSort);
 
     // Find the hull
     std::vector<Point> hull;
-    for (int idx = 0; idx < points.size(); idx++) {
-        hull = hull_check(hull, points[idx]);
+    hull.push_back(mainPoint);
+    for (int idx = 1; idx < points.size(); idx++) {
+        hull = checkHull(hull, points[idx]);
     }
     // Check closure of hull
-    hull = hull_check(hull, points[1]);
+   // hull = checkHull(hull, points[1]);
     //TODO: Which point to pop
-    hull.pop_back();
+   // hull.pop_back();
 
     return hull;
 }
@@ -77,16 +126,16 @@ std::vector<Point> ChanAlgorithm::graham_scan(std::vector<Point> &points) {
     @param points: vector of points forming a convex polygon.
     @param base: base point
 */
-int ChanAlgorithm::tangent_idx(std::vector<Point> points, Point base) {
+int findTangentIndex(std::vector<Point> points, Point base) {
     int lower_bound = 0;
     int upper_bound = points.size();
 
-    // Find orientation of turns for points right before and after the lower bound.
-    int lb_turn_before = orientation(base, points[0], points[points.size() - 1]);
-    int lb_turn_after = orientation(base, points[0], points[1]);
+    // Find getOrientation of turns for points right before and after the lower bound.
+    int lb_turn_before = getOrientation(base, points[0], points[points.size() - 1]);
+    int lb_turn_after = getOrientation(base, points[0], points[1]);
 
     // Check if first point is the point lying to the right of all other points.
-    if (lb_turn_before != RIGHT_TURN && lb_turn_after == LEFT_TURN) {
+    if (lb_turn_before != CLOCKWISE && lb_turn_after == ANTICLOCKWISE) {
         return 0;
     }
 
@@ -96,25 +145,25 @@ int ChanAlgorithm::tangent_idx(std::vector<Point> points, Point base) {
         int mid = (upper_bound + lower_bound) / 2;
 
         // Compute its turns.
-        int mid_turn_before = orientation(base, points[mid], points[(mid - 1) % points.size()]);
-        int mid_turn_after = orientation(base, points[mid], points[(mid + 1) % points.size()]);
+        int mid_turn_before = getOrientation(base, points[mid], points[(mid - 1) % points.size()]);
+        int mid_turn_after = getOrientation(base, points[mid], points[(mid + 1) % points.size()]);
 
         // Check in which direction the next cut should be based on the position relative to
         // the lower_bound point.
-        int cut_direction = orientation(base, points[lower_bound], points[mid]);
+        int cut_direction = getOrientation(base, points[lower_bound], points[mid]);
 
-        if (mid_turn_before != RIGHT_TURN && mid_turn_after == LEFT_TURN) {
+        if (mid_turn_before != CLOCKWISE && mid_turn_after == ANTICLOCKWISE) {
             // All points lie to the right of 'mid'
             return mid;
-        } else if ((cut_direction != RIGHT_TURN && lb_turn_after != LEFT_TURN) ||
-                   (cut_direction == RIGHT_TURN && mid_turn_before == RIGHT_TURN)) {
+        } else if ((cut_direction != CLOCKWISE && lb_turn_after != ANTICLOCKWISE) ||
+                   (cut_direction == CLOCKWISE && mid_turn_before == CLOCKWISE)) {
             // The leftmost point lies to the right of the cut (line between 'lower_bound' and 'mid')
             upper_bound = mid;
         } else {
             // The leftmost point lies to the left of the cut.
             lower_bound = mid + 1;
         }
-        lb_turn_after = orientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
+        lb_turn_after = getOrientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
     }
     return lower_bound;
 }
@@ -125,7 +174,7 @@ int ChanAlgorithm::tangent_idx(std::vector<Point> points, Point base) {
     point is the point with lowest y coordinate across all hulls.
     @param hulls: vector of hulls (vectors of points)
 */
-std::pair<int, int> ChanAlgorithm::lowest_point(std::vector<std::vector<Point> > hulls) {
+std::pair<int, int> findLowestPoint(std::vector<std::vector<Point> > hulls) {
     int hull = 0, point = 0;
     double lowest_y = hulls[0][0].y;
     for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
@@ -145,7 +194,7 @@ std::pair<int, int> ChanAlgorithm::lowest_point(std::vector<std::vector<Point> >
     @param hulls: vector of hulls (vectors of points)
     @param base_pair: base point (the last added point from the hull merge)
 */
-std::pair<int, int> ChanAlgorithm::next_merge_point(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair) {
+std::pair<int, int> findNextMergePoint(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair) {
     int hull = 0, point = 0;
     Point base = hulls[base_pair.first][base_pair.second];
     // Select next point on the same hull as the next point for the merge
@@ -153,12 +202,12 @@ std::pair<int, int> ChanAlgorithm::next_merge_point(std::vector<std::vector<Poin
                                                 (base_pair.second + 1) % hulls[base_pair.first].size());
     for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
         if (hull_idx != base_pair.first) {
-            int candidate_idx = tangent_idx(hulls[hull_idx], base);
+            int candidate_idx = findTangentIndex(hulls[hull_idx], base);
             Point previous = hulls[result.first][result.second];
             Point candidate = hulls[hull_idx][candidate_idx];
-            int linearity = orientation(base, previous, candidate);
-            if (linearity == RIGHT_TURN || (linearity == COLLINEAR && dist_square(base, previous) <
-                                                                      dist_square(base, candidate))) {
+            int linearity = getOrientation(base, previous, candidate);
+            if(linearity == CLOCKWISE || (linearity == COLLINEAR && getDistance(base, previous) <
+                                                                            getDistance(base, candidate))) {
                 result = std::make_pair(hull_idx, candidate_idx);
             }
         }
@@ -173,7 +222,7 @@ std::pair<int, int> ChanAlgorithm::next_merge_point(std::vector<std::vector<Poin
     @param points: vector of points the be analysed
     @param parallel_idx: parallelism index determining the amount of parallel computation
 */
-std::vector<Point> ChanAlgorithm::chan(std::vector<Point> points, int parallel_idx) {
+std::vector<Point> doChan(std::vector<Point> points, int parallel_idx) {
     std::vector<std::vector<Point> > hulls;
     /*
         TODO The following sode snipped will need to be parallelized using mpi in order to achieve real parallelism.
@@ -185,16 +234,16 @@ std::vector<Point> ChanAlgorithm::chan(std::vector<Point> points, int parallel_i
         for (int point_idx = idx; point_idx < points.size(); point_idx += parallel_idx) {
             subset.push_back(points[point_idx]);
         }
-        hulls.push_back(graham_scan(subset));
+        hulls.push_back(doGrahamScan(subset));
     }
     /*
         TODO END
     */
-    std::pair<int, int> next_point = lowest_point(hulls);
+    std::pair<int, int> next_point = findLowestPoint(hulls);
     std::vector<Point> result;
     result.push_back(hulls[next_point.first][next_point.second]);
     do {
-        next_point = next_merge_point(hulls, next_point);
+        next_point = findNextMergePoint(hulls, next_point);
         result.push_back(hulls[next_point.first][next_point.second]);
     } while (result[0] != result[result.size() - 1]);
     result.pop_back();

@@ -6,8 +6,8 @@
 
 #include "Point.h"
 
-int orientation(Point p1, Point p2, Point p3);
-double dist_square(Point p1, Point p2);
-int check_orientation(const void *vpp1, const void *vpp2);
-std::vector<Point> createPoints(double pointCount);
-void pointsVectorToFile(std::vector<Point>, std::string fileName);
+int getOrientation(Point p1, Point p2, Point p3);
+double getDistance(Point p1, Point p2);
+int lowestAngleSort(const void *vpp1, const void *vpp2);
+std::vector<Point> createPoints(int count, double min, double max);
+void writePointsToFile(std::vector<Point>, std::string fileName);
