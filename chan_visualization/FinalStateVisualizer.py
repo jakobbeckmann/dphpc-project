@@ -1,30 +1,35 @@
-import os
+"""
+Get a quick look on the final output of Chan's Algorithm.
+"""
+
 import numpy as np
-# import matplotlib as mpl
 import matplotlib.pyplot as plt
-import itertools
+import os
 
 
-class Chan2DVisualizer:
+class FinalStateVisualizer:
 
     def __init__(self, all_points_file, hull_points_file):
         self.all_points = self.__class__.load_csv_file(all_points_file)
         self.hull_points = self.__class__.load_csv_file(hull_points_file)
 
-    def plot_points(self):
+    def plot_points(self, show_axis):
         fig, ax = plt.subplots()
         fig.set_size_inches(7, 7)
 
-        ax.scatter(self.all_points[0], self.all_points[1], s=10, c='red', alpha=0.7)
-        ax.scatter(self.hull_points[0], self.hull_points[1], s=20, c='blue')
+        ax.scatter(self.all_points[0], self.all_points[1], s=30, c='red', alpha=0.8, edgecolors='none')
+        ax.scatter(self.hull_points[0], self.hull_points[1], s=150, c='cyan', alpha=0.5, edgecolors='none')
+        ax.plot(self.hull_points[0], self.hull_points[1], 'c-')
+        ax.plot([self.hull_points[0][0], self.hull_points[0][-1]],
+                [self.hull_points[1][0], self.hull_points[1][-1]], 'c-')
+
+        if not show_axis:
+            ax.axis('off')
 
         '''for axis in [ax.get_xaxis(), ax.get_yaxis()]:
             axis.set_ticks([])'''
 
         plt.show()
-
-    def start_animation(self):
-        pass
 
     @staticmethod
     def load_csv_file(chan_data_file):
@@ -36,11 +41,11 @@ class Chan2DVisualizer:
 
 def main():
     data_base_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'cmake-build-debug')
-    all_points_file = os.path.join(data_base_path, 'all_points.dat')
+    all_points_file = os.path.join(data_base_path, 'all_sorted.dat')
     hull_points_file = os.path.join(data_base_path, 'hull_points.dat')
 
-    chan_visualizer = Chan2DVisualizer(all_points_file, hull_points_file)
-    chan_visualizer.plot_points()
+    chan_visualizer = FinalStateVisualizer(all_points_file, hull_points_file)
+    chan_visualizer.plot_points(show_axis=False)
 
 if __name__ == '__main__':
 
