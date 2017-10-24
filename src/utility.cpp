@@ -72,7 +72,7 @@ std::vector<Point> createPoints(int count, double min, double max) {
  * @param points
  * @param fileName
  */
-void writePointsToFile(std::vector<Point> points, std::string fileName) {
+void writePointsToFile(const std::vector<Point>& points, const std::string& fileName) {
     std::ofstream allPointsFile;
     allPointsFile.open(fileName);
     for (Point point : points) {
