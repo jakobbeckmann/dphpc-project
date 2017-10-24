@@ -192,7 +192,6 @@ std::pair<int, int> findLowestPoint(const std::vector<std::vector<Point> >& hull
     @param base_pair: base point (the last added point from the hull merge)
 */
 std::pair<int, int> findNextMergePoint(const std::vector<std::vector<Point> >& hulls, std::pair<int, int> base_pair) {
-    int hull = 0, point = 0;
     Point base = hulls[base_pair.first][base_pair.second];
     // Select next point on the same hull as the next point for the merge
     std::pair<int, int> result = std::make_pair(base_pair.first, (base_pair.second + 1) % hulls[base_pair.first].size());
