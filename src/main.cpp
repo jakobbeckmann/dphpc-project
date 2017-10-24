@@ -9,7 +9,7 @@
 
 #include "Point.h"
 #include "utility.h"
-#include "chan2d.h"
+#include "ChanAlgorithm.h"
 
 
 
@@ -21,6 +21,7 @@ int main(int argc, char const *argv[]) {
     fileWriter.updateFileName();
 
 
+    ChanAlgorithm chanAlgo;
     //TODO: Parallel implementation
     /*
     std::cout << "Please enter the parallelism index:" << std::endl;
@@ -39,7 +40,7 @@ int main(int argc, char const *argv[]) {
     pointsVectorToFile(points, "all_points.dat");
 
     // std::vector<Point> result = graham_scan(points);
-    std::vector<Point> result = chan(points, PARALLELISM_IDX, fileWriter);
+    std::vector<Point> result = chanAlgo.chan(points, PARALLELISM_IDX);
     std::cout << "=========Result=========" << std::endl;
     for(Point point: result) {
         std::cout << point << " ";

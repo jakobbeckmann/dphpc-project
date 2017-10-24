@@ -20,7 +20,7 @@ algorithm contains only collinear points.
 #include <cmath>
 #include <vector>
 
-#include "chan2d.h"
+#include "ChanAlgorithm.h"
 #include "utility.h"
 
 
@@ -31,16 +31,14 @@ algorithm contains only collinear points.
     @param points: vector of points
     @param base: point
 */
-std::vector<Point> hull_check(std::vector<Point>& points, Point base, FileWriter& fileWriter) {
+std::vector<Point> ChanAlgorithm::hull_check(std::vector<Point> &points, Point base) {
     int last_idx = points.size() - 1;
-    while(points.size() > 1 && orientation(points[last_idx - 1], points[last_idx], base) != LEFT_TURN) {
-        fileWriter.appendPointToFile(points[last_idx], RIGHT_TURN);
+    while (points.size() > 1 && orientation(points[last_idx - 1], points[last_idx], base) != LEFT_TURN) {
         points.pop_back();
         last_idx = points.size() - 1;
     }
-    if(points.size() == 0 || points[last_idx] != base) {
+    if (points.size() == 0 || points[last_idx] != base) {
         points.push_back(base);
-        fileWriter.appendPointToFile(base, LEFT_TURN);
     }
     return points;
 }
@@ -51,8 +49,8 @@ std::vector<Point> hull_check(std::vector<Point>& points, Point base, FileWriter
     Returns a vector of points contained in the convex hull of the input.
     @param points: vector of points
 */
-std::vector<Point> graham_scan(std::vector<Point>& points, FileWriter& fileWriter) {
-    if(points.size() <= 1) {
+std::vector<Point> ChanAlgorithm::graham_scan(std::vector<Point> &points) {
+    if (points.size() <= 1) {
         return points;
     }
     // Sort the points based on polar angles w.r.t. p0
@@ -60,11 +58,11 @@ std::vector<Point> graham_scan(std::vector<Point>& points, FileWriter& fileWrite
 
     // Find the hull
     std::vector<Point> hull;
-    for(int idx = 0; idx < points.size(); idx++) {
-        hull = hull_check(hull, points[idx], fileWriter);
+    for (int idx = 0; idx < points.size(); idx++) {
+        hull = hull_check(hull, points[idx]);
     }
     // Check closure of hull
-    hull = hull_check(hull, points[1], fileWriter);
+    hull = hull_check(hull, points[1]);
     //TODO: Which point to pop
     hull.pop_back();
 
@@ -79,7 +77,7 @@ std::vector<Point> graham_scan(std::vector<Point>& points, FileWriter& fileWrite
     @param points: vector of points forming a convex polygon.
     @param base: base point
 */
-int tangent_idx(std::vector<Point> points, Point base) {
+int ChanAlgorithm::tangent_idx(std::vector<Point> points, Point base) {
     int lower_bound = 0;
     int upper_bound = points.size();
 
@@ -88,12 +86,12 @@ int tangent_idx(std::vector<Point> points, Point base) {
     int lb_turn_after = orientation(base, points[0], points[1]);
 
     // Check if first point is the point lying to the right of all other points.
-    if(lb_turn_before != RIGHT_TURN && lb_turn_after == LEFT_TURN) {
+    if (lb_turn_before != RIGHT_TURN && lb_turn_after == LEFT_TURN) {
         return 0;
     }
 
     // First point is not the right most point.
-    while(lower_bound < upper_bound) {
+    while (lower_bound < upper_bound) {
         // Find index of point in between the two bounds.
         int mid = (upper_bound + lower_bound) / 2;
 
@@ -105,11 +103,11 @@ int tangent_idx(std::vector<Point> points, Point base) {
         // the lower_bound point.
         int cut_direction = orientation(base, points[lower_bound], points[mid]);
 
-        if(mid_turn_before != RIGHT_TURN && mid_turn_after == LEFT_TURN) {
+        if (mid_turn_before != RIGHT_TURN && mid_turn_after == LEFT_TURN) {
             // All points lie to the right of 'mid'
             return mid;
-        } else if((cut_direction != RIGHT_TURN && lb_turn_after != LEFT_TURN) ||
-                  (cut_direction == RIGHT_TURN && mid_turn_before == RIGHT_TURN)) {
+        } else if ((cut_direction != RIGHT_TURN && lb_turn_after != LEFT_TURN) ||
+                   (cut_direction == RIGHT_TURN && mid_turn_before == RIGHT_TURN)) {
             // The leftmost point lies to the right of the cut (line between 'lower_bound' and 'mid')
             upper_bound = mid;
         } else {
@@ -127,12 +125,12 @@ int tangent_idx(std::vector<Point> points, Point base) {
     point is the point with lowest y coordinate across all hulls.
     @param hulls: vector of hulls (vectors of points)
 */
-std::pair<int, int> lowest_point(std::vector<std::vector<Point> > hulls) {
+std::pair<int, int> ChanAlgorithm::lowest_point(std::vector<std::vector<Point> > hulls) {
     int hull = 0, point = 0;
     double lowest_y = hulls[0][0].y;
-    for(int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
-        for(int point_idx = 0; point_idx < hulls[hull_idx].size(); point_idx++) {
-            if(hulls[hull_idx][point_idx].y < lowest_y) {
+    for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
+        for (int point_idx = 0; point_idx < hulls[hull_idx].size(); point_idx++) {
+            if (hulls[hull_idx][point_idx].y < lowest_y) {
                 hull = hull_idx;
                 point = point_idx;
             }
@@ -147,19 +145,20 @@ std::pair<int, int> lowest_point(std::vector<std::vector<Point> > hulls) {
     @param hulls: vector of hulls (vectors of points)
     @param base_pair: base point (the last added point from the hull merge)
 */
-std::pair<int, int> next_merge_point(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair) {
+std::pair<int, int> ChanAlgorithm::next_merge_point(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair) {
     int hull = 0, point = 0;
     Point base = hulls[base_pair.first][base_pair.second];
     // Select next point on the same hull as the next point for the merge
-    std::pair<int, int> result = std::make_pair(base_pair.first, (base_pair.second + 1) % hulls[base_pair.first].size());
-    for(int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
-        if(hull_idx != base_pair.first) {
+    std::pair<int, int> result = std::make_pair(base_pair.first,
+                                                (base_pair.second + 1) % hulls[base_pair.first].size());
+    for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
+        if (hull_idx != base_pair.first) {
             int candidate_idx = tangent_idx(hulls[hull_idx], base);
             Point previous = hulls[result.first][result.second];
             Point candidate = hulls[hull_idx][candidate_idx];
             int linearity = orientation(base, previous, candidate);
-            if(linearity == RIGHT_TURN || (linearity == COLLINEAR && dist_square(base, previous) <
-                                                                             dist_square(base, candidate))) {
+            if (linearity == RIGHT_TURN || (linearity == COLLINEAR && dist_square(base, previous) <
+                                                                      dist_square(base, candidate))) {
                 result = std::make_pair(hull_idx, candidate_idx);
             }
         }
@@ -168,27 +167,25 @@ std::pair<int, int> next_merge_point(std::vector<std::vector<Point> > hulls, std
 }
 
 
-
 /**
     Returns the 2D convex hull of the points given in the argument. The parallelism index determines how many subsets of
     points should be analysed in parallel using Graham's scan.
     @param points: vector of points the be analysed
     @param parallel_idx: parallelism index determining the amount of parallel computation
 */
-std::vector<Point> chan(std::vector<Point> points, int parallel_idx, FileWriter& fileWriter) {
+std::vector<Point> ChanAlgorithm::chan(std::vector<Point> points, int parallel_idx) {
     std::vector<std::vector<Point> > hulls;
     /*
         TODO The following sode snipped will need to be parallelized using mpi in order to achieve real parallelism.
     */
     int hull_count = 0;
 
-    for(int idx = 0; idx < parallel_idx; idx++) {
+    for (int idx = 0; idx < parallel_idx; idx++) {
         std::vector<Point> subset;
-        for(int point_idx = idx; point_idx < points.size(); point_idx += parallel_idx) {
+        for (int point_idx = idx; point_idx < points.size(); point_idx += parallel_idx) {
             subset.push_back(points[point_idx]);
         }
-        fileWriter.setGrahamSubsetIdx(idx);
-        hulls.push_back(graham_scan(subset, fileWriter));
+        hulls.push_back(graham_scan(subset));
     }
     /*
         TODO END
@@ -199,9 +196,8 @@ std::vector<Point> chan(std::vector<Point> points, int parallel_idx, FileWriter&
     do {
         next_point = next_merge_point(hulls, next_point);
         result.push_back(hulls[next_point.first][next_point.second]);
-    } while(result[0] != result[result.size() - 1]);
+    } while (result[0] != result[result.size() - 1]);
     result.pop_back();
     return result;
 }
-
 
