@@ -50,11 +50,37 @@ vector<Point> ChanAlgorithm::grahamScan(vector<Point> &points, int subsetIdx) {
 
     // Find the hull
     vector<Point> hull;
+    vector<int> idxStack;
+
     hull.push_back(startPoint);  // Adding first point to hull.
+    idxStack.push_back(0);
 
     // Graham algorithm core
     for (int idx = 1; idx < points.size(); idx++) {
         hull = checkHull(hull, points[idx], grahamWriter);
+
+        Point base = points[idx];
+        int last_idx = hull.size() - 1;
+
+        while (hull.size() > 1 && getOrientation(hull[last_idx - 1], hull[last_idx], base) != ANTICLOCKWISE) {
+
+            grahamWriter.writeGraham(hull[last_idx-1], hull[last_idx], base, 0, hull[last_idx], CLOCKWISE);
+
+
+            hull.pop_back();
+            idxStack.pop_back();
+
+            last_idx = hull.size() - 1;
+
+        }
+
+        if (hull.empty() || hull[last_idx] != base) {
+            grahamWriter.writeGraham(hull[last_idx-1], hull[last_idx], base, 1, base, ANTICLOCKWISE);
+            hull.push_back(base);
+            idxStack.push_back(idx);
+        }
+
+
     }
 
     // Check closure of hull
@@ -65,6 +91,7 @@ vector<Point> ChanAlgorithm::grahamScan(vector<Point> &points, int subsetIdx) {
     return hull;
 }
 
+
 /**
     Finds the clockwise hull of a vector of points. If the base does not lie inside the hull, it is added to the hull.
     In essence, this extends the hull by the base point and corrects it for convexity.
@@ -72,29 +99,28 @@ vector<Point> ChanAlgorithm::grahamScan(vector<Point> &points, int subsetIdx) {
     @param points: vector of points
     @param base: point
 */
+/*
 vector<Point> ChanAlgorithm::checkHull(vector<Point> &hull_points, Point base, FileWriter& fileWriter) {
     int last_idx = hull_points.size() - 1;
 
     while (hull_points.size() > 1 && getOrientation(hull_points[last_idx - 1], hull_points[last_idx], base) != ANTICLOCKWISE) {
 
-        fileWriter.writeGraham(hull_points[last_idx-1], hull_points[last_idx], base, CLOCKWISE);
+        fileWriter.writeGraham(hull_points[last_idx-1], hull_points[last_idx], base, 0, hull_points[last_idx], CLOCKWISE);
 
 
         hull_points.pop_back();
         last_idx = hull_points.size() - 1;
 
-        fileWriter.writeGraham(hull_points[last_idx-1], hull_points[last_idx], base, CLOCKWISE);
-
     }
 
     if (hull_points.empty() || hull_points[last_idx] != base) {
-        fileWriter.writeGraham(hull_points[last_idx-1], hull_points[last_idx], base, ANTICLOCKWISE);
+        fileWriter.writeGraham(hull_points[last_idx-1], hull_points[last_idx], base, 1, base, ANTICLOCKWISE);
         hull_points.push_back(base);
     }
     return hull_points;
 }
 
-
+*/
 
 /**
     Returns the index of the point in the list that sits such that each other point

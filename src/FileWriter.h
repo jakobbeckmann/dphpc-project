@@ -25,13 +25,13 @@ public:
         file.close();
     }
 
-    void writeGraham(Point last, Point secLast, Point base, int orientation) {
+    void writeGraham(Point last, Point secLast, Point base, int addRemove, Point addRemPoint, int orientation) {
         using namespace std;
         ofstream file;
         file.open(fileName, std::ios_base::app);
         file << last.x << "," << secLast.x << "," << base.x << ","
              << last.y << "," << secLast.y << "," << base.y << ","
-             << orientation << endl;
+             << addRemove << "," << addRemPoint.x << "," << addRemPoint.y << "," << orientation << endl;
 
         file.close();
     }

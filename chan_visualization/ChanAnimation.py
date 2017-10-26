@@ -20,7 +20,7 @@ class ChanAnimation:
         # TODO: For multiple graham runs
         self.graham_run = data_dict['graham_runs'][0]
 
-        self.current_hull_points = [0]  # indices
+        self.current_hull_points = {'x': [], 'y': []}  # indices
         self.state = []          # base, last, last-1 indices
         self.current_orientation = None
         self.color_orientation = {'clockwise': 'black', 'anticlockwise': 'green'}
@@ -29,24 +29,27 @@ class ChanAnimation:
 
     def update_state(self, step):
 
-        self.state = self.graham_run[step][:7]
+        self.state = self.graham_run[step][:6]
         for idx, item in enumerate(self.state):
             if item < 0:
                 self.state[idx] = 0
 
-        """
-        added = self.graham_run[step][3]
-        if added != -1:
-            self.current_hull_points.append(added)
-            print 'added ', added
-        
-        removed = self.graham_run[step][4]
-        if removed != -1:
-            print 'removed ', removed
-            self.current_hull_points.remove(removed)
-        """
-        orientation = self.graham_run[step][6]
-        print orientation
+        add_point = self.graham_run[step][6]
+
+        add_rem_x = self.graham_run[step][7]
+        add_rem_y = self.graham_run[step][8]
+
+        print 'add point', add_point
+        if add_point:
+            self.current_hull_points['x'].append(add_rem_x)
+            self.current_hull_points['y'].append(add_rem_y)
+            print 'add'
+        else:
+            print 'remove', add_rem_x, add_rem_y
+            self.current_hull_points['x'].remove(add_rem_x)
+            self.current_hull_points['y'].remove(add_rem_y)
+
+        orientation = self.graham_run[step][9]
         if orientation == -1:
             self.current_orientation = 'clockwise'
         elif orientation == 1:
@@ -59,14 +62,14 @@ class ChanAnimation:
         return x, y
 
     def get_hull_lines_pos(self):
-        x = [self.all_points['x'][idx] for idx in self.current_hull_points]
-        y = [self.all_points['y'][idx] for idx in self.current_hull_points]
+        x = self.current_hull_points['x']
+        y = self.current_hull_points['y']
         return x, y
 
     def plot_all_points(self, axes):
         # TODO: animation of quick sort, means adding points one after the other
-        axes.scatter(self.all_points['x'], self.all_points['y'], s=300, c='red', alpha=0.8, edgecolors='none')
-        axes.scatter(self.hull_points['x'], self.hull_points['y'], s=300, c='magenta', alpha=0.8, edgecolors='none')
+        axes.scatter(self.all_points['x'], self.all_points['y'], s=100, c='red', alpha=0.8, edgecolors='none')
+        axes.scatter(self.hull_points['x'], self.hull_points['y'], s=100, c='magenta', alpha=0.8, edgecolors='none')
         axes.plot(self.hull_points['x'], self.hull_points['y'], c='magenta', alpha=0.8, linewidth=0.4)
         axes.plot([self.hull_points['x'][0], self.hull_points['x'][-1]],
                   [self.hull_points['y'][0], self.hull_points['y'][-1]], c='magenta', alpha=0.8, linewidth=0.4)
@@ -103,18 +106,16 @@ def init():
 
 def animate(step):
     global visualizer
-    print 'step ', 0
-    print 'state ', visualizer.state
 
     visualizer.update_state(step)
     two_lines.set_data(*visualizer.get_two_lines_pos())
     two_lines.set_color(visualizer.color_orientation[visualizer.current_orientation])
-    #hull_lines.set_data(*visualizer.get_hull_lines_pos())
+    hull_lines.set_data(*visualizer.get_hull_lines_pos())
     return two_lines, hull_lines
 
 
 ani = animation.FuncAnimation(fig, animate, frames=visualizer.n_steps,
-                              interval=500, blit=True, init_func=init)
+                              interval=50, blit=True, init_func=init)
 
 #ani.save('animation.mp4', fps=30)
 plt.show()
