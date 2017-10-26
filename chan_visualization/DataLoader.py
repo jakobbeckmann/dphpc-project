@@ -22,7 +22,7 @@ class DataLoader:
 
     def load_graham_histories(self):
         """Loading the graham subscan files and storing all lines in numpy ndarray."""
-        graham_sub_files = glob(join_paths(self.output_folder, 'graham_sub_*.dat'))
+        graham_sub_files = glob(join_paths(self.output_folder, 'graham_sub_*.log'))
 
         graham_dict = {}
         for idx, graham_file in enumerate(graham_sub_files):
@@ -33,8 +33,8 @@ class DataLoader:
     def load_all_data(self):
 
         all_data_dict = {
-            'all_sorted':  self.load_points_xy('all_sorted.dat'),
-            'hull_points': self.load_points_xy('hull_points.dat'),
+            'all_sorted':  self.load_points_xy('all_sorted.csv'),
+            'hull_points': self.load_points_xy('hull_points.csv'),
             'graham_runs': self.load_graham_histories()
         }
 

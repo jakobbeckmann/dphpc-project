@@ -21,11 +21,23 @@ class ChanAnimation:
         self.graham_run = data_dict['graham_runs'][0]
 
         self.current_hull_points = {'x': [], 'y': []}  # indices
+
+        self.idx_stack = [0, 1]
+
         self.state = []          # base, last, last-1 indices
         self.current_orientation = None
         self.color_orientation = {'clockwise': 'black', 'anticlockwise': 'green'}
         self.step = 0
         self.n_steps = len(self.graham_run)
+
+    def update_stack_state(self, step):
+
+        add_rem_flag = self.graham_run[step][1]
+
+        if add_rem_flag == 1:
+            self.idx_stack.append(self.graham_run[step][0])
+        elif add_rem_flag == -1:
+            del self.idx_stack[-2]
 
     def update_state(self, step):
 
@@ -57,13 +69,13 @@ class ChanAnimation:
         print self.current_orientation
 
     def get_two_lines_pos(self):
-        x = self.state[0: 3]
-        y = self.state[3: 6]
+        x = [self.all_points['x'][idx] for idx in self.idx_stack[-3:]]
+        y = [self.all_points['y'][idx] for idx in self.idx_stack[-3:]]
         return x, y
 
     def get_hull_lines_pos(self):
-        x = self.current_hull_points['x']
-        y = self.current_hull_points['y']
+        x = [self.all_points['x'][idx] for idx in self.idx_stack]
+        y = [self.all_points['y'][idx] for idx in self.idx_stack]
         return x, y
 
     def plot_all_points(self, axes):
@@ -82,6 +94,7 @@ class ChanAnimation:
 # --------------------------------
 # Initializing DataLoader and GrahamVisualizer
 loader = DataLoader('C:\Users\mathee\CLionProjects\dphpc-project\cmake-build-debug')
+loader = DataLoader('C:\Users\mathee\Desktop\Master\Design of Parallel and High-Performance Computing HS16\Project\RustOutputFiles')
 all_data = loader.load_all_data()
 visualizer = ChanAnimation(all_data)
 
@@ -95,10 +108,10 @@ visualizer.plot_all_points(axes=ax)
 steps_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
 two_lines, = ax.plot([], [], alpha=0.8, linewidth=3)  # switching red / cyan
 hull_lines, = ax.plot([], [], c='orange', alpha=0.8, linewidth=3)
+#plt.show()
 
 
 def init():
-    pass
     two_lines.set_data([], [])
     hull_lines.set_data([], [])
     return two_lines, hull_lines
@@ -107,15 +120,15 @@ def init():
 def animate(step):
     global visualizer
 
-    visualizer.update_state(step)
+    visualizer.update_stack_state(step)
     two_lines.set_data(*visualizer.get_two_lines_pos())
-    two_lines.set_color(visualizer.color_orientation[visualizer.current_orientation])
+    #two_lines.set_color(visualizer.color_orientation[visualizer.current_orientation])
     hull_lines.set_data(*visualizer.get_hull_lines_pos())
     return two_lines, hull_lines
 
 
 ani = animation.FuncAnimation(fig, animate, frames=visualizer.n_steps,
-                              interval=50, blit=True, init_func=init)
+                              interval=1000, blit=True, init_func=init)
 
 #ani.save('animation.mp4', fps=30)
 plt.show()

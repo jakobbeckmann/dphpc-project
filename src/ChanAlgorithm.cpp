@@ -57,7 +57,7 @@ vector<Point> ChanAlgorithm::grahamScan(vector<Point> &points, int subsetIdx) {
 
     // Graham algorithm core
     for (int idx = 1; idx < points.size(); idx++) {
-        hull = checkHull(hull, points[idx], grahamWriter);
+        //hull = checkHull(hull, points[idx], grahamWriter);
 
         Point base = points[idx];
         int last_idx = hull.size() - 1;
