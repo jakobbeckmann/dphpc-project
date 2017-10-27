@@ -18,31 +18,34 @@ class DataLoader:
         data = self.load_csv_file(join_paths(self.output_folder, filename))
         x = [item[0] for item in data]
         y = [item[1] for item in data]
+        print len(x)
+        print len(y)
         return {'x': x, 'y': y}
 
     def load_graham_histories(self):
         """Loading the graham subscan files and storing all lines in numpy ndarray."""
-        graham_sub_files = glob(join_paths(self.output_folder, 'graham_sub_*.log'))
-
+        graham_sub_files = glob(join_paths(self.output_folder, 'graham_sub_*.dat'))
         graham_dict = {}
         for idx, graham_file in enumerate(graham_sub_files):
-            graham_dict[idx] = self.load_csv_file(graham_file.format(idx), skip_rows=1)
+            graham_dict[idx] = self.load_csv_file(graham_file.format(idx))
 
         return graham_dict
 
     def load_all_data(self):
 
         all_data_dict = {
-            'all_sorted':  self.load_points_xy('all_sorted.csv'),
-            'hull_points': self.load_points_xy('hull_points.csv'),
+            'all_sorted':  self.load_points_xy('all_sorted.dat'),
+            'hull_points': self.load_points_xy('hull_points.dat'),
             'graham_runs': self.load_graham_histories()
         }
+
 
         return all_data_dict
 
     @staticmethod
-    def load_csv_file(file_path, skip_rows=0):
-        return pd.read_csv(file_path, skiprows=skip_rows).as_matrix()
+    def load_csv_file(file_path):
+        return pd.read_csv(file_path, header=None).as_matrix()
+
 
 if __name__ == '__main__':
     loader = DataLoader('C:\Users\mathee\CLionProjects\dphpc-project\cmake-build-debug')
