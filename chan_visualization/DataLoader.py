@@ -12,33 +12,44 @@ class DataLoader:
     def __init__(self, output_folder):
         self.output_folder = output_folder
 
-    def load_points_xy(self, filename):
-        """Returns a numpy array containing two arrays, one for x, one for y."""
-        data = self.load_csv_file(join_paths(self.output_folder, filename))
-        x = [item[0] for item in data]
-        y = [item[1] for item in data]
-        print len(x)
-        print len(y)
-        return {'x': x, 'y': y}
+    def load_sub_files(self, filename_template, file_format):
+        """
+        Loading the sorted points, hull points and graham history from every graham sub run.
 
-    def load_graham_histories(self):
-        """Loading the graham subscan files and storing all lines in numpy ndarray."""
-        graham_sub_files = glob(join_paths(self.output_folder, 'graham_sub_*.dat'))
-        graham_dict = {}
-        for idx, graham_file in enumerate(graham_sub_files):
-            graham_dict[idx] = self.load_csv_file(graham_file.format(idx))
+        :param filename_template:
+        :param file_format:
+        :return: sub_files_dict, keys are subrun indices, entries are np arrays, data from csv file
+        """
+        assert file_format in ['xy_positions', 'graham_history']
 
-        return graham_dict
+        sub_files = glob(join_paths(self.output_folder, filename_template))
+        sub_files_dict = {}
+
+        for idx, sub_file in enumerate(sub_files):
+            data = self.load_csv_file(sub_file.format(idx))
+
+            if file_format == 'xy_positions':
+                x = [item[0] for item in data]
+                y = [item[1] for item in data]
+                sub_files_dict[idx] = {'x': x, 'y': y}
+            elif file_format == 'graham_history':
+                sub_files_dict[idx] = data
+
+        return sub_files_dict
 
     def load_all_data(self):
 
         all_data_dict = {
-            'all_sorted':  self.load_points_xy('all_sorted.dat'),
-            'hull_points': self.load_points_xy('hull_points.dat'),
-            'graham_runs': self.load_graham_histories()
+            'sub_sorted':  self.load_sub_files('sorted_sub_*.dat', 'xy_positions'),
+            'hull_points': self.load_sub_files('hull_points_*.dat', 'xy_positions'),
+            'graham_runs': self.load_sub_files('graham_sub_*.dat', 'graham_history'),
+            'total_hull': self.load_all_hull_points('hull_points.dat')
         }
 
         return all_data_dict
+
+    def load_all_hull_points(self, filename):
+        return self.load_csv_file(join_paths(self.output_folder, filename))
 
     @staticmethod
     def load_csv_file(file_path):
