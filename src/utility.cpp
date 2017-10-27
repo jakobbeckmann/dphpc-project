@@ -20,7 +20,7 @@
     @param p2: second point
     @param p3: third point
 */
-int getOrientation(Point p1, Point p2, Point p3) {
+int getOrientation(const Point& p1, const Point& p2, const Point& p3) {
     double cross_product = (p2.y - p1.y) * (p3.x - p2.x) - (p3.y - p2.y) * (p2.x - p1.x);
     if (fabs(cross_product) < EPSILON)
         return COLLINEAR;
@@ -32,7 +32,7 @@ int getOrientation(Point p1, Point p2, Point p3) {
     @param point1: first point.
     @param point2: second point.
 */
-double getDistance(Point p1, Point p2) {
+double getDistance(const Point& p1, const Point& p2) {
     return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
 }
 
@@ -50,6 +50,7 @@ double getDistance(Point p1, Point p2) {
     @param vpp1: pointer to first point
     @param vpp2: pointer to second point
 */
+/*
 int lowestAngleSort(const void *vpp1, const void *vpp2) {
     Point p0;
     Point* pp1 = (Point*) vpp1;
@@ -60,11 +61,15 @@ int lowestAngleSort(const void *vpp1, const void *vpp2) {
     }
     return (orient == CLOCKWISE)? 1: -1;
 }
+*/
 
-void swapPoints(vector<Point> &points, int indx1, int indx2) {
-    Point p = points[indx2];
-    points[indx2] = points[indx1];
-    points[indx1] = p;
+/**
+ *  Swap two points with idx1 and idx2 in a points vector.
+ */
+void swapPoints(vector<Point> &points, int idx1, int idx2) {
+    Point p = points[idx2];
+    points[idx2] = points[idx1];
+    points[idx1] = p;
 }
 
 /**
@@ -79,6 +84,9 @@ int findLowestLeftmostPointIndex(vector<Point> &points) {
             result = idx;
         }
     }
+
+    std::cout << "Found lowest left index: " << result << std::endl;
+    std::cout << "Value: " << points[result].x << " " << points[result].y << std::endl;
     return result;
 }
 

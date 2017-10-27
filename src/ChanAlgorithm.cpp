@@ -18,10 +18,10 @@ algorithm contains only collinear points.
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <functional>
 
 #include "ChanAlgorithm.h"
-#include "utility.h"
-
 
 /**
     Performs a Graham Scan on input vector of points.
@@ -39,20 +39,24 @@ vector<Point> ChanAlgorithm::grahamScan(vector<Point> &points, int subsetIdx) {
         return points;
     }
 
-    Point startPoint;
     int bottomLeftPointIdx = findLowestLeftmostPointIndex(points);
-    startPoint = points[bottomLeftPointIdx];
+    startingPoint = points[bottomLeftPointIdx];
+    startingPoint.printPoint(),
     swapPoints(points, bottomLeftPointIdx, 0);
 
-    // Sort the points based on polar angles w.r.t. p0
-    qsort(&points[1], points.size() - 1, sizeof(Point), lowestAngleSort);
+    sort( points.begin( ) + 1, points.end( ),
+          [this]( Point p1, Point p2 )
+          {
+              return this->lowestAngleSort(p1, p2);
+          });
+
     FileWriter::writePointsToFile(points, "all_sorted.dat");
 
     // Find the hull
     vector<Point> hull;
     vector<int> idxStack;
 
-    hull.push_back(startPoint);  // Adding first point to hull.
+    hull.push_back(startingPoint);  // Adding first point to hull.
     idxStack.push_back(0);
 
     // Graham algorithm core
@@ -79,48 +83,29 @@ vector<Point> ChanAlgorithm::grahamScan(vector<Point> &points, int subsetIdx) {
             hull.push_back(base);
             idxStack.push_back(idx);
         }
-
-
     }
-
-    // Check closure of hull
-    // hull = checkHull(hull, points[1]);
-    //TODO: Which point to pop
-    // hull.pop_back();
 
     return hull;
 }
 
-
 /**
-    Finds the clockwise hull of a vector of points. If the base does not lie inside the hull, it is added to the hull.
-    In essence, this extends the hull by the base point and corrects it for convexity.
-    Returns a vector of points.
-    @param points: vector of points
-    @param base: point
+    Function used when sorting using qsort().
+    Returns the point with lowest polar angle w.r.t startingPoint (which is being defined in grahamScan
+    using the findLowestLeftMostPoint function).
+    @param vpp1: pointer to first point
+    @param vpp2: pointer to second point
 */
-/*
-vector<Point> ChanAlgorithm::checkHull(vector<Point> &hull_points, Point base, FileWriter& fileWriter) {
-    int last_idx = hull_points.size() - 1;
+int ChanAlgorithm::lowestAngleSort(const Point& pp1, const Point& pp2) {
+    //Point* pp1 = (Point*) vpp1;
+    //Point* pp2 = (Point*) vpp2;
 
-    while (hull_points.size() > 1 && getOrientation(hull_points[last_idx - 1], hull_points[last_idx], base) != ANTICLOCKWISE) {
-
-        fileWriter.writeGraham(hull_points[last_idx-1], hull_points[last_idx], base, 0, hull_points[last_idx], CLOCKWISE);
-
-
-        hull_points.pop_back();
-        last_idx = hull_points.size() - 1;
-
+    int orient = getOrientation(startingPoint, pp1, pp2);
+    if(orient == COLLINEAR) {
+        return (getDistance(startingPoint, pp1) <= getDistance(startingPoint, pp2))? 1: 0;
     }
-
-    if (hull_points.empty() || hull_points[last_idx] != base) {
-        fileWriter.writeGraham(hull_points[last_idx-1], hull_points[last_idx], base, 1, base, ANTICLOCKWISE);
-        hull_points.push_back(base);
-    }
-    return hull_points;
+    return (orient == ANTICLOCKWISE)? 1: 0;
 }
 
-*/
 
 /**
     Returns the index of the point in the list that sits such that each other point

@@ -16,6 +16,13 @@
 class FileWriter {
 
 public:
+
+    FileWriter() {
+        remove("all_sorted.dat");
+        remove("hull_points.dat");
+        remove("graham_sub_0.dat");
+    }
+
     void writeGrahamStep(int baseIdx, int lastIdx, int secLastIdx, int addedIdx, int removedIdx, int orientation) {
         using namespace std;
         ofstream file;

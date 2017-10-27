@@ -18,10 +18,11 @@ public:
     double x, y;
 
     // Constructor
-    explicit Point(double x=0, double y=0) {
-        this->x = x;
-        this->y = y;
-    }
+    explicit Point(double x=0, double y=0)
+        : x(x), y(y)
+        {
+
+        }
 
     // Overload operators
     friend bool operator== (const Point& p1, const Point& p2) {
@@ -33,5 +34,9 @@ public:
     friend std::ostream& operator<< (std::ostream& output, const Point& point) {
         output << "(" << point.x << ", " << point.y << ")";
         return output;
+    }
+
+    void printPoint() {
+        std::cout << x << "," << y << std::endl;
     }
 };
