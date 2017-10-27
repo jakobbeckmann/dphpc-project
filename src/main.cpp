@@ -12,13 +12,12 @@
 #include "ChanAlgorithm.h"
 
 int main(int argc, char const *argv[]) {
-    int POINT_COUNT = 0, PARALLELISM_IDX = 1, MIN = -10, MAX = 10;
 
+    //-------------------------------------------------------------------------------
+    // USER INPUT SECTION
 
-    ChanAlgorithm chanAlgo;
-
-
-    //TODO: Parallel implementation
+    int POINT_COUNT = 0,  MIN = -10, MAX = 10;
+    size_t PARALLELISM_IDX = 0;
     std::cout << "Enter number of subsets for Graham Scans..." << std::endl;
     std::cin >> PARALLELISM_IDX;
     if(PARALLELISM_IDX < 1) return -1;
@@ -35,18 +34,23 @@ int main(int argc, char const *argv[]) {
     std::cout << "Ener MAX value for x/y coordinates..." << std::endl;
     std::cin >> MAX;
 
+    //-------------------------------------------------------------------------------
+    // ALGORITHM SECTION
+
+    ChanAlgorithm chan;
     std::vector<Point> points = createPoints(POINT_COUNT, MIN, MAX);
+    std::vector<Point> result = chan.run(points, PARALLELISM_IDX);
 
-    // std::vector<Point> result = doGrahamScan(points);
-    std::vector<Point> result = chanAlgo.run(points, PARALLELISM_IDX);
+    //-------------------------------------------------------------------------------
+    // OUTPUT SECTION
 
-    std::cout << "=========Result=========" << std::endl;
+    std::cout << "\n\n=========Result=========" << std::endl;
     for(Point point: result) {
         std::cout << point << " ";
     }
     std::cout << std::endl;
 
-    FileWriter::writePointsToFile(result, "hull_points.dat");
+    FileWriter::writePointsToFile(result, "hull_points.dat", true);
 
     return 0;
 }
