@@ -95,3 +95,27 @@ std::vector<Point> createPoints(int count, double min, double max) {
     return points;
 
 }
+
+std::vector<std::vector<Point>> SplitVector(const std::vector<Point>& vec, size_t n)
+{
+    std::vector<std::vector<Point>> outVec;
+
+    size_t length = vec.size() / n;
+    size_t remain = vec.size() % n;
+
+    std::cout << "sub vectors contain " << length << " elements with remainder " << remain << std::endl;
+
+    size_t begin = 0;
+    size_t end = 0;
+
+    for (size_t i = 0; i < std::min(n, vec.size()); ++i)
+    {
+        end += (remain > 0) ? (length + !!(remain--)) : length;
+
+        outVec.emplace_back(std::vector<Point>(vec.begin() + begin, vec.begin() + end));
+
+        begin = end;
+    }
+
+    return outVec;
+}
