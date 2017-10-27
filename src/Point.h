@@ -19,10 +19,9 @@ public:
     double x, y;
 
     // Constructor
-    explicit Point(double x=0, double y=0) {
-        this->x = x;
-        this->y = y;
-    }
+    explicit Point(double x=0, double y=0)
+     : x(x), y(y)
+    {}
 
     // Overload operators
     friend bool operator== (const Point& p1, const Point& p2) {

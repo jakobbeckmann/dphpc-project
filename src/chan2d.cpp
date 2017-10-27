@@ -123,7 +123,7 @@ std::vector<Point> doGrahamScan(std::vector<Point> &points) {
     @param points: vector of points forming a convex polygon.
     @param base: base point
 */
-int findTangentIndex(std::vector<Point> points, Point base) {
+int findTangentIndex(const std::vector<Point>& points, Point base) {
     int lower_bound = 0;
     int upper_bound = points.size();
 
@@ -171,7 +171,7 @@ int findTangentIndex(std::vector<Point> points, Point base) {
     point is the point with lowest y coordinate across all hulls.
     @param hulls: vector of hulls (vectors of points)
 */
-std::pair<int, int> findLowestPoint(std::vector<std::vector<Point> > hulls) {
+std::pair<int, int> findLowestPoint(const std::vector<std::vector<Point> >& hulls) {
     int hull = 0, point = 0;
     double lowest_y = hulls[0][0].y;
     for(int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
@@ -191,8 +191,7 @@ std::pair<int, int> findLowestPoint(std::vector<std::vector<Point> > hulls) {
     @param hulls: vector of hulls (vectors of points)
     @param base_pair: base point (the last added point from the hull merge)
 */
-std::pair<int, int> findNextMergePoint(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair) {
-    int hull = 0, point = 0;
+std::pair<int, int> findNextMergePoint(const std::vector<std::vector<Point> >& hulls, std::pair<int, int> base_pair) {
     Point base = hulls[base_pair.first][base_pair.second];
     // Select next point on the same hull as the next point for the merge
     std::pair<int, int> result = std::make_pair(base_pair.first, (base_pair.second + 1) % hulls[base_pair.first].size());
@@ -219,7 +218,7 @@ std::pair<int, int> findNextMergePoint(std::vector<std::vector<Point> > hulls, s
     @param points: vector of points the be analysed
     @param parallel_idx: parallelism index determining the amount of parallel computation
 */
-std::vector<Point> doChan(std::vector<Point> points, int parallel_idx) {
+std::vector<Point> doChan(const std::vector<Point>& points, int parallel_idx) {
     std::vector<std::vector<Point> > hulls;
     /*
         TODO The following sode snipped will need to be parallelised using mpi in order to achieve real parallelism.
