@@ -6,9 +6,8 @@
 
 #include "Point.h"
 
-int getOrientation(Point p1, Point p2, Point p3);
-double getDistance(Point p1, Point p2);
-int lowestAngleSort(const void *vpp1, const void *vpp2);
+int getOrientation(const Point& p1, const Point& p2, const Point& p3);
+double getDistance(const Point& p1, const Point& p2);
 std::vector<Point> createPoints(int count, double min, double max);
 void swapPoints(std::vector<Point> &points, int indx1, int indx2);
 int findLowestLeftmostPointIndex(std::vector<Point> &points);

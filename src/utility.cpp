@@ -45,28 +45,9 @@ double getDistance(const Point& p1, const Point& p2) {
  */
 
 /**
-    Function used when sorting using qsort().
-    Returns the point with lowest polar angle w.r.t p0(0, 0) and the x-axis.
-    @param vpp1: pointer to first point
-    @param vpp2: pointer to second point
-*/
-/*
-int lowestAngleSort(const void *vpp1, const void *vpp2) {
-    Point p0;
-    Point* pp1 = (Point*) vpp1;
-    Point* pp2 = (Point*) vpp2;
-    int orient = getOrientation(p0, *pp1, *pp2);
-    if(orient == COLLINEAR) {
-        return (getDistance(p0, *pp1) <= getDistance(p0, *pp2))? -1: 1;
-    }
-    return (orient == CLOCKWISE)? 1: -1;
-}
-*/
-
-/**
  *  Swap two points with idx1 and idx2 in a points vector.
  */
-void swapPoints(vector<Point> &points, int idx1, int idx2) {
+void swapPoints(std::vector<Point> &points, int idx1, int idx2) {
     Point p = points[idx2];
     points[idx2] = points[idx1];
     points[idx1] = p;
@@ -75,7 +56,7 @@ void swapPoints(vector<Point> &points, int idx1, int idx2) {
 /**
  * Finds the index of the most bottom left point. Used to start the graham scan.
  */
-int findLowestLeftmostPointIndex(vector<Point> &points) {
+int findLowestLeftmostPointIndex(std::vector<Point> &points) {
     int result = 0;
     double lowest = points[0].y;
     for (int idx = 1; idx < points.size(); idx++) {
