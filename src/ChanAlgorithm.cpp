@@ -32,7 +32,7 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
     grahamWriter.setGrahamSubsetIdx(subsetIdx);
     grahamWriter.setBaseName("graham_sub");
     grahamWriter.updateFileName();
-    //grahamWriter.cleanExistingFiles();
+    grahamWriter.cleanOutputFile();
 
     if (points.size() <= 1) {
         return points;
@@ -40,7 +40,6 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
 
     int bottomLeftPointIdx = findLowestLeftmostPointIndex(points);
     startingPoint = points[bottomLeftPointIdx];
-    startingPoint.printPoint(),
     swapPoints(points, bottomLeftPointIdx, 0);
 
     sort( points.begin( ) + 1, points.end( ),
@@ -49,7 +48,8 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
               return this->lowestAngleSort(p1, p2);
           });
 
-    FileWriter::writePointsToFile(points, "all_sorted.dat");
+    const std::string subSortedName = std::string("sorted_sub_") + std::to_string(subsetIdx) + ".dat";
+    FileWriter::writePointsToFile(points, subSortedName, true);
 
     // Find the hull
     std::vector<Point> hull;
@@ -83,6 +83,8 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
             idxStack.push_back(idx);
         }
     }
+    const std::string subHullName = std::string("hull_points_") + std::to_string(subsetIdx) + ".dat";
+    FileWriter::writePointsToFile(hull, subHullName, true);
 
     return hull;
 }
@@ -204,21 +206,17 @@ std::pair<int, int> ChanAlgorithm::findNextMergePoint(std::vector<std::vector<Po
     @param points: std::vector of points the be analysed
     @param parallel_idx: parallelism index determining the amount of parallel computation
 */
-std::vector<Point> ChanAlgorithm::run(std::vector<Point> points, int parallel_idx) {
+std::vector<Point> ChanAlgorithm::run(std::vector<Point> points, size_t parallel_idx) {
+
     std::vector<std::vector<Point> > hulls;
-    /*
-        TODO The following sode snipped will need to be parallelized using mpi in order to achieve real parallelism.
-    */
+
     int currentSubsetIdx = 0;
 
-    for (int idx = 0; idx < parallel_idx; idx++) {
-        std::vector<Point> subset;
-        for (int point_idx = idx; point_idx < points.size(); point_idx += parallel_idx) {
-            subset.push_back(points[point_idx]);
-        }
-        hulls.push_back(grahamScan(subset, currentSubsetIdx));
+    for (std::vector<Point> subPoints : SplitVector(points, parallel_idx)) {
+        hulls.push_back(grahamScan(subPoints, currentSubsetIdx));
         currentSubsetIdx++;
     }
+
     /*
         TODO END
     */

@@ -14,6 +14,6 @@ private:
     std::pair<int, int> findNextMergePoint(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair);
 
 public:
-    std::vector<Point> run(std::vector<Point> points, int parallel_idx);
+    std::vector<Point> run(std::vector<Point> points, size_t parallel_idx);
 
 };

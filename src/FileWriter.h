@@ -16,13 +16,6 @@
 class FileWriter {
 
 public:
-
-    FileWriter() {
-        remove("all_sorted.dat");
-        remove("hull_points.dat");
-        remove("graham_sub_0.dat");
-    }
-
     void writeGrahamStep(int baseIdx, int lastIdx, int secLastIdx, int addedIdx, int removedIdx, int orientation) {
         using namespace std;
         ofstream file;
@@ -55,13 +48,32 @@ public:
     void setGrahamSubsetIdx(int& idx) {
         grahamSubsetIdx = idx;
         updateFileName();
+
     }
 
-    static void writePointsToFile(std::vector<Point> points, const std::string& fileName) {
+    /**
+     * Removes the file with current fileName
+     */
+    void cleanOutputFile() {
+        if( remove( fileName.c_str() ) != 0 )
+            std::cout << "Could NOT delete " << fileName.c_str() << std::endl;
+        else
+            std::cout << "Deleted " << fileName.c_str() << std::endl;
+
+    }
+
+    /**
+     * Writes a vector of
+     * @param points
+     * @param fileName
+     */
+    static void writePointsToFile(std::vector<Point> points, const std::string& fileName, bool removeFirst) {
+        if (removeFirst)
+            remove(fileName.c_str());
         std::ofstream allPointsFile;
         allPointsFile.open(fileName);
-        for (int i = 0; i < points.size(); i++) {
-            allPointsFile << points[i].x << "," << points[i].y << std::endl;
+        for (Point point : points) {
+            allPointsFile << point.x << "," << point.y << std::endl;
         }
         allPointsFile.close();
     }
