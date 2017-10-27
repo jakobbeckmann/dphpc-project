@@ -2,7 +2,6 @@
 Loads data output from the C++ output files into python dictionary for easy access.
 """
 
-import numpy as np
 from os.path import join as join_paths
 from glob import glob
 import pandas as pd
@@ -39,7 +38,6 @@ class DataLoader:
             'graham_runs': self.load_graham_histories()
         }
 
-
         return all_data_dict
 
     @staticmethod
@@ -48,7 +46,7 @@ class DataLoader:
 
 
 if __name__ == '__main__':
+
+    '''Example usage...'''
     loader = DataLoader('C:\Users\mathee\CLionProjects\dphpc-project\cmake-build-debug')
     data_dict = loader.load_all_data()
-
-    pass

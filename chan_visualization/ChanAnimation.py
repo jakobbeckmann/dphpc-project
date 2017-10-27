@@ -51,13 +51,11 @@ class ChanAnimation:
         add_rem_x = self.graham_run[step][7]
         add_rem_y = self.graham_run[step][8]
 
-        print 'add point', add_point
         if add_point:
             self.current_hull_points['x'].append(add_rem_x)
             self.current_hull_points['y'].append(add_rem_y)
             print 'add'
         else:
-            print 'remove', add_rem_x, add_rem_y
             self.current_hull_points['x'].remove(add_rem_x)
             self.current_hull_points['y'].remove(add_rem_y)
 
@@ -90,7 +88,8 @@ class ChanAnimation:
         axes.plot([self.hull_points['x'][0], self.hull_points['x'][-1]],
                   [self.hull_points['y'][0], self.hull_points['y'][-1]], c='green', alpha=0.8, linewidth=0.4)
 
-        #for idx in range(len(self.all_points['x'])):
+        ''' Outcomment to label points '''
+        # for idx in range(len(self.all_points['x'])):
         #    axes.text(self.all_points['x'][idx], self.all_points['y'][idx], str(idx))
 
         axes.axis('off')
@@ -98,7 +97,6 @@ class ChanAnimation:
 # --------------------------------
 # Initializing DataLoader and GrahamVisualizer
 loader = DataLoader('C:\Users\mathee\CLionProjects\dphpc-project\cmake-build-debug')
-#loader = DataLoader('C:\Users\mathee\Desktop\Master\Design of Parallel and High-Performance Computing HS16\Project\RustOutputFiles')
 all_data = loader.load_all_data()
 visualizer = ChanAnimation(all_data)
 
