@@ -2,8 +2,7 @@
     Point class representing a 2D point and some operators.
  */
 
-#ifndef DPHPC_PROJECT_POINT_H
-#define DPHPC_PROJECT_POINT_H
+#pragma once
 
 #include <cmath>
 #include <iostream>
@@ -20,8 +19,10 @@ public:
 
     // Constructor
     explicit Point(double x=0, double y=0)
-     : x(x), y(y)
-    {}
+        : x(x), y(y)
+        {
+
+        }
 
     // Overload operators
     friend bool operator== (const Point& p1, const Point& p2) {
@@ -34,7 +35,8 @@ public:
         output << "(" << point.x << ", " << point.y << ")";
         return output;
     }
+
+    void printPoint() {
+        std::cout << x << "," << y << std::endl;
+    }
 };
-
-
-#endif //DPHPC_PROJECT_POINT_H

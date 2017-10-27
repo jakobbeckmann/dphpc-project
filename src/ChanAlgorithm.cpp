@@ -17,102 +17,93 @@ algorithm contains only collinear points.
 */
 
 #include <iostream>
-#include <cmath>
 #include <vector>
+#include <algorithm>
+#include <functional>
 
-#include "constants.h"
-#include "utility.h"
-
-
-/**
-    Finds the clockwise hull of a vector of points. If the base does not lie inside the hull, it is added to the hull.
-    In essence, this extends the hull by the base point and corrects it for convexity.
-    Returns a vector of points.
-    @param points: vector of points
-    @param base: point
-*/
-std::vector<Point> checkHull(std::vector<Point> &points, Point base) {
-    int last_idx = points.size() - 1;
-    while(points.size() > 1 && getOrientation(points[last_idx - 1], points[last_idx], base) != ANTICLOCKWISE) {
-        points.pop_back();
-        last_idx = points.size() - 1;
-    }
-    if(points.size() == 0 || points[last_idx] != base) {
-        points.push_back(base);
-    }
-    return points;
-}
-
-/**
- * Finds the index of the most bottom left point.
- * @param points
- * @return
- */
-int findLowestLeftmostPointIndex(std::vector<Point> &points) {
-    int result = 0;
-    double lowest = points[0].y;
-    for (int idx = 1; idx < points.size(); idx++) {
-        if (points[idx].y < lowest || (points[idx].y == lowest && points[idx].x < points[result].x)) {
-            lowest = points[idx].y;
-            result = idx;
-        }
-    }
-    return result;
-}
-
-void swapPoints(std::vector<Point> &points, int indx1, int indx2) {
-    Point p = points[indx2];
-    points[indx2] = points[indx1];
-    points[indx1] = p;
-}
-
-Point mainPoint;
-
-/**
-    Function used when sorting using qsort().
-    Returns the point with lowest polar angle w.r.t p0(0, 0) and the x-axis.
-    @param vpp1: pointer to first point
-    @param vpp2: pointer to second point
-*/
-int lowestAngleSort(const void *vpp1, const void *vpp2) {
-    Point p0 = mainPoint;
-    Point* pp1 = (Point*) vpp1;
-    Point* pp2 = (Point*) vpp2;
-    int orient = getOrientation(p0, *pp1, *pp2);
-    if(orient == COLLINEAR) {
-        return (getDistance(p0, *pp1) <= getDistance(p0, *pp2))? -1: 1;
-    }
-    return (orient == CLOCKWISE)? 1: -1;
-}
+#include "ChanAlgorithm.h"
 
 /**
     Performs a Graham Scan on input vector of points.
     Returns a vector of points contained in the convex hull of the input.
-    @param points: vector of points
+    @param points: vector of points in the graham subset.
 */
-std::vector<Point> doGrahamScan(std::vector<Point> &points) {
-    if(points.size() <= 1) {
+vector<Point> ChanAlgorithm::grahamScan(vector<Point> &points, int subsetIdx) {
+    FileWriter grahamWriter;
+    grahamWriter.setGrahamSubsetIdx(subsetIdx);
+    grahamWriter.setBaseName("graham_sub");
+    grahamWriter.updateFileName();
+    //grahamWriter.cleanExistingFiles();
+
+    if (points.size() <= 1) {
         return points;
     }
 
     int bottomLeftPointIdx = findLowestLeftmostPointIndex(points);
-    mainPoint = points[bottomLeftPointIdx];
+    startingPoint = points[bottomLeftPointIdx];
+    startingPoint.printPoint(),
     swapPoints(points, bottomLeftPointIdx, 0);
 
-    // Sort the points based on polar angles w.r.t. p0
-    std::qsort(&points[1], points.size() - 1, sizeof(Point), lowestAngleSort);
+    sort( points.begin( ) + 1, points.end( ),
+          [this]( Point p1, Point p2 )
+          {
+              return this->lowestAngleSort(p1, p2);
+          });
+
+    FileWriter::writePointsToFile(points, "all_sorted.dat");
 
     // Find the hull
-    std::vector<Point> hull;
-    hull.push_back(mainPoint);
-    for(int idx = 1; idx < points.size(); idx++) {
-        hull = checkHull(hull, points[idx]);
+    vector<Point> hull;
+    vector<int> idxStack;
+
+    hull.push_back(startingPoint);  // Adding first point to hull.
+    idxStack.push_back(0);
+
+    // Graham algorithm core
+    for (int idx = 1; idx < points.size(); idx++) {
+        //hull = checkHull(hull, points[idx], grahamWriter);
+
+        Point base = points[idx];
+        int last_idx = hull.size() - 1;
+
+        while (hull.size() > 1 && getOrientation(hull[last_idx - 1], hull[last_idx], base) != ANTICLOCKWISE) {
+
+            grahamWriter.writeGraham(hull[last_idx-1], hull[last_idx], base, 0, hull[last_idx], CLOCKWISE);
+
+
+            hull.pop_back();
+            idxStack.pop_back();
+
+            last_idx = hull.size() - 1;
+
+        }
+
+        if (hull.empty() || hull[last_idx] != base) {
+            grahamWriter.writeGraham(hull[last_idx-1], hull[last_idx], base, 1, base, ANTICLOCKWISE);
+            hull.push_back(base);
+            idxStack.push_back(idx);
+        }
     }
-    // Check closure of hull
-   // hull = checkHull(hull, points[0]);
-   // hull.pop_back();
 
     return hull;
+}
+
+/**
+    Function used when sorting using qsort().
+    Returns the point with lowest polar angle w.r.t startingPoint (which is being defined in grahamScan
+    using the findLowestLeftMostPoint function).
+    @param vpp1: pointer to first point
+    @param vpp2: pointer to second point
+*/
+int ChanAlgorithm::lowestAngleSort(const Point& pp1, const Point& pp2) {
+    //Point* pp1 = (Point*) vpp1;
+    //Point* pp2 = (Point*) vpp2;
+
+    int orient = getOrientation(startingPoint, pp1, pp2);
+    if(orient == COLLINEAR) {
+        return (getDistance(startingPoint, pp1) <= getDistance(startingPoint, pp2))? 1: 0;
+    }
+    return (orient == ANTICLOCKWISE)? 1: 0;
 }
 
 
@@ -132,12 +123,12 @@ int findTangentIndex(const std::vector<Point>& points, Point base) {
     int lb_turn_after = getOrientation(base, points[0], points[1]);
 
     // Check if first point is the point lying to the right of all other points.
-    if(lb_turn_before != CLOCKWISE && lb_turn_after == ANTICLOCKWISE) {
+    if (lb_turn_before != CLOCKWISE && lb_turn_after == ANTICLOCKWISE) {
         return 0;
     }
 
     // First point is not the right most point.
-    while(lower_bound < upper_bound) {
+    while (lower_bound < upper_bound) {
         // Find index of point in between the two bounds.
         int mid = (upper_bound + lower_bound) / 2;
 
@@ -149,11 +140,11 @@ int findTangentIndex(const std::vector<Point>& points, Point base) {
         // the lower_bound point.
         int cut_direction = getOrientation(base, points[lower_bound], points[mid]);
 
-        if(mid_turn_before != CLOCKWISE && mid_turn_after == ANTICLOCKWISE) {
+        if (mid_turn_before != CLOCKWISE && mid_turn_after == ANTICLOCKWISE) {
             // All points lie to the right of 'mid'
             return mid;
-        } else if((cut_direction != CLOCKWISE && lb_turn_after != ANTICLOCKWISE) ||
-                  (cut_direction == CLOCKWISE && mid_turn_before == CLOCKWISE)) {
+        } else if ((cut_direction != CLOCKWISE && lb_turn_after != ANTICLOCKWISE) ||
+                   (cut_direction == CLOCKWISE && mid_turn_before == CLOCKWISE)) {
             // The leftmost point lies to the right of the cut (line between 'lower_bound' and 'mid')
             upper_bound = mid;
         } else {
@@ -174,15 +165,15 @@ int findTangentIndex(const std::vector<Point>& points, Point base) {
 std::pair<int, int> findLowestPoint(const std::vector<std::vector<Point> >& hulls) {
     int hull = 0, point = 0;
     double lowest_y = hulls[0][0].y;
-    for(int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
-        for(int point_idx = 0; point_idx < hulls[hull_idx].size(); point_idx++) {
-            if(hulls[hull_idx][point_idx].y < lowest_y) {
+    for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
+        for (int point_idx = 0; point_idx < hulls[hull_idx].size(); point_idx++) {
+            if (hulls[hull_idx][point_idx].y < lowest_y) {
                 hull = hull_idx;
                 point = point_idx;
             }
         }
     }
-    return std::make_pair(hull, point);
+    return make_pair(hull, point);
 }
 
 
@@ -194,22 +185,22 @@ std::pair<int, int> findLowestPoint(const std::vector<std::vector<Point> >& hull
 std::pair<int, int> findNextMergePoint(const std::vector<std::vector<Point> >& hulls, std::pair<int, int> base_pair) {
     Point base = hulls[base_pair.first][base_pair.second];
     // Select next point on the same hull as the next point for the merge
-    std::pair<int, int> result = std::make_pair(base_pair.first, (base_pair.second + 1) % hulls[base_pair.first].size());
-    for(int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
-        if(hull_idx != base_pair.first) {
+    pair<int, int> result = make_pair(base_pair.first,
+                                                (base_pair.second + 1) % hulls[base_pair.first].size());
+    for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
+        if (hull_idx != base_pair.first) {
             int candidate_idx = findTangentIndex(hulls[hull_idx], base);
             Point previous = hulls[result.first][result.second];
             Point candidate = hulls[hull_idx][candidate_idx];
             int linearity = getOrientation(base, previous, candidate);
             if(linearity == CLOCKWISE || (linearity == COLLINEAR && getDistance(base, previous) <
                                                                             getDistance(base, candidate))) {
-                result = std::make_pair(hull_idx, candidate_idx);
+                result = make_pair(hull_idx, candidate_idx);
             }
         }
     }
     return result;
 }
-
 
 
 /**
@@ -221,25 +212,28 @@ std::pair<int, int> findNextMergePoint(const std::vector<std::vector<Point> >& h
 std::vector<Point> doChan(const std::vector<Point>& points, int parallel_idx) {
     std::vector<std::vector<Point> > hulls;
     /*
-        TODO The following sode snipped will need to be parallelised using mpi in order to achieve real parallelism.
+        TODO The following sode snipped will need to be parallelized using mpi in order to achieve real parallelism.
     */
-    for(int idx = 0; idx < parallel_idx; idx++) {
-        std::vector<Point> subset;
-        for(int point_idx = idx; point_idx < points.size(); point_idx += parallel_idx) {
+    int currentSubsetIdx = 0;
+
+    for (int idx = 0; idx < parallel_idx; idx++) {
+        vector<Point> subset;
+        for (int point_idx = idx; point_idx < points.size(); point_idx += parallel_idx) {
             subset.push_back(points[point_idx]);
         }
-        hulls.push_back(doGrahamScan(subset));
+        hulls.push_back(grahamScan(subset, currentSubsetIdx));
+        currentSubsetIdx++;
     }
     /*
         TODO END
     */
-    std::pair<int, int> next_point = findLowestPoint(hulls);
-    std::vector<Point> result;
+    pair<int, int> next_point = findLowestPoint(hulls);
+    vector<Point> result;
     result.push_back(hulls[next_point.first][next_point.second]);
     do {
         next_point = findNextMergePoint(hulls, next_point);
         result.push_back(hulls[next_point.first][next_point.second]);
-    } while(result[0] != result[result.size() - 1]);
+    } while (result[0] != result[result.size() - 1]);
     result.pop_back();
     return result;
 }

@@ -10,4 +10,5 @@ int getOrientation(Point p1, Point p2, Point p3);
 double getDistance(Point p1, Point p2);
 int lowestAngleSort(const void *vpp1, const void *vpp2);
 std::vector<Point> createPoints(int count, double min, double max);
-void writePointsToFile(const std::vector<Point>&, const std::string& fileName);
+void swapPoints(std::vector<Point> &points, int indx1, int indx2);
+int findLowestLeftmostPointIndex(std::vector<Point> &points);
