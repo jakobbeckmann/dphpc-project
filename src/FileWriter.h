@@ -16,14 +16,6 @@
 class FileWriter {
 
 public:
-    void writeGrahamStep(int baseIdx, int lastIdx, int secLastIdx, int addedIdx, int removedIdx, int orientation) {
-        using namespace std;
-        ofstream file;
-        file.open(fileName, std::ios_base::app);
-        file << to_string(baseIdx) << "," << to_string(lastIdx) << "," << to_string(secLastIdx) << ","
-             << to_string(addedIdx) << "," << to_string(removedIdx) << "," << to_string(orientation) << endl;
-        file.close();
-    }
 
     void writeGraham(Point last, Point secLast, Point base, int addRemove, Point addRemPoint, int orientation) {
         using namespace std;
@@ -33,6 +25,16 @@ public:
              << last.y << "," << secLast.y << "," << base.y << ","
              << addRemove << "," << addRemPoint.x << "," << addRemPoint.y << "," << orientation << endl;
 
+        file.close();
+    }
+    /**
+     * Used to write indices - not used at the moment.
+     */
+    void writeGrahamStep(int baseIdx, int lastIdx, int secLastIdx, int addedIdx, int removedIdx, int orientation) {
+        std::ofstream file;
+        file.open(fileName, std::ios_base::app);
+        file << baseIdx << "," << lastIdx << "," << secLastIdx << ","
+             << addedIdx << "," << removedIdx << "," << orientation << std::endl;
         file.close();
     }
 
