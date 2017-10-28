@@ -35,7 +35,7 @@ class GrahamAnimation:
 
         self.colors             = cm.rainbow(np.linspace(0, 1, self.n_graham_subs))
 
-        #self.idx_stack = [len(self.all_points['x']) - 1, 0, 1]  # unused
+        # self.idx_stack = [len(self.all_points['x']) - 1, 0, 1]  # unused
 
     # not used at the moment
     def update_stack_state(self, step):

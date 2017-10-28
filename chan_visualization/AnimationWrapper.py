@@ -17,7 +17,7 @@ import matplotlib.animation as animation
 
 input_data_path = 'C:\Users\mathee\CLionProjects\dphpc-project\cmake-build-debug'
 output_data_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__))) + '/cmake-build-debug'
-save_movie = True
+save_movie = False
 
 #####################
 
