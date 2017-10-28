@@ -29,19 +29,18 @@ fig = plt.figure(figsize=(15, 8))
 
 animations = []
 
-for graham_idx in range(n_graham_subs):
-    ax = fig.add_subplot(111)
-    graham_visualizer = GrahamAnimation(data_dict, graham_idx)
-    graham_visualizer.set_ax(ax)
-    graham_visualizer.plot_all_points()
+ax = fig.add_subplot(111)
+graham_visualizer = GrahamAnimation(data_dict)
+graham_visualizer.set_ax(ax)
+graham_visualizer.plot_all_points()
 
-    animations.append( animation.FuncAnimation(fig,
-                                               graham_visualizer.animate,
-                                               frames=graham_visualizer.n_steps,
-                                               interval=50,
-                                               blit=False,
-                                               init_func=graham_visualizer.init_animation,
-                                               repeat=False))
+animations.append(animation.FuncAnimation(fig,
+                                          graham_visualizer.animate,
+                                          frames=max(graham_visualizer.n_steps.values()),
+                                          interval=10,
+                                          blit=False,
+                                          init_func=graham_visualizer.init_animation,
+                                          repeat=False))
 
 
 Writer = animation.writers['ffmpeg']

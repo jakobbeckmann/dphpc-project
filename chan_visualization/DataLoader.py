@@ -45,6 +45,7 @@ class DataLoader:
             'graham_runs': self.load_sub_files('graham_sub_*.dat', 'graham_history'),
             'total_hull': self.load_all_hull_points('hull_points.dat')
         }
+        all_data_dict['n_graham_subs'] = len(all_data_dict['sub_sorted'])
 
         return all_data_dict
 
