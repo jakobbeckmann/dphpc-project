@@ -85,6 +85,26 @@ std::vector<Point> createPoints(int count, double min, double max) {
 
 }
 
+
+/**
+    Returns a std::pair representing the hull number and point index inside that hull. The represented
+    point is the point with lowest y coordinate across all hulls.
+    @param hulls: std::vector of hulls (vectors of points)
+*/
+std::pair<int, int> findLowestPoint(const std::vector<std::vector<Point>>& hulls) {
+    int hull = 0, point = 0;
+    double lowest_y = hulls[0][0].y;
+    for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
+        for (int point_idx = 0; point_idx < hulls[hull_idx].size(); point_idx++) {
+            if (hulls[hull_idx][point_idx].y < lowest_y) {
+                hull = hull_idx;
+                point = point_idx;
+            }
+        }
+    }
+    return std::make_pair(hull, point);
+}
+
 std::vector<std::vector<Point>> SplitVector(const std::vector<Point>& vec, size_t n)
 {
     std::vector<std::vector<Point>> outVec;
