@@ -43,14 +43,18 @@ class DataLoader:
             'sub_sorted':  self.load_sub_files('sorted_sub_*.dat', 'xy_positions'),
             'hull_points': self.load_sub_files('hull_points_*.dat', 'xy_positions'),
             'graham_runs': self.load_sub_files('graham_sub_*.dat', 'graham_history'),
-            'total_hull': self.load_all_hull_points('hull_points.dat')
+            'total_hull': self.load_single_pos_file('hull_points.dat'),
+            'merge_hulls': self.load_single_pos_file('merge_hulls.dat')
         }
         all_data_dict['n_graham_subs'] = len(all_data_dict['sub_sorted'])
 
         return all_data_dict
 
-    def load_all_hull_points(self, filename):
-        return self.load_csv_file(join_paths(self.output_folder, filename))
+    def load_single_pos_file(self, filename):
+        data = self.load_csv_file(join_paths(self.output_folder, filename))
+        x = [item[0] for item in data]
+        y = [item[1] for item in data]
+        return {'x': x, 'y': y}
 
     @staticmethod
     def load_csv_file(file_path):
