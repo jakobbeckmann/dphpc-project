@@ -15,6 +15,7 @@ class GrahamAnimation:
         """
 
         self.all_points         = data_dict['sub_sorted']
+        self.final_hull         = data_dict['total_hull']
         self.final_sub_hulls    = data_dict['hull_points']
         self.graham_run         = data_dict['graham_runs']
         self.n_graham_subs      = data_dict['n_graham_subs']
@@ -25,7 +26,7 @@ class GrahamAnimation:
 
         self.state              = {idx: [] for idx in range(self.n_graham_subs)}
         self.curr_orientation   = {idx: None for idx in range(self.n_graham_subs)}
-        self.n_steps            = {idx: len(self.graham_run[idx]) for idx in range(self.n_graham_subs)}
+        self.n_steps_graham     = {idx: len(self.graham_run[idx]) for idx in range(self.n_graham_subs)}
         self.two_lines          = {idx: None for idx in range(self.n_graham_subs)}
         self.hull_lines         = {idx: None for idx in range(self.n_graham_subs)}
 
@@ -35,6 +36,11 @@ class GrahamAnimation:
 
         self.colors             = cm.rainbow(np.linspace(0, 1, self.n_graham_subs))
         self.label_points       = label_points
+
+        self.merge_history      = data_dict['merge_hulls']
+        self.n_steps_merge      = len(self.merge_history['x'])
+        self.merge_color        = 'cyan'
+        self.merge_lines        = None
 
         # self.idx_stack = [len(self.all_points['x']) - 1, 0, 1]  # unused
 
@@ -87,18 +93,33 @@ class GrahamAnimation:
         y = self.curr_sub_hull[idx]['y']
         return x, y
 
+    def get_merge_lines_pos(self, step):
+
+        x = self.merge_history['x'][:(step - max(self.n_steps_graham.values()) - 1)]
+        y = self.merge_history['y'][:(step - max(self.n_steps_graham.values()) - 1)]
+
+        if step == self.n_steps_merge + max(self.n_steps_graham.values()):
+            x.append(self.merge_history['x'][0])
+            y.append(self.merge_history['y'][0])
+
+        return x, y
+
     def plot_all_points(self):
         # TODO: animation of quick sort, means adding points one after the other
 
         for idx in range(self.n_graham_subs):
             hull_color = self.colors[idx]
             points_color = self.colors[idx]
-            self.ax.scatter(self.all_points[idx]['x'], self.all_points[idx]['y'], s=20, c=points_color, alpha=0.8, edgecolors='none')
-            self.ax.scatter(self.final_sub_hulls[idx]['x'], self.final_sub_hulls[idx]['y'], s=20, c=hull_color, alpha=0.8, edgecolors='none')
+            self.ax.scatter(self.all_points[idx]['x'], self.all_points[idx]['y'], s=10, c=points_color, alpha=0.8, edgecolors='none')
+            self.ax.scatter(self.final_sub_hulls[idx]['x'], self.final_sub_hulls[idx]['y'], s=10, c=hull_color, alpha=0.8, edgecolors='none')
 
             self.ax.plot(self.final_sub_hulls[idx]['x'], self.final_sub_hulls[idx]['y'], c=hull_color, alpha=0.8, linewidth=0.4)
             self.ax.plot([self.final_sub_hulls[idx]['x'][0], self.final_sub_hulls[idx]['x'][-1]],
                          [self.final_sub_hulls[idx]['y'][0], self.final_sub_hulls[idx]['y'][-1]], c=hull_color, alpha=0.8, linewidth=0.4)
+
+        #self.ax.plot(self.final_hull['x'], self.final_hull['y'], c=self.merge_color, alpha=0.8, linewidth=6)
+        #self.ax.plot([self.final_hull['x'][0], self.final_hull['x'][-1]],
+                     #[self.final_hull['y'][0], self.final_hull['y'][-1]], c=self.merge_color, alpha=0.8, linewidth=6)
 
         ''' Outcomment to label points '''
         if self.label_points:
@@ -115,18 +136,23 @@ class GrahamAnimation:
 
         for idx in range(self.n_graham_subs):
             hull_color = self.colors[idx]
-            self.two_lines[idx], = self.ax.plot([], [], c=hull_color, alpha=0.8, linewidth=3)  # switching red / cyan
-            self.hull_lines[idx], = self.ax.plot([], [], c=hull_color, alpha=0.8, linewidth=3)
+            self.two_lines[idx], = self.ax.plot([], [], c=hull_color, alpha=0.8, linewidth=2)  # switching red / cyan
+            self.hull_lines[idx], = self.ax.plot([], [], c=hull_color, alpha=0.8, linewidth=2)
+        self.merge_lines, = self.ax.plot([], [], c=self.merge_color, alpha=0.9, linewidth=3)
         
-        return tuple(self.two_lines) + tuple(self.hull_lines)
+        return tuple(self.two_lines) + tuple(self.hull_lines), self.merge_lines,
 
     def animate(self, step):
+
         for idx in range(self.n_graham_subs):
-            if 0 < step < self.n_steps[idx]:
+            if 0 < step < self.n_steps_graham[idx]:
                 self.update_graham_state(step, idx)
                 self.two_lines[idx].set_data(*self.get_two_lines_pos(idx))
                 self.two_lines[idx].set_color(self.two_lines_color[self.curr_orientation[idx]])
                 self.hull_lines[idx].set_data(*self.get_hull_lines_pos(idx))
-        
-        return tuple(self.two_lines) + tuple(self.hull_lines)
+
+        if max(self.n_steps_graham.values()) < step  < self.n_steps_merge + max(self.n_steps_graham.values()) + 1:
+            self.merge_lines.set_data(*self.get_merge_lines_pos(step))
+
+        return tuple(self.two_lines) + tuple(self.hull_lines), self.merge_lines,
 
