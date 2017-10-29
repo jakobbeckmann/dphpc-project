@@ -37,23 +37,6 @@ double getDistance(const Point& p1, const Point& p2) {
 }
 
 /**
- * Generates random points for given min and max x/y coordinates.
- * @param count number of random points
- * @param min minimum possible value of x/y coordinate
- * @param max maximum possible value of x/y coordinate
- * @return
- */
-
-/**
- *  Swap two points with idx1 and idx2 in a points vector.
- */
-void swapPoints(std::vector<Point> &points, int idx1, int idx2) {
-    Point p = points[idx2];
-    points[idx2] = points[idx1];
-    points[idx1] = p;
-}
-
-/**
  * Finds the index of the most bottom left point. Used to start the graham scan.
  */
 int findLowestLeftmostPointIndex(std::vector<Point> &points) {
@@ -71,7 +54,13 @@ int findLowestLeftmostPointIndex(std::vector<Point> &points) {
     return result;
 }
 
-
+/**
+ * Generates random points for given min and max x/y coordinates.
+ * @param count number of random points
+ * @param min minimum possible value of x/y coordinate
+ * @param max maximum possible value of x/y coordinate
+ * @return
+ */
 std::vector<Point> createPoints(int count, double min, double max) {
     std::vector<Point> points;
     std::random_device rd;  //Will be used to obtain a seed for the random number engine

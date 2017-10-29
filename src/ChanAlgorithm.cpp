@@ -15,10 +15,11 @@ algorithm contains only collinear points.
 @Authors: Jakob Beckmann, Matthäus Heer, Polly
 */
 
-#include <iostream>
-#include <vector>
 #include <algorithm>
 #include <functional>
+#include <iostream>
+#include <utility>
+#include <vector>
 
 #include "ChanAlgorithm.h"
 
@@ -39,14 +40,17 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
     }
 
     int bottomLeftPointIdx = findLowestLeftmostPointIndex(points);
-    startingPoint = points[bottomLeftPointIdx];
-    swapPoints(points, bottomLeftPointIdx, 0);
+    std::swap(points[bottomLeftPointIdx], points[0]);
+    const Point& startingPoint = points[0];
 
-    sort( points.begin( ) + 1, points.end( ),
-          [this]( Point p1, Point p2 )
-          {
-              return this->lowestAngleSort(p1, p2);
-          });
+    // Returns the point with lowest polar angle w.r.t startingPoint
+    std::sort(points.begin()+1, points.end(), [&startingPoint](const Point& p1, const Point& p2) {
+        int orient = getOrientation(startingPoint, p1, p2);
+        if(orient == COLLINEAR) {
+            return getDistance(startingPoint, p1) <= getDistance(startingPoint, p2);
+        }
+        return orient != CLOCKWISE;
+    });
 
     const std::string subSortedName = std::string("sorted_sub_") + std::to_string(subsetIdx) + ".dat";
     FileWriter::writePointsToFile(points, subSortedName, true);
@@ -88,22 +92,6 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
 
     return hull;
 }
-
-/**
-    Function used when sorting using qsort().
-    Returns the point with lowest polar angle w.r.t startingPoint (which is being defined in grahamScan
-    using the findLowestLeftMostPoint function).
-    @param vpp1: pointer to first point
-    @param vpp2: pointer to second point
-*/
-int ChanAlgorithm::lowestAngleSort(const Point& pp1, const Point& pp2) {
-    int orient = getOrientation(startingPoint, pp1, pp2);
-    if(orient == COLLINEAR) {
-        return (getDistance(startingPoint, pp1) <= getDistance(startingPoint, pp2))? 1: 0;
-    }
-    return (orient == ANTICLOCKWISE)? 1: 0;
-}
-
 
 /**
     Returns the index of the point in the list that sits such that each other point
