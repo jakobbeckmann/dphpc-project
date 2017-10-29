@@ -30,14 +30,14 @@ fig = plt.figure(figsize=(15, 8))
 animations = []
 
 ax = fig.add_subplot(111)
-graham_visualizer = GrahamAnimation(data_dict)
+graham_visualizer = GrahamAnimation(data_dict, label_points=False)
 graham_visualizer.set_ax(ax)
 graham_visualizer.plot_all_points()
 
 animations.append(animation.FuncAnimation(fig,
                                           graham_visualizer.animate,
                                           frames=max(graham_visualizer.n_steps.values()),
-                                          interval=10,
+                                          interval=100,
                                           blit=False,
                                           init_func=graham_visualizer.init_animation,
                                           repeat=False))

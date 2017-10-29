@@ -8,7 +8,7 @@ import numpy as np
 
 
 class GrahamAnimation:
-    def __init__(self, data_dict):
+    def __init__(self, data_dict, label_points):
         """
             - state represents the 3 indices of base_idx, last_idx, last_idx - 1, used to draw the arrows
             - hull_points is the stack of points that lie on the hull (at a given moment)
@@ -34,6 +34,7 @@ class GrahamAnimation:
         self.ax                 = None
 
         self.colors             = cm.rainbow(np.linspace(0, 1, self.n_graham_subs))
+        self.label_points       = label_points
 
         # self.idx_stack = [len(self.all_points['x']) - 1, 0, 1]  # unused
 
@@ -100,8 +101,10 @@ class GrahamAnimation:
                          [self.final_sub_hulls[idx]['y'][0], self.final_sub_hulls[idx]['y'][-1]], c=hull_color, alpha=0.8, linewidth=0.4)
 
         ''' Outcomment to label points '''
-        # for idx in range(len(self.all_points['x'])):
-        #    self.ax.text(self.all_points['x'][idx], self.all_points['y'][idx], str(idx))
+        if self.label_points:
+            for idx in range(self.n_graham_subs):
+                for i in range(len(self.all_points[idx]['x'])):
+                    self.ax.text(self.all_points[idx]['x'][i], self.all_points[idx]['y'][i], str(i))
 
         self.ax.axis('off')
 
