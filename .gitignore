@@ -2,6 +2,6 @@
 .idea/dphpc-project.iml
 .idea/modules.xml
 .idea/workspace.xml
-src/.idea/
 cmake-build-debug/
 Dependencies/
+Output/out_*
