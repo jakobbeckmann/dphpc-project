@@ -113,6 +113,7 @@ int ChanAlgorithm::findTangentIndex(const std::vector<Point>& points, Point base
 
     // First point is not the right most point.
     while (lower_bound < upper_bound) {
+        lb_turn_after = getOrientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
         // Find index of point in between the two bounds.
         int mid = (upper_bound + lower_bound) / 2;
 
@@ -135,7 +136,10 @@ int ChanAlgorithm::findTangentIndex(const std::vector<Point>& points, Point base
             // The leftmost point lies to the left of the cut.
             lower_bound = mid + 1;
         }
-        lb_turn_after = getOrientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
+    }
+
+    if(lower_bound == points.size()) {
+        return (lower_bound  - 1);
     }
     return lower_bound;
 }
@@ -149,8 +153,10 @@ int ChanAlgorithm::findTangentIndex(const std::vector<Point>& points, Point base
 */
 std::pair<int, int> ChanAlgorithm::findNextMergePoint(const std::vector<std::vector<Point>>& hulls, std::pair<int, int> base_pair) {
     Point base = hulls[base_pair.first][base_pair.second];
+
     // Select next point on the same hull as the next point for the merge
     std::pair<int, int> result = std::make_pair(base_pair.first, (base_pair.second + 1) % hulls[base_pair.first].size());
+
     for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
         if (hull_idx != base_pair.first) {
             int candidate_idx = findTangentIndex(hulls[hull_idx], base);
@@ -183,16 +189,19 @@ std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t p
         currentSubsetIdx++;
     }
 
-    /*
-        TODO END
-    */
-    std::pair<int, int> next_point = findLowestPoint(hulls);
+    FileWriter mergeWriter = FileWriter("merge_hulls.dat");
+
+    std::pair<int, int> next_point = findLowestPoint(hulls); // pair contains: subhullIdx and pointIdx on that hull
+    mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
     std::vector<Point> result;
-    result.push_back(hulls[next_point.first][next_point.second]);
+
+    result.push_back(hulls[next_point.first][next_point.second]);  // lowest point of all sub hulls
     do {
         next_point = findNextMergePoint(hulls, next_point);
         result.push_back(hulls[next_point.first][next_point.second]);
+        mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
     } while (result[0] != result[result.size() - 1]);
-    result.pop_back();
+
+    result.pop_back(); // due to previous double insertion of last point
     return result;
 }

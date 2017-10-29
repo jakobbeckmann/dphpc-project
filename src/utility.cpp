@@ -72,15 +72,6 @@ std::vector<Point> createPoints(int count, double min, double max) {
         points.emplace_back(Point(x, y));
     }
 
-    /*points.emplace_back(Point(1, 1));
-    points.emplace_back(Point(1, 3));
-    points.emplace_back(Point(3, 2));
-    points.emplace_back(Point(3, 5));
-    points.emplace_back(Point(5, 3));
-    points.emplace_back(Point(5, 1));
-    points.emplace_back(Point(6, 1));
-    points.emplace_back(Point(2.5, 3.95));*/
-
     return points;
 
 }
@@ -97,6 +88,7 @@ std::pair<int, int> findLowestPoint(const std::vector<std::vector<Point>>& hulls
     for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
         for (int point_idx = 0; point_idx < hulls[hull_idx].size(); point_idx++) {
             if (hulls[hull_idx][point_idx].y < lowest_y) {
+                lowest_y = hulls[hull_idx][point_idx].y;
                 hull = hull_idx;
                 point = point_idx;
             }

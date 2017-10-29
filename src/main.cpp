@@ -35,10 +35,12 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
+    /*
     std::cout << "Enter MIN value for x/y coordinates..." << std::endl;
     std::cin >> MIN;
     std::cout << "Enter MAX value for x/y coordinates..." << std::endl;
     std::cin >> MAX;
+    */
 
     //-------------------------------------------------------------------------------
     // ALGORITHM SECTION
