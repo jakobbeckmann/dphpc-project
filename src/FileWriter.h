@@ -69,7 +69,7 @@ public:
      * @param points
      * @param fileName
      */
-    static void writePointsToFile(std::vector<Point> points, const std::string& fileName, bool removeFirst) {
+    static void writePointsToFile(const std::vector<Point>& points, const std::string& fileName, bool removeFirst) {
         if (removeFirst)
             remove(fileName.c_str());
         std::ofstream allPointsFile;

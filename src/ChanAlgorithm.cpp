@@ -100,7 +100,7 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
     @param points: std::vector of points forming a convex polygon.
     @param base: base point
 */
-int ChanAlgorithm::findTangentIndex(std::vector<Point> points, Point base) {
+int ChanAlgorithm::findTangentIndex(const std::vector<Point>& points, Point base) {
     int lower_bound = 0;
     int upper_bound = points.size();
 
@@ -148,7 +148,7 @@ int ChanAlgorithm::findTangentIndex(std::vector<Point> points, Point base) {
     point is the point with lowest y coordinate across all hulls.
     @param hulls: std::vector of hulls (vectors of points)
 */
-std::pair<int, int> ChanAlgorithm::findLowestPoint(std::vector<std::vector<Point> > hulls) {
+std::pair<int, int> ChanAlgorithm::findLowestPoint(const std::vector<std::vector<Point>>& hulls) {
     int hull = 0, point = 0;
     double lowest_y = hulls[0][0].y;
     for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
@@ -168,8 +168,7 @@ std::pair<int, int> ChanAlgorithm::findLowestPoint(std::vector<std::vector<Point
     @param hulls: std::vector of hulls (vectors of points)
     @param base_pair: base point (the last added point from the hull merge)
 */
-std::pair<int, int> ChanAlgorithm::findNextMergePoint(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair) {
-    int hull = 0, point = 0;
+std::pair<int, int> ChanAlgorithm::findNextMergePoint(const std::vector<std::vector<Point>>& hulls, std::pair<int, int> base_pair) {
     Point base = hulls[base_pair.first][base_pair.second];
     // Select next point on the same hull as the next point for the merge
     std::pair<int, int> result = std::make_pair(base_pair.first, (base_pair.second + 1) % hulls[base_pair.first].size());
@@ -194,7 +193,7 @@ std::pair<int, int> ChanAlgorithm::findNextMergePoint(std::vector<std::vector<Po
     @param points: std::vector of points the be analysed
     @param parallel_idx: parallelism index determining the amount of parallel computation
 */
-std::vector<Point> ChanAlgorithm::run(std::vector<Point> points, size_t parallel_idx) {
+std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t parallel_idx) {
 
     std::vector<std::vector<Point> > hulls;
 
