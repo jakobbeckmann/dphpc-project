@@ -5,8 +5,6 @@
 
 class ChanAlgorithm {
 private:
-    Point startingPoint;
-
     int lowestAngleSort(const Point& pp1, const Point& pp2);
     int findTangentIndex(const std::vector<Point>& points, Point base);
     std::vector<Point> grahamScan(std::vector<Point>& points, int subsetIdx);
