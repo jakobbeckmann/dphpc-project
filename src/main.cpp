@@ -29,9 +29,9 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
-    std::cout << "Ener MIN value for x/y coordinates..." << std::endl;
+    std::cout << "Enter MIN value for x/y coordinates..." << std::endl;
     std::cin >> MIN;
-    std::cout << "Ener MAX value for x/y coordinates..." << std::endl;
+    std::cout << "Enter MAX value for x/y coordinates..." << std::endl;
     std::cin >> MAX;
 
     //-------------------------------------------------------------------------------
