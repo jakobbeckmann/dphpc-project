@@ -19,7 +19,9 @@ public:
 
     FileWriter() = default;
 
-    explicit FileWriter(const char* _fileName) : fileName(_fileName) {};
+    explicit FileWriter(const char* _fileName) : fileName(_fileName) {
+        fileName = "../Output/" + fileName;
+        cleanOutputFile(); };
 
     /**
      * Appends a current "State", i.e. the points last-1, last, base, the current orientation of those three
@@ -57,7 +59,7 @@ public:
     }
 
     void updateFileName() {
-        fileName = baseName + "_" + std::to_string(grahamSubsetIdx) + ".dat";
+        fileName = "../Output/" + baseName + "_" + std::to_string(grahamSubsetIdx) + ".dat";
     }
 
     void setBaseName(const char* name) {
@@ -95,6 +97,14 @@ public:
             allPointsFile << point.x << "," << point.y << "\n";
         }
     }
+
+    static void writeNumberToFile(const int& someNumber, const std::string& fileName, bool removeFirst) {
+        if (removeFirst)
+            remove(fileName.c_str());
+        std::ofstream outFile(fileName);
+        outFile << someNumber << "\n";
+    }
+
 
 private:
     int grahamSubsetIdx = 0;

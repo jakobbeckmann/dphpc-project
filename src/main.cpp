@@ -15,18 +15,20 @@
 int main(int argc, char const *argv[]) {
 
     //-------------------------------------------------------------------------------
-    // CREATE OUTPUT FOLDER
+    // CLEAR OUTPUT FOLDER
 
-    // TODO: Platform specific, therefore use boost library, include into project
 
-    //-------------------------------------------------------------------------------
+
     // USER INPUT SECTION
 
-    int POINT_COUNT = 0,  MIN = -10, MAX = 10;
+    int MIN = -10, MAX = 10;
+    size_t POINT_COUNT = 0;
     size_t PARALLELISM_IDX = 0;
-    std::cout << "Enter number of subsets for Graham Scans..." << std::endl;
+
+    std::cout << "Enter number of subsets for Graham Scans... " << std::endl;
     std::cin >> PARALLELISM_IDX;
     if(PARALLELISM_IDX < 1) return -1;
+    FileWriter::writeNumberToFile(PARALLELISM_IDX, "../Output/out_n_graham_subs.dat", true);
 
     std::cout << "Enter number of points..." << std::endl;
     std::cin >> POINT_COUNT;
@@ -58,7 +60,7 @@ int main(int argc, char const *argv[]) {
     }
     std::cout << std::endl;
 
-    FileWriter::writePointsToFile(result, "hull_points.dat", true);
+    FileWriter::writePointsToFile(result, "../Output/out_hull_points.dat", true);
 
     return 0;
 }

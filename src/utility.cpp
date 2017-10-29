@@ -7,6 +7,7 @@
 #include <random>
 #include <fstream>
 #include <iostream>
+#include <glob.h>
 
 #include "utility.h"
 
@@ -42,15 +43,13 @@ double getDistance(const Point& p1, const Point& p2) {
 int findLowestLeftmostPointIndex(std::vector<Point> &points) {
     int result = 0;
     double lowest = points[0].y;
-    for (int idx = 1; idx < points.size(); idx++) {
+    for (size_t idx = 1; idx < points.size(); idx++) {
         if (points[idx].y < lowest || (points[idx].y == lowest && points[idx].x < points[result].x)) {
             lowest = points[idx].y;
             result = idx;
         }
     }
 
-    std::cout << "Found lowest left index: " << result << std::endl;
-    std::cout << "Value: " << points[result].x << " " << points[result].y << std::endl;
     return result;
 }
 
@@ -62,17 +61,31 @@ int findLowestLeftmostPointIndex(std::vector<Point> &points) {
  * @return
  */
 std::vector<Point> createPoints(int count, double min, double max) {
-    std::vector<Point> points;
-    std::random_device rd;  //Will be used to obtain a seed for the random number engine
-    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-    std::uniform_real_distribution<> dis(min, max);
-    for(int idx = 0; idx < count; idx++) {
-        double x = (double) dis(gen);
-        double y = (double) dis(gen);
-        points.emplace_back(Point(x, y));
+
+    size_t nSubSets = 5;
+
+    std::vector<Point> finalPoints;
+
+    for (size_t i = 0; i < nSubSets + 1; i++) {
+        std::vector<Point> points;
+        std::random_device rd;  //Will be used to obtain a seed for the random number engine
+        std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+
+        std::uniform_real_distribution<> dis(min, max);
+
+        size_t nPointsInSubSet = (i < nSubSets)? count / nSubSets : count % nSubSets;
+
+        for(size_t idx = 0; idx < nPointsInSubSet; idx++) {
+            auto x = (double) dis(gen);
+            auto y = (double) dis(gen);
+            double xOffset = ((double) std::rand() / (RAND_MAX)) * 20 - 5;
+            double yOffset = ((double) std::rand() / (RAND_MAX)) * 20 - 5;
+            points.emplace_back(Point(x + xOffset, y + yOffset));
+        }
+        finalPoints.insert(finalPoints.end(), points.begin(), points.end());
     }
 
-    return points;
+    return finalPoints;
 
 }
 
@@ -85,8 +98,8 @@ std::vector<Point> createPoints(int count, double min, double max) {
 std::pair<int, int> findLowestPoint(const std::vector<std::vector<Point>>& hulls) {
     int hull = 0, point = 0;
     double lowest_y = hulls[0][0].y;
-    for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
-        for (int point_idx = 0; point_idx < hulls[hull_idx].size(); point_idx++) {
+    for (size_t hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
+        for (size_t point_idx = 0; point_idx < hulls[hull_idx].size(); point_idx++) {
             if (hulls[hull_idx][point_idx].y < lowest_y) {
                 lowest_y = hulls[hull_idx][point_idx].y;
                 hull = hull_idx;

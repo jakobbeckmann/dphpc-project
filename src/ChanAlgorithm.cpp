@@ -1,6 +1,7 @@
 /**
-chan2d.cpp
+ChanAlgorithm.cpp
 08-10-2017
+
 @Description: 2D implementation of Chan's algorithm. Note that we do not consider a point to be part of the hull if it
 is the middle point of 3 collinear points. Hence no three points in a hull (either global or local/Graham) will ever
 be collinear.  The reason for this design choice is that collinear points only add computation for hull mergers.
@@ -12,7 +13,7 @@ collinear points to be part of hulls, Graham's scan returns an empty hull.
 By extension we assume that the points have general position and hence no subset of points being analysed by Graham's
 algorithm contains only collinear points.
 
-@Authors: Jakob Beckmann, Matthäus Heer, Polly
+@Authors: Jakob Beckmann, Matthäus Heer, Polena Lilyanova
 */
 
 #include <algorithm>
@@ -30,7 +31,7 @@ algorithm contains only collinear points.
 std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int subsetIdx) {
     FileWriter grahamWriter;
     grahamWriter.setGrahamSubsetIdx(subsetIdx);
-    grahamWriter.setBaseName("graham_sub");
+    grahamWriter.setBaseName("out_graham_sub");
     grahamWriter.updateFileName();
     grahamWriter.cleanOutputFile();
 
@@ -51,7 +52,7 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
         return orient != CLOCKWISE;
     });
 
-    const std::string subSortedName = std::string("sorted_sub_") + std::to_string(subsetIdx) + ".dat";
+    const std::string subSortedName = std::string("../Output/out_sorted_sub_") + std::to_string(subsetIdx) + ".dat";
     FileWriter::writePointsToFile(points, subSortedName, true);
 
     // Find the hull
@@ -85,7 +86,7 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
             idxStack.push_back(idx);
         }
     }
-    const std::string subHullName = std::string("hull_points_") + std::to_string(subsetIdx) + ".dat";
+    const std::string subHullName = std::string("../Output/out_hull_points_") + std::to_string(subsetIdx) + ".dat";
     FileWriter::writePointsToFile(hull, subHullName, true);
 
     return hull;
@@ -189,7 +190,7 @@ std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t p
         currentSubsetIdx++;
     }
 
-    FileWriter mergeWriter = FileWriter("merge_hulls.dat");
+    FileWriter mergeWriter = FileWriter("out_merge_hulls.dat");
 
     std::pair<int, int> next_point = findLowestPoint(hulls); // pair contains: subhullIdx and pointIdx on that hull
     mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
