@@ -7,11 +7,17 @@
 #include <fstream>
 #include <random>
 
+
 #include "Point.h"
 #include "utility.h"
 #include "ChanAlgorithm.h"
 
 int main(int argc, char const *argv[]) {
+
+    //-------------------------------------------------------------------------------
+    // CREATE OUTPUT FOLDER
+
+    // TODO: Platform specific, therefore use boost library, include into project
 
     //-------------------------------------------------------------------------------
     // USER INPUT SECTION
