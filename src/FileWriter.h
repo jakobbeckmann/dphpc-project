@@ -18,24 +18,18 @@ class FileWriter {
 public:
 
     void writeGraham(Point last, Point secLast, Point base, int addRemove, Point addRemPoint, int orientation) {
-        using namespace std;
-        ofstream file;
-        file.open(fileName, std::ios_base::app);
+        std::ofstream file(fileName, std::ios_base::app);
         file << last.x << "," << secLast.x << "," << base.x << ","
              << last.y << "," << secLast.y << "," << base.y << ","
-             << addRemove << "," << addRemPoint.x << "," << addRemPoint.y << "," << orientation << endl;
-
-        file.close();
+             << addRemove << "," << addRemPoint.x << "," << addRemPoint.y << "," << orientation << "\n";
     }
     /**
      * Used to write indices - not used at the moment.
      */
     void writeGrahamStep(int baseIdx, int lastIdx, int secLastIdx, int addedIdx, int removedIdx, int orientation) {
-        std::ofstream file;
-        file.open(fileName, std::ios_base::app);
+        std::ofstream file(fileName, std::ios_base::app);
         file << baseIdx << "," << lastIdx << "," << secLastIdx << ","
-             << addedIdx << "," << removedIdx << "," << orientation << std::endl;
-        file.close();
+             << addedIdx << "," << removedIdx << "," << orientation << "\n";
     }
 
     void updateFileName() {
@@ -69,15 +63,13 @@ public:
      * @param points
      * @param fileName
      */
-    static void writePointsToFile(std::vector<Point> points, const std::string& fileName, bool removeFirst) {
+    static void writePointsToFile(const std::vector<Point>& points, const std::string& fileName, bool removeFirst) {
         if (removeFirst)
             remove(fileName.c_str());
-        std::ofstream allPointsFile;
-        allPointsFile.open(fileName);
+        std::ofstream allPointsFile(fileName);
         for (Point point : points) {
-            allPointsFile << point.x << "," << point.y << std::endl;
+            allPointsFile << point.x << "," << point.y << "\n";
         }
-        allPointsFile.close();
     }
 
 private:

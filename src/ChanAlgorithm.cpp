@@ -15,10 +15,11 @@ algorithm contains only collinear points.
 @Authors: Jakob Beckmann, Matthäus Heer, Polly
 */
 
-#include <iostream>
-#include <vector>
 #include <algorithm>
 #include <functional>
+#include <iostream>
+#include <utility>
+#include <vector>
 
 #include "ChanAlgorithm.h"
 
@@ -39,14 +40,17 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
     }
 
     int bottomLeftPointIdx = findLowestLeftmostPointIndex(points);
-    startingPoint = points[bottomLeftPointIdx];
-    swapPoints(points, bottomLeftPointIdx, 0);
+    std::swap(points[bottomLeftPointIdx], points[0]);
+    const Point& startingPoint = points[0];
 
-    sort( points.begin( ) + 1, points.end( ),
-          [this]( Point p1, Point p2 )
-          {
-              return this->lowestAngleSort(p1, p2);
-          });
+    // Returns the point with lowest polar angle w.r.t startingPoint
+    std::sort(points.begin()+1, points.end(), [&startingPoint](const Point& p1, const Point& p2) {
+        int orient = getOrientation(startingPoint, p1, p2);
+        if(orient == COLLINEAR) {
+            return getDistance(startingPoint, p1) <= getDistance(startingPoint, p2);
+        }
+        return orient != CLOCKWISE;
+    });
 
     const std::string subSortedName = std::string("sorted_sub_") + std::to_string(subsetIdx) + ".dat";
     FileWriter::writePointsToFile(points, subSortedName, true);
@@ -90,29 +94,13 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
 }
 
 /**
-    Function used when sorting using qsort().
-    Returns the point with lowest polar angle w.r.t startingPoint (which is being defined in grahamScan
-    using the findLowestLeftMostPoint function).
-    @param vpp1: pointer to first point
-    @param vpp2: pointer to second point
-*/
-int ChanAlgorithm::lowestAngleSort(const Point& pp1, const Point& pp2) {
-    int orient = getOrientation(startingPoint, pp1, pp2);
-    if(orient == COLLINEAR) {
-        return (getDistance(startingPoint, pp1) <= getDistance(startingPoint, pp2))? 1: 0;
-    }
-    return (orient == ANTICLOCKWISE)? 1: 0;
-}
-
-
-/**
     Returns the index of the point in the list that sits such that each other point
     in the list is on the left of the line from said point to the base point given in
     the arguments.
     @param points: std::vector of points forming a convex polygon.
     @param base: base point
 */
-int ChanAlgorithm::findTangentIndex(std::vector<Point> points, Point base) {
+int ChanAlgorithm::findTangentIndex(const std::vector<Point>& points, Point base) {
     int lower_bound = 0;
     int upper_bound = points.size();
 
@@ -160,7 +148,7 @@ int ChanAlgorithm::findTangentIndex(std::vector<Point> points, Point base) {
     point is the point with lowest y coordinate across all hulls.
     @param hulls: std::vector of hulls (vectors of points)
 */
-std::pair<int, int> ChanAlgorithm::findLowestPoint(std::vector<std::vector<Point> > hulls) {
+std::pair<int, int> ChanAlgorithm::findLowestPoint(const std::vector<std::vector<Point>>& hulls) {
     int hull = 0, point = 0;
     double lowest_y = hulls[0][0].y;
     for (int hull_idx = 0; hull_idx < hulls.size(); hull_idx++) {
@@ -180,8 +168,7 @@ std::pair<int, int> ChanAlgorithm::findLowestPoint(std::vector<std::vector<Point
     @param hulls: std::vector of hulls (vectors of points)
     @param base_pair: base point (the last added point from the hull merge)
 */
-std::pair<int, int> ChanAlgorithm::findNextMergePoint(std::vector<std::vector<Point> > hulls, std::pair<int, int> base_pair) {
-    int hull = 0, point = 0;
+std::pair<int, int> ChanAlgorithm::findNextMergePoint(const std::vector<std::vector<Point>>& hulls, std::pair<int, int> base_pair) {
     Point base = hulls[base_pair.first][base_pair.second];
     // Select next point on the same hull as the next point for the merge
     std::pair<int, int> result = std::make_pair(base_pair.first, (base_pair.second + 1) % hulls[base_pair.first].size());
@@ -206,7 +193,7 @@ std::pair<int, int> ChanAlgorithm::findNextMergePoint(std::vector<std::vector<Po
     @param points: std::vector of points the be analysed
     @param parallel_idx: parallelism index determining the amount of parallel computation
 */
-std::vector<Point> ChanAlgorithm::run(std::vector<Point> points, size_t parallel_idx) {
+std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t parallel_idx) {
 
     std::vector<std::vector<Point> > hulls;
 
