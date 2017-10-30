@@ -12,7 +12,7 @@ import matplotlib.animation as animation
 # ----- SPECIFY PARAMETERS
 
 save_movie = False
-show_labels = False
+show_labels = True
 
 # -----
 

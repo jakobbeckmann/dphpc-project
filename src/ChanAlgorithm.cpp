@@ -21,6 +21,7 @@ algorithm contains only collinear points.
 #include <iostream>
 #include <vector>
 
+
 #include "ChanAlgorithm.h"
 
 /**
@@ -28,7 +29,7 @@ algorithm contains only collinear points.
     Returns a std::vector of points contained in the convex hull of the input.
     @param points: std::vector of points in the graham subset.
 */
-std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int subsetIdx) {
+std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point>& points, int subsetIdx) {
     FileWriter grahamWriter;
     grahamWriter.setGrahamSubsetIdx(subsetIdx);
     grahamWriter.setBaseName("out_graham_sub");
@@ -44,7 +45,7 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point> &points, int sub
     const Point& startingPoint = points[0];
 
     // Returns the point with lowest polar angle w.r.t startingPoint
-    std::sort(points.begin()+1, points.end(), [&startingPoint](const Point& p1, const Point& p2) {
+    std::stable_sort(points.begin()+1, points.end(), [&startingPoint](const Point& p1, const Point& p2) {
         int orient = getOrientation(startingPoint, p1, p2);
         if(orient == COLLINEAR) {
             return getDistance(startingPoint, p1) <= getDistance(startingPoint, p2);
