@@ -27,7 +27,7 @@ class ChanAnimation:
         # ----- graham subset animation part
         self.curr_sub_hull      = {idx: {'x': [self.all_points[idx]['x'][add_idx] for add_idx in [-1, 0, 1]],
                                          'y': [self.all_points[idx]['y'][add_idx] for add_idx in [-1, 0, 1]]}
-                                   for idx in range(self.n_graham_subs)}
+                                                for idx in range(self.n_graham_subs)}
 
         self.state              = {idx: [] for idx in range(self.n_graham_subs)}
         self.curr_orientation   = {idx: None for idx in range(self.n_graham_subs)}
@@ -147,7 +147,7 @@ class ChanAnimation:
             self.two_lines[idx], = self.ax.plot([], [], c=hull_color, alpha=0.8, linewidth=2)  # switching red / cyan
             self.hull_lines[idx], = self.ax.plot([], [], c=hull_color, alpha=0.8, linewidth=2)
         self.merge_lines, = self.ax.plot([], [], c=self.merge_color, alpha=0.9, linewidth=3)
-        
+
         return tuple(self.two_lines) + tuple(self.hull_lines), self.merge_lines,
 
     def animate(self, step):
@@ -163,4 +163,3 @@ class ChanAnimation:
             self.merge_lines.set_data(*self.get_merge_lines_pos(step))
 
         return tuple(self.two_lines) + tuple(self.hull_lines), self.merge_lines,
-

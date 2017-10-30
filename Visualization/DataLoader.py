@@ -63,7 +63,7 @@ class DataLoader:
 
         for outfile in all_files:
             last_letter_before_point = outfile.split('.')[0].split('_')[-1]
-            print last_letter_before_point
+            print(last_letter_before_point)
             if self.isinteger(last_letter_before_point):
                 if int(last_letter_before_point) > (self.n_graham_subs - 1):
                     os.remove(outfile)
@@ -89,5 +89,5 @@ class DataLoader:
 if __name__ == '__main__':
 
     '''Example usage...'''
-    loader = DataLoader('C:\Users\mathee\CLionProjects\dphpc-project\cmake-build-debug')
+    loader = DataLoader('')
     data_dict = loader.load_all_data()
