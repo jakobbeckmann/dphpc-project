@@ -115,7 +115,6 @@ int ChanAlgorithm::findTangentIndex(const std::vector<Point>& points, Point base
 
     // First point is not the right most point.
     while (lower_bound < upper_bound) {
-        lb_turn_after = getOrientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
         // Find index of point in between the two bounds.
         int mid = (upper_bound + lower_bound) / 2;
 
@@ -136,13 +135,12 @@ int ChanAlgorithm::findTangentIndex(const std::vector<Point>& points, Point base
             upper_bound = mid;
         } else {
             // The leftmost point lies to the left of the cut.
-            lower_bound = mid + 1;
+            lower_bound = mid;
         }
     }
 
-    if(lower_bound == points.size()) {
-        return (lower_bound  - 1);
-    }
+    lb_turn_after = getOrientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
+
     return lower_bound;
 }
 
@@ -171,6 +169,7 @@ std::pair<int, int> ChanAlgorithm::findNextMergePoint(const std::vector<std::vec
             }
         }
     }
+
     return result;
 }
 

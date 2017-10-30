@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 """
 Wraps the single algorithm steps into a whole animation.
 """
@@ -33,12 +35,12 @@ graham_visualizer.set_ax(ax)
 graham_visualizer.plot_all_points()
 n_steps = max(graham_visualizer.n_steps_graham.values()) + graham_visualizer.n_steps_merge + 1
 
-print "n steps", n_steps
+print("n steps", n_steps)
 
 animations.append(animation.FuncAnimation(fig,
                                           graham_visualizer.animate,
                                           frames=n_steps,
-                                          interval=20,
+                                          interval=10,
                                           blit=False,
                                           init_func=graham_visualizer.init_animation,
                                           repeat=False))
