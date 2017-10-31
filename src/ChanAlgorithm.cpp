@@ -137,9 +137,9 @@ int ChanAlgorithm::findTangentIndex(const std::vector<Point>& points, Point base
             // The leftmost point lies to the left of the cut.
             lower_bound = mid;
         }
-    }
 
-    lb_turn_after = getOrientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
+        lb_turn_after = getOrientation(base, points[lower_bound], points[(lower_bound + 1) % points.size()]);
+    }
 
     return lower_bound;
 }
