@@ -126,7 +126,7 @@ std::vector<std::vector<Point>> SplitVector(const std::vector<Point>& vec, size_
     {
         end += (remain > 0) ? (length + !!(remain--)) : length;
 
-        outVec.emplace_back(std::vector<Point>(vec.begin() + begin, vec.begin() + end));
+        outVec.emplace_back(vec.begin() + begin, vec.begin() + end);
 
         begin = end;
     }
