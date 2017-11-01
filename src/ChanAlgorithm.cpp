@@ -13,7 +13,7 @@ collinear points to be part of hulls, Graham's scan returns an empty hull.
 By extension we assume that the points have general position and hence no subset of points being analysed by Graham's
 algorithm contains only collinear points.
 
-@Authors: Jakob Beckmann, Matthäus Heer, Polena Lilyanova
+@Authors: Jakob Beckmann, Matthäus Heer, Polena Lilyanova, Georg Kilzer
 */
 
 #include <algorithm>
