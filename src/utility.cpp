@@ -41,7 +41,7 @@ double getDistance(const Point& p1, const Point& p2) {
 /**
  * Finds the index of the most bottom left point. Used to start the graham scan.
  */
-int findLowestLeftmostPointIndex(std::vector<Point> &points) {
+int findLowestLeftmostPointIndex(const std::vector<Point>& points) {
     int result = 0;
     double lowest = points[0].y;
     for (size_t idx = 1; idx < points.size(); idx++) {
