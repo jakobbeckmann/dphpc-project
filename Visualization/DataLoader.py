@@ -88,5 +88,5 @@ class DataLoader:
 if __name__ == '__main__':
 
     '''Example usage...'''
-    loader = DataLoader('C:\Users\mathee\CLionProjects\dphpc-project\cmake-build-debug')
+    loader = DataLoader('../Output')
     data_dict = loader.load_all_data()
