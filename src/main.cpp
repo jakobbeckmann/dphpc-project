@@ -2,10 +2,11 @@
     Main function for the chan 2d algorithm implementation.
  */
 
-#include <iostream>
-#include <vector>
 #include <fstream>
+#include <iostream>
 #include <random>
+#include <sstream>
+#include <vector>
 
 
 #include "Point.h"
@@ -25,13 +26,23 @@ int main(int argc, char const *argv[]) {
     size_t POINT_COUNT = 0;
     size_t PARALLELISM_IDX = 0;
 
-    std::cout << "Enter number of subsets for Graham Scans... " << std::endl;
-    std::cin >> PARALLELISM_IDX;
+    if (argc == 3) {
+        std::stringstream sstream(argv[1]);
+		sstream >> PARALLELISM_IDX;
+    } else {
+        std::cout << "Enter number of subsets for Graham Scans... " << std::endl;
+        std::cin >> PARALLELISM_IDX;
+    }
     if(PARALLELISM_IDX < 1) return -1;
     FileWriter::writeNumberToFile(PARALLELISM_IDX, "../Output/out_n_graham_subs.dat", true);
 
-    std::cout << "Enter number of points..." << std::endl;
-    std::cin >> POINT_COUNT;
+    if (argc == 3) {
+        std::stringstream sstream(argv[2]);
+        sstream >> POINT_COUNT;
+    } else {
+        std::cout << "Enter number of points..." << std::endl;
+        std::cin >> POINT_COUNT;
+    }
     if(POINT_COUNT < PARALLELISM_IDX * 3) {
         std::cout << "Please need more points or less parallelism." << std::endl;
         return -1;
