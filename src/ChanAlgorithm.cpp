@@ -182,12 +182,13 @@ std::pair<int, int> ChanAlgorithm::findNextMergePoint(const std::vector<std::vec
 std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t parallel_idx) {
 
     std::vector<std::vector<Point> > hulls;
+    hulls.resize(parallel_idx);
 
     int currentSubsetIdx = 0;
 
-    for (std::vector<Point> subPoints : SplitVector(points, parallel_idx)) {
-        hulls.push_back(grahamScan(subPoints, currentSubsetIdx));
-        currentSubsetIdx++;
+    for (size_t i = 0; i < parallel_idx; ++i) {
+        std::vector<Point> part = SplitVector(points, i, parallel_idx);
+        hulls[i] = grahamScan(part, i);
     }
 
     FileWriter mergeWriter = FileWriter("out_merge_hulls.dat");

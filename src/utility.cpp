@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <glob.h>
+#include <cassert>
 
 #include "utility.h"
 
@@ -110,26 +111,18 @@ std::pair<int, int> findLowestPoint(const std::vector<std::vector<Point>>& hulls
     return std::make_pair(hull, point);
 }
 
-std::vector<std::vector<Point>> SplitVector(const std::vector<Point>& vec, size_t n)
+std::vector<Point> SplitVector(const std::vector<Point>& vec, size_t i, size_t n)
 {
-    std::vector<std::vector<Point>> outVec;
-
     size_t length = vec.size() / n;
     size_t remain = vec.size() % n;
 
-    std::cout << "sub vectors contain " << length << " elements with remainder " << remain << std::endl;
+    if (i == 0)
+        std::cout << "sub vectors contain " << length << " elements with remainder " << remain << std::endl;
 
-    size_t begin = 0;
-    size_t end = 0;
+    size_t begin = i*length;
+    size_t end = i+1 == n ? vec.size() : std::min((i+1)*length, vec.size());
 
-    for (size_t i = 0; i < std::min(n, vec.size()); ++i)
-    {
-        end += (remain > 0) ? (length + !!(remain--)) : length;
+    assert(begin < end);
 
-        outVec.emplace_back(vec.begin() + begin, vec.begin() + end);
-
-        begin = end;
-    }
-
-    return outVec;
+    return std::vector<Point>(vec.begin() + begin, vec.begin() + end);
 }
