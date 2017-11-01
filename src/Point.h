@@ -35,8 +35,4 @@ public:
         output << "(" << point.x << ", " << point.y << ")";
         return output;
     }
-
-    void printPoint() {
-        std::cout << x << "," << y << std::endl;
-    }
 };
