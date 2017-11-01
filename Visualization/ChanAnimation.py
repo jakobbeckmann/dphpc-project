@@ -152,7 +152,7 @@ class ChanAnimation:
 
     def animate(self, step):
         if step % 100 == 0:
-            print step
+            print(step)
         for idx in range(self.n_graham_subs):
             if 0 < step < self.n_steps_graham[idx]:
                 self.update_graham_state(step, idx)
