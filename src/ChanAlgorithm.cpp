@@ -184,8 +184,6 @@ std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t p
     std::vector<std::vector<Point> > hulls;
     hulls.resize(parallel_idx);
 
-    int currentSubsetIdx = 0;
-
     #pragma omp parallel for
     for (size_t i = 0; i < parallel_idx; ++i) {
         std::vector<Point> part = SplitVector(points, i, parallel_idx);
