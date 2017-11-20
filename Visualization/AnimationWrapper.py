@@ -35,7 +35,6 @@ graham_visualizer.set_ax(ax)
 graham_visualizer.plot_all_points()
 n_steps = max(graham_visualizer.n_steps_graham.values()) + graham_visualizer.n_steps_merge + 1
 
-print("n steps", n_steps)
 
 animations.append(animation.FuncAnimation(fig,
                                           graham_visualizer.animate,
