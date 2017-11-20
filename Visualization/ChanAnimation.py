@@ -36,7 +36,11 @@ class ChanAnimation:
         self.hull_lines         = {idx: None for idx in range(self.n_graham_subs)}
         self.two_lines_color    = {'clockwise': 'black', 'anticlockwise': 'green'}
         self.step               = 0
-        self.graham_colors      = cm.rainbow(np.linspace(0, 1, self.n_graham_subs))
+
+        if self.n_graham_subs == 1:
+            self.graham_colors = ['red']
+        else:
+            self.graham_colors      = cm.rainbow(np.linspace(0, 1, self.n_graham_subs))
         self.label_points       = label_points
 
         # ----- merge subsets animation part
@@ -45,16 +49,6 @@ class ChanAnimation:
         self.merge_lines        = None
 
         # self.idx_stack = [len(self.all_points['x']) - 1, 0, 1]  # unused
-
-    # not used at the moment
-    def update_stack_state(self, step):
-
-        add_rem_flag = self.graham_run[step][1]
-
-        if add_rem_flag == 1:
-            self.idx_stack.append(self.graham_run[step][0])
-        elif add_rem_flag == -1:
-            del self.idx_stack[-2]
 
     def update_graham_state(self, step, idx):
         """Updates the state of the [idx] graham subanimation to step [step]."""
