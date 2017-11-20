@@ -23,10 +23,6 @@ int main(int argc, char const *argv[]) {
         points.push_back(Point(x, y));
     }
 
-    for (vector<Point>::iterator it = points.begin(); it != points.end(); ++it) {
-        it->print();
-    }
-
     std::vector<Point> result;
     double totalTime = 0;
 
@@ -40,8 +36,7 @@ int main(int argc, char const *argv[]) {
         std::exit(EXIT_FAILURE);
     }
 
-    std::cout << result.size() << std::endl;
-
+    std::cout << totalTime << endl;
     for (vector<Point>::iterator it = result.begin(); it != result.end(); ++it) {
         it->print();
     }

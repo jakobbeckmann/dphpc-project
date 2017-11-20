@@ -22,8 +22,6 @@ int main(int argc, char const *argv[]) {
         points = randomShapeGenerator(numberOfPoints, range);
     } else if (shape == "circle") {
         points = circleShapeGenerator(numberOfPoints, range);
-    } else if (shape == "disk") {
-        points = diskShapeGenerator(numberOfPoints, range);
     } else if (shape == "square") {
         points = squareShapeGenerator(numberOfPoints, range);
     } else {

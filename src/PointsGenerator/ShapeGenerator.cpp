@@ -57,20 +57,6 @@ std::vector<Point> circleShapeGenerator(int count, double range) {
 }
 
 /**
- * Generates random points for given range in disk shape;
- * @param count number of random points
- * @param range +range for maximum possible value of x/y coordinate and -range for minimum
- * @return
- */
-std::vector<Point> diskShapeGenerator(int count, double range) {
-    double min = -range;
-    double max = range;
-    size_t nSubSets = 5;
-    std::vector<Point> finalPoints;
-    return finalPoints;
-}
-
-/**
  * Generates random points for given range in square shape;
  * @param count number of random points
  * @param range +range for maximum possible value of x/y coordinate and -range for minimum

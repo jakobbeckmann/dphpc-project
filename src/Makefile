@@ -1,15 +1,16 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall
+CXXFLAGS = -std=c++11 -Wall -O2
  
 EXEC = AlgorithmsRunner
-SOURCES = $(wildcard *.cc)
-OBJECTS = $(SOURCES:.cc=.o)
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
 
 all: AlgorithmsRunner
 
-AlgorithmsRunner.o: AlgorithmsRunner.cpp ChanAlgorithm.h
-ChanAlgorithm.o: ChanAlgorithm.h ChanAlgorithm.cpp
-AlgorithmsRunner: AlgorithmsRunner.o
+AlgorithmsRunner.o: AlgorithmsRunner.cpp
+ChanAlgorithm.o: ChanAlgorithm.cpp ChanAlgorithm.h
+utility.o: utility.cpp utility.h
+AlgorithmsRunner: AlgorithmsRunner.o ChanAlgorithm.o utility.o
 	$(CXX) $(CXXFLAGS) $^ -o $(EXEC)
 
 clean:
