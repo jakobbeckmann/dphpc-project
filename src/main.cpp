@@ -10,6 +10,7 @@
 
 
 #include "Point.h"
+#include "PointsGenerator/ShapeGenerator.h"
 #include "utility.h"
 #include "ChanAlgorithm.h"
 
@@ -22,7 +23,7 @@ int main(int argc, char const *argv[]) {
 
     // USER INPUT SECTION
 
-    int MIN = -10, MAX = 10;
+    int RANGE = 10;
     size_t POINT_COUNT = 0;
     size_t PARALLELISM_IDX = 0;
 
@@ -59,8 +60,12 @@ int main(int argc, char const *argv[]) {
     // ALGORITHM SECTION
 
     ChanAlgorithm chan;
-    std::vector<Point> points = createPoints(POINT_COUNT, MIN, MAX);
+    std::vector<Point> points = randomShapeGenerator(POINT_COUNT, RANGE);
     std::vector<Point> result = chan.run(points, PARALLELISM_IDX);
+
+    for (std::vector<Point>::iterator it = result.begin(); it != result.end(); ++it) {
+        it->print();
+    }
 
     //-------------------------------------------------------------------------------
     // OUTPUT SECTION
