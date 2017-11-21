@@ -16,8 +16,9 @@ all: AlgorithmsRunner
 
 AlgorithmsRunner.o: AlgorithmsRunner.cpp
 ChanAlgorithm.o: ChanAlgorithm.cpp ChanAlgorithm.h
+GrahamScanAlgorithm.o: GrahamScanAlgorithm.cpp GrahamScanAlgorithm.h
 utility.o: utility.cpp utility.h
-AlgorithmsRunner: AlgorithmsRunner.o ChanAlgorithm.o utility.o
+AlgorithmsRunner: AlgorithmsRunner.o ChanAlgorithm.o GrahamScanAlgorithm.o utility.o
 	$(CXX) $(CXXFLAGS) $^ -o $(EXEC)
 
 clean:

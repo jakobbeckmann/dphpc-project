@@ -17,7 +17,7 @@ import numpy as np
 
 def runCorrectAlgorithm(numOfPoints, dataFile):
     output = subprocess.check_output(
-        'cat ' + dataFile + ' | ../AlgorithmsRunner 1 ' + str(numOfPoints) + ' version1', shell=True)
+        'cat ' + dataFile + ' | ../AlgorithmsRunner 1 ' + str(numOfPoints) + ' graham', shell=True)
     return parseOutput(output)
 
 def checkCorrectnessOfOutput(outputToCheck, correctOutput):
@@ -58,7 +58,7 @@ subprocess.call('make -C ../', shell=True)
 # Set up test and result environment
 RUNTIMES = 10;
 STEP = 20;
-ALGORITHMS = ['version1']
+ALGORITHMS = ['version1', 'graham']
 result = {}
 for numOfPoints in range(MINIMUM_NUMBER_POINTS, MAXIMUM_NUMBER_POINTS, STEP):
     result.update({numOfPoints : {}})
@@ -97,7 +97,7 @@ for numOfPoints in range(MINIMUM_NUMBER_POINTS, MAXIMUM_NUMBER_POINTS, STEP):
                 # Check if output of algorithm was correct
                 if checkCorrectnessOfOutput(output, correctOutput):
                     # Save the running time for given number of points and algorithm
-                    time = float(output.split('\n')[3])
+                    time = float(output.split('\n')[0])
                     result[numOfPoints][ALGORITHMS[i]][c].append(time)
                 else:
                     print 'Wrong results for ' + ALGORITHMS[i] + ' running on '+ str(c) + '. Setting time to -10000.\n'

@@ -7,6 +7,7 @@
 
 #include "Point.h"
 #include "ChanAlgorithm.h"
+#include "GrahamScanAlgorithm.h"
 
 using namespace std;
 
@@ -30,6 +31,11 @@ int main(int argc, char const *argv[]) {
         ChanAlgorithm chan;
         // measure time
         result = chan.run(points, numberOfCores);
+        totalTime = 2.387;
+    } else  if (algorithm == "graham") {
+        GrahamScanAlgorithm graham;
+        // measure time
+        result = graham.run(points, numberOfCores);
         totalTime = 2.387;
     } else {
         std::cout << "No such algorithm!";
