@@ -55,43 +55,6 @@ int findLowestLeftmostPointIndex(const std::vector<Point>& points) {
 }
 
 /**
- * Generates random points for given min and max x/y coordinates.
- * @param count number of random points
- * @param min minimum possible value of x/y coordinate
- * @param max maximum possible value of x/y coordinate
- * @return
- */
-std::vector<Point> createPoints(int count, double min, double max) {
-
-    size_t nSubSets = 5;
-
-    std::vector<Point> finalPoints;
-
-    for (size_t i = 0; i < nSubSets + 1; i++) {
-        std::vector<Point> points;
-        std::random_device rd;  //Will be used to obtain a seed for the random number engine
-        std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-
-        std::uniform_real_distribution<> dis(min, max);
-
-        size_t nPointsInSubSet = (i < nSubSets)? count / nSubSets : count % nSubSets;
-
-        for(size_t idx = 0; idx < nPointsInSubSet; idx++) {
-            auto x = (double) dis(gen);
-            auto y = (double) dis(gen);
-            double xOffset = ((double) std::rand() / (RAND_MAX)) * 20 - 5;
-            double yOffset = ((double) std::rand() / (RAND_MAX)) * 20 - 5;
-            points.emplace_back(Point(x + xOffset, y + yOffset));
-        }
-        finalPoints.insert(finalPoints.end(), points.begin(), points.end());
-    }
-
-    return finalPoints;
-
-}
-
-
-/**
     Returns a std::pair representing the hull number and point index inside that hull. The represented
     point is the point with lowest y coordinate across all hulls.
     @param hulls: std::vector of hulls (vectors of points)
