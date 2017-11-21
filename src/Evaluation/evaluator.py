@@ -24,8 +24,9 @@ def checkCorrectnessOfOutput(outputToCheck, correctOutput):
     parsedOutputToCheck = parseOutput(outputToCheck)
     if len(parsedOutputToCheck) == len(correctOutput):
         for point in parsedOutputToCheck:
-            if not (point in correctOutput):
+            if not point in correctOutput:
                 return False
+        return True
     else:
         return False
 
@@ -65,7 +66,9 @@ for numOfPoints in range(MINIMUM_NUMBER_POINTS, MAXIMUM_NUMBER_POINTS, STEP):
 # For each number of points, generate data set of points,
 # run on 1 to maximum number of parallelism
 #  each algorithm RUNTIMES number of times saving the running time for each run
+print 'Starting evaluations...\n'
 for numOfPoints in range(MINIMUM_NUMBER_POINTS, MAXIMUM_NUMBER_POINTS, STEP):
+    print 'Generating points ' + str(numOfPoints) + '\n'
     dataFile = ''
     if len(INPUT_FILE) > 0:
         dataFile = INPUT_FILE
@@ -84,6 +87,8 @@ for numOfPoints in range(MINIMUM_NUMBER_POINTS, MAXIMUM_NUMBER_POINTS, STEP):
         # Run each algorithm for 1 to PARALLELISM number of cores
         for c in range(MIN_PARALLELISM, MAX_PARALLELISM + 1):
             result[numOfPoints][ALGORITHMS[i]].update({c : []})
+            print 'Starting evaluation for ' + ALGORITHMS[i] + ' on ' + str(c) + ' cores' + ' with ' + str(numOfPoints) \
+                  + '\n'
             # Run each algorithm RUNTIMES number of times
             for j in range(0, RUNTIMES):
                 output = subprocess.check_output(
@@ -97,12 +102,16 @@ for numOfPoints in range(MINIMUM_NUMBER_POINTS, MAXIMUM_NUMBER_POINTS, STEP):
                 else:
                     print 'Wrong results for ' + ALGORITHMS[i] + ' running on '+ str(c) + '. Setting time to -10000.\n'
                     result[numOfPoints][ALGORITHMS[i]][c].append(-10000)
+            print 'Finished evaluation\n'
+
 
 # Writing results to uniquely named file
+print 'Writing results to file...\n'
 now = datetime.datetime.now()
-resultFile = 'result_' + str(numOfPoints) + '_' + str(now.month) + '_' + str(now.day) + '_' + str(now.hour) + '_' + str(now.minute) + '_' \
+resultFile = 'result_' + str(numOfPoints) + '_' + SHAPE + '_' + str(now.month) + '_' + str(now.day) + '_' + str(now.hour) + '_' + str(now.minute) + '_' \
              + str(now.second)
 file = open(resultFile, 'w')
+file.write(SHAPE + '\n')
 file.write('numPoints,algorithm,numCores,avgTimingOf' + str(RUNTIMES) + '\n')
 for points, algorithms in result.iteritems():
     for algorithm, cores in algorithms.iteritems():
