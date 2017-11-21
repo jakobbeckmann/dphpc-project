@@ -1,5 +1,12 @@
+# MacOS is special :)
+OS := $(shell uname)
+ifeq ($(OS), Darwin)
+# Mac OS X
+CXX = g++-7
+else
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -O2
+endif
+CXXFLAGS = -std=c++11 -Wall -fopenmp -O2 -w
  
 EXEC = AlgorithmsRunner
 SOURCES = $(wildcard *.cpp)

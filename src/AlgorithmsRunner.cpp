@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]) {
         ChanAlgorithm chan;
         // measure time
         result = chan.run(points, numberOfCores);
-        totalTime = 10;
+        totalTime = 2.387;
     } else {
         std::cout << "No such algorithm!";
         std::exit(EXIT_FAILURE);
