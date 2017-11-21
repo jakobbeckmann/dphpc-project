@@ -1,2 +1,0 @@
-This file only exists such that git tracks this folder.
-Do not modify or remove.

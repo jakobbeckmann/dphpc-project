@@ -4,6 +4,11 @@
 .idea/workspace.xml
 cmake-build-debug/
 Dependencies/
-Output/out_*
+Output/
+!Output/output_readme.txt
+Input/
+!Input/input_readme.txt
+!Input/bird.jpg
+
 Visualisation/__pycache__/
 Visualisation/*.pyc
