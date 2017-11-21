@@ -5,3 +5,4 @@
 ############################################
 
 This file exists such that everyone has an empty output folder to store their results in.
+Files in this folder will NOT be tracked by git.
