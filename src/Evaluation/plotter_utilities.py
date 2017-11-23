@@ -1,16 +1,3 @@
-#!/usr/bin/env python
-
-# Plots results from the evaluations in different modes.
-# Provide the script with the following arguments:
-# -f relative path to read the results from (the file should be in the format generated from evaluator.py)
-# -m mode of the plot: speedup_cores ; speedup_numPoints
-# -a list of algorithms to plot in the format "['algortihm1','algorithm2'...]"
-# -n number of points
-
-import ast
-import sys
-import matplotlib.pyplot as plt
-
 # Parsing the file which should be in the following format:
 # shape
 # numPoints,algorithm,cores,avgTiming
@@ -67,16 +54,3 @@ def plot(n, time, name, xlabel, ylabel, xlim, ylim):
     if name == "speedup.png":
         ax.plot([0,24], [0,24], '--')
     plt.savefig(name)
-
-# Fetch command line arguments
-FILEPATH = sys.argv[sys.argv.index('-f') + 1]
-MODE = sys.argv[sys.argv.index('-m') + 1]
-ALGORITHMS = ast.literal_eval(sys.argv[sys.argv.index('-a') + 1])
-NUMBER_POINTS = int(sys.argv[sys.argv.index('-n') + 1])
-
-# Read the result tile and parse it in appropiate format
-file = open(FILEPATH, 'r')
-shape, parsedFile = parseFile(file.read())
-
-if (mode == 'speedup_cores'):
-    plotSpeedupAndCores(parsedFile, NUMBER_POINTS, ALGORITHMS[0], shape)
