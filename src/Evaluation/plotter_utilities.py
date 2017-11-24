@@ -1,9 +1,13 @@
+import matplotlib.pyplot as plt
+
 # Parsing the file which should be in the following format:
-# shape
-# numPoints,algorithm,cores,avgTiming
-# 10,someAlgorithm,2,3.444
-# ...
-# eof
+'''
+shape   <- name of the shape: circle, random, etc.
+numPoints,algorithm,cores,avgTiming <- labels
+10,someAlgorithm,2,3.444 <- values
+... <- more values
+eof <- empty for eof
+'''
 def parseFile(file):
     allParts = file.split('\n')
     shape = allParts[0]
@@ -14,28 +18,23 @@ def parseFile(file):
         algorithm = lineParts[1]
         cores = int(lineParts[2])
         avgTiming = float(lineParts[3])
-        if algorithm in parsedFile:
-            if cores in parsedFile[algorithm]:
-                parsedFile[algorithm][cores].update({numPoints: avgTiming})
-            else:
-                parsedFile[algorithm].update({cores: {}})
-        else:
+        if not algorithm in parsedFile:
             parsedFile.update({algorithm: {}})
+        if not cores in parsedFile[algorithm]:
+            parsedFile[algorithm].update({cores: {}})
+        parsedFile[algorithm][cores].update({numPoints: avgTiming})
     return shape, parsedFile
 
-# TODO: extent to more than one algorithm
-# Plots the speedup for given number of points for given set of algorithms.
-def plotSpeedupAndCores(data, numPoints, algorithms, shape):
-    sequentialTime = data[algorithms][1][numPoints]
+# Plots the speedup for given number of points for given algorithm
+def plotSpeedupAndCores(data, numPoints, algorithm, shape, minParallelism):
+    sequentialTime = data[algorithm][minParallelism][numPoints]
     speedUps = []
     cores = []
-    for i in range(2, len(data[algorithms]) + 1):
-        speedUp = sequentialTime/data[algorithms][i][numPoints]
+    for i in range(2, len(data[algorithm]) + 1):
+        speedUp = sequentialTime/data[algorithm][i][numPoints]
         speedUps.append(speedUp)
         cores.append(i)
-    print cores
-    print speedUps
-    plot(cores, speedUps, shape + '_' + algorithms + '_SpeedUp_Cores.png', 'Cores', 'Speed up', 25, 25)
+    plot(cores, speedUps, shape + '_' + algorithm + '_SpeedUp_Cores.png', 'Cores', 'Speed up', 25, 25)
 
 # Constructs simple plot with given x and y values
 def plot(n, time, name, xlabel, ylabel, xlim, ylim):

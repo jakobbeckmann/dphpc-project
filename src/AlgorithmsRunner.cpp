@@ -8,6 +8,7 @@
 #include "Point.h"
 #include "ChanAlgorithm.h"
 #include "GrahamScanAlgorithm.h"
+#include "JarvisAlgorithm.h"
 
 using namespace std;
 
@@ -36,6 +37,11 @@ int main(int argc, char const *argv[]) {
         GrahamScanAlgorithm graham;
         // measure time
         result = graham.run(points, numberOfCores);
+        totalTime = 2.387;
+    } else  if (algorithm == "jarvis") {
+        JarvisAlgorithm jarvis;
+        // measure time
+        result = jarvis.run(points, numberOfCores);
         totalTime = 2.387;
     } else {
         std::cout << "No such algorithm!";

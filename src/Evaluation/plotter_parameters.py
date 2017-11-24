@@ -21,6 +21,8 @@ parser.add_argument('-m', default='speedup_cores', dest='mode', nargs='?',
                     choices=['speedup_cores', 'speedup_points'], help='Mode of the plot')
 parser.add_argument('-alg', default=['graham', 'jarvis', 'chan1'], dest='alg', nargs='+',
                     help='List of algorithms to plot')
+parser.add_argument('-minprl', default='1', dest='minprl', type=int, nargs='?',
+                    help='Minimum number of cores used in the evaluation')
 
 args = parser.parse_args()
 
@@ -29,8 +31,4 @@ FILE = args.file
 NUMBER_OF_POINTS = args.points
 MODE = args.mode
 ALGORITHMS = args.alg
-
-# Relative paths to script
-EXECUTABLES = ['PointsGenerator/', '']
-POINT_GENERATOR = '../PointsGenerator/PointsGenerator'
-ALGORITHM_RUNNER = '../AlgorithmsRunner'
+MIN_PARALLELISM = args.minprl
