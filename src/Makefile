@@ -6,7 +6,7 @@ CXX = g++-7
 else
 CXX = g++
 endif
-CXXFLAGS = -std=c++11 -Wall -fopenmp -O2 -w
+CXXFLAGS = -std=c++11 -Wall -fopenmp -O2 -w -g
  
 EXEC = AlgorithmsRunner
 SOURCES = $(wildcard *.cpp)
