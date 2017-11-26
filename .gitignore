@@ -6,6 +6,6 @@ cmake-build-debug/
 Dependencies/
 Output/out_*
 Visualisation/__pycache__/
-Visualisation/*.pyc
+*.pyc
 *.o
 build/
