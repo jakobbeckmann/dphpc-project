@@ -4,11 +4,17 @@
 .idea/workspace.xml
 cmake-build-debug/
 Dependencies/
+
 Output/
 !Output/output_readme.txt
+
 Input/
 !Input/input_readme.txt
-!Input/bird.jpg
+
+FiguresAndMovies/
+!FiguresAndMovies/figuresandmovies_readme.txt
 
 Visualisation/__pycache__/
 Visualisation/*.pyc
+.idea/dphpc-project.iml___jb_tmp___
+
