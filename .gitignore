@@ -11,3 +11,10 @@ Visualisation/__pycache__/
 build/
 src/Evaluation/result_*
 src/Evaluation/data_*
+
+
+quickhull/CMakeFiles/
+quickhull/Dependencies/
+quickhull/CMakeCache.txt
+quickhull/cmake_install.cmake
+quickhull/Makefile
