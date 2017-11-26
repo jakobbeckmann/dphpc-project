@@ -36,7 +36,7 @@ parser.add_argument('-otf', default='true', dest='otf', type=bool, nargs='?',
                     help='Should it generate data points on-the-fly')
 parser.add_argument('-f', default='none', dest='file', nargs='?',
                     help='Relative path to e file if on-the-fly generation of data points is not used.')
-parser.add_argument('-alg', default=['graham', 'jarvis', 'chan1'], dest='alg', nargs='+',
+parser.add_argument('-alg', default=['graham', 'jarvis', 'chan1', 'chan2'], dest='alg', nargs='+',
                     help='Algorithms for which the evaluation is run for')
 parser.add_argument('-t', default='10', dest='runtimes', type=int, nargs='?',
                     help='How many times each test configuration should be run')
