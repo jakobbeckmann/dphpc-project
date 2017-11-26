@@ -49,13 +49,15 @@ class ImagePointsCreator:
     def monte_carlo_sampling(self, processed_image):
         """Takes the pre-processed image and randomly samples self.n_points into the region of interest."""
         points = []
-        for _ in range(self.n_points):
+        sampled_points = 0
+        while sampled_points < self.n_points:
             x = random.randint(0, self.image_shape['x'] - 1)
             y = random.randint(0, self.image_shape['y'] - 1)
             if processed_image[y, x] != 0:
                 x_noise = random.uniform(-1, 1)
                 y_noise = random.uniform(-1, 1)
                 points.append([x + x_noise, (self.image_shape['y'] - y) + y_noise])
+                sampled_points += 1
         return np.array(points)
 
     def check_output_file(self, output_file, overwrite_file=False):
