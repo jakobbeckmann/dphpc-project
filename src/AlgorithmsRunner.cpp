@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 
+#include "timer.hpp"
 #include "Point.h"
 #include "ChanAlgorithm.h"
 #include "GrahamScanAlgorithm.h"
@@ -30,34 +31,32 @@ int main(int argc, char const *argv[]) {
     }
 
     std::vector<Point> result;
-    double totalTime = 0;
 
     if (algorithm == "chan1") {
         ChanAlgorithm chan;
         // measure time
+		timer timer;
         result = chan.run(points, numberOfCores);
-        totalTime = 2.387;
     } else if (algorithm == "chan2") {
         ChanAlgorithm2Merge chan;
         // measure time
+		timer timer;
         result = chan.run(points, numberOfCores);
-        totalTime = 2.387;
     } else  if (algorithm == "graham") {
         GrahamScanAlgorithm graham;
         // measure time
+		timer timer;
         result = graham.run(points, numberOfCores);
-        totalTime = 2.387;
     } else  if (algorithm == "jarvis") {
         JarvisAlgorithm jarvis;
         // measure time
+		timer timer;
         result = jarvis.run(points, numberOfCores);
-        totalTime = 2.387;
     } else {
         std::cout << "No such algorithm!";
         std::exit(EXIT_FAILURE);
     }
 
-    std::cout << totalTime << std::endl;
     for (const Point& p : result) {
         p.print();
     }

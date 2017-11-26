@@ -2,31 +2,23 @@
 * Timer class.
 */
 
-#include <sys/time.h>
-#include <cwchar>  // for NULL
+#include <chrono>
+
+// TODO: Check if this is steady everywhere we care about, if it isn't consider using steady_clock instead.
+using hrc = std::chrono::high_resolution_clock;
 
 class timer {
 public:
 	timer() {
-		start_time.tv_sec  = 0;
-		start_time.tv_usec = 0;
-		stop_time.tv_sec   = 0;
-		stop_time.tv_usec  = 0;
+		start = hrc::now();
 	}
 
-	inline void start() {
-		gettimeofday(&start_time, NULL);
-	}
-
-	inline void stop() {
-		gettimeofday(&stop_time, NULL);
-	}
-
-	double get_timing() const {
-		return (stop_time.tv_sec - start_time.tv_sec) + (stop_time.tv_usec - start_time.tv_usec)*1e-6;
+	~timer() {
+		hrc::time_point end = hrc::now();
+		std::cout << std::chrono::duration_cast<std::chrono::microseconds>(end-start).count() << "\n";
 	}
 
 private:
-	struct timeval start_time, stop_time;
+	hrc::time_point start;
 };
 
