@@ -209,6 +209,17 @@ std::vector<Point> ChanAlgorithm::mergeAllHulls(const std::vector<std::vector<Po
     return result;
 }
 
+std::vector<Point> ChanAlgorithm::mergeTwoHulls(const std::vector<Point>& a, const std::vector<Point>& b)
+{
+	std::vector<Point> result;
+
+	// TODO: Hack
+	std::vector<std::vector<Point>> tmp = { a, b };
+
+	return mergeAllHulls(tmp);
+}
+
+
 /**
     Returns the 2D convex hull of the points given in the argument. The parallelism index determines how many subsets of
     points should be analysed in parallel using Graham's scan.
@@ -227,4 +238,46 @@ std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t p
     }
 
     return mergeAllHulls(hulls);
+}
+
+/**
+ * Splits the points into @p parallel_idx parts (TODO: rename the parameter),
+ * then computes convex hulls for each of the sets in parallel (OpenMP) with
+ * Graham's scan.
+ * Afterwards these individual hulls are merged as outlined below:
+ * 0 1 2 3 4 5 6 7 8 index
+ * A B C D E F G H I
+ * AB  CD  EF  GH  I
+ * ABCD    EFGH    I
+ * ABCDEFGH        I
+ * ABCDEFGHI
+ * 
+ * Where the merges from one line to the next are performed in parallel with
+ * OpenMP again.
+*/
+std::vector<Point> ChanAlgorithm2Merge::run(const std::vector<Point>& points, size_t parallel_idx) {
+
+    std::vector<std::vector<Point> > hulls;
+    hulls.resize(parallel_idx);
+
+	#pragma omp parallel for
+	for (size_t i = 0; i < parallel_idx; ++i) {
+		std::vector<Point> part = SplitVector(points, i, parallel_idx);
+		hulls[i] = grahamScan(part, i);
+	}
+
+	// step_size = 2, 4, 8, ...
+	for (size_t i = hulls.size(), step_size = 2; step_size/2 < i; step_size <<= 1)
+	{
+		// The loop operates on j and j+step_size/2, but iterates over j+step_size/2
+		// this is needed to fit openmp loop restrictions.
+		#pragma omp parallel for
+		for (size_t j_h = step_size/2; j_h < i; j_h += step_size)
+		{
+			size_t j = j_h-step_size/2; // 0, step_size, 2*step_size, 3*step_size, ...
+			hulls[j] = mergeTwoHulls(hulls[j], hulls[j_h]);
+		}
+	}
+
+	return hulls[0];
 }

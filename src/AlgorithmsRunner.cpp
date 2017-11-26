@@ -13,7 +13,7 @@
 int main(int argc, char const *argv[]) {
     if (argc < 4) {
         std::cout << "Usage: " << argv[0] << " numcores numpoints algorithm\n";
-        std::cout << "  algorithm := version1|graham|jarvis\n";
+        std::cout << "  algorithm := chan1|chan2|graham|jarvis\n";
 		return -1;
     }
 
@@ -34,6 +34,11 @@ int main(int argc, char const *argv[]) {
 
     if (algorithm == "chan1") {
         ChanAlgorithm chan;
+        // measure time
+        result = chan.run(points, numberOfCores);
+        totalTime = 2.387;
+    } else if (algorithm == "chan2") {
+        ChanAlgorithm2Merge chan;
         // measure time
         result = chan.run(points, numberOfCores);
         totalTime = 2.387;
