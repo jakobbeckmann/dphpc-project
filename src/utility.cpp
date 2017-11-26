@@ -7,8 +7,9 @@
 #include <random>
 #include <fstream>
 #include <iostream>
-#include <glob.h>
+#include <sstream>
 #include <cassert>
+#include <string>
 
 #include "utility.h"
 
@@ -88,6 +89,24 @@ std::vector<Point> createPoints(int count, double min, double max) {
 
     return finalPoints;
 
+}
+
+std::vector<Point> readPointsFromFile(const std::string& filePath)
+{
+    std::vector<Point> points;
+
+    std::ifstream source(filePath);
+    std::string line;
+
+    while (std::getline(source, line)) {
+        double x, y;
+        std::istringstream ss(line);
+        ss >> x >> y;
+        //std::cout << x << ", " << y << "\n";
+        Point point(x,y);
+        points.push_back(point);
+    }
+    return points;
 }
 
 

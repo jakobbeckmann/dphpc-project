@@ -3,7 +3,7 @@ Creates a text file with points which represent extracted shapes from some input
 
 Note:
     - the input image (png or jpg) has to be located in the "Input" folder of the project.
-    - the output file will be located in the "Input" folder of the project as well.
+    - the output file containg the created points will be stored in the "Input" folder of the project as well.
 """
 
 
@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 
 input_image         = 'bird.jpg'
 output_file         = 'bird_points.dat'
-number_of_points    = 5000
-show_points         = False
+number_of_points    = 2000
+show_points         = True
 
 # ------------------------------------------ #
 

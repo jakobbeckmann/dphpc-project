@@ -6,72 +6,60 @@
 #include <iostream>
 #include <random>
 #include <sstream>
-#include <vector>
+#include <omp.h>
 
-
-#include "Point.h"
-#include "utility.h"
 #include "ChanAlgorithm.h"
+#include "timer.hpp"
+
 
 int main(int argc, char const *argv[]) {
 
+    std::cout << "[Information]: Max n threads possible - " << omp_get_max_threads() << std::endl;
+
     //-------------------------------------------------------------------------------
-    // CLEAR OUTPUT FOLDER
-
-
-
     // USER INPUT SECTION
+    std::string inputFile = "../Input/bird_points.dat";
+    std::vector<int> nCores = {1, 2, 3, 4, 5, 6, 7, 8};
 
-    int MIN = -10, MAX = 10;
-    size_t POINT_COUNT = 0;
-    size_t PARALLELISM_IDX = 0;
-
-    if (argc == 3) {
-        std::stringstream sstream(argv[1]);
-		sstream >> PARALLELISM_IDX;
-    } else {
-        std::cout << "Enter number of subsets for Graham Scans... " << std::endl;
-        std::cin >> PARALLELISM_IDX;
-    }
-    if(PARALLELISM_IDX < 1) return -1;
-    FileWriter::writeNumberToFile(PARALLELISM_IDX, "../Output/out_n_graham_subs.dat", true);
-
-    if (argc == 3) {
-        std::stringstream sstream(argv[2]);
-        sstream >> POINT_COUNT;
-    } else {
-        std::cout << "Enter number of points..." << std::endl;
-        std::cin >> POINT_COUNT;
-    }
-    if(POINT_COUNT < PARALLELISM_IDX * 3) {
-        std::cout << "Please need more points or less parallelism." << std::endl;
-        return -1;
-    }
-
-    /*
-    std::cout << "Enter MIN value for x/y coordinates..." << std::endl;
-    std::cin >> MIN;
-    std::cout << "Enter MAX value for x/y coordinates..." << std::endl;
-    std::cin >> MAX;
-    */
 
     //-------------------------------------------------------------------------------
     // ALGORITHM SECTION
-
+    std::vector<Point> points = readPointsFromFile(inputFile);
+    size_t PARALLELISM_IDX = nCores.size();
     ChanAlgorithm chan;
-    std::vector<Point> points = createPoints(POINT_COUNT, MIN, MAX);
-    std::vector<Point> result = chan.run(points, PARALLELISM_IDX);
+    timer t;
+    t.clean_timing_file();
+
+    std::vector<std::vector<Point>> allResults;
+
+    for (int threadCount: nCores)
+    {
+        omp_set_dynamic(0);                 // Explicitly disable dynamic teams
+        omp_set_num_threads(threadCount);
+
+        t.start();
+        std::vector<Point> result = chan.run(points, PARALLELISM_IDX);
+        t.stop();
+        allResults.emplace_back(result);
+        std::cout << "Chan algorithm took:" << t.get_timing() << " seconds." << std::endl;
+        t.write_to_file(threadCount);
+
+    }
 
     //-------------------------------------------------------------------------------
     // OUTPUT SECTION
 
-    std::cout << "\n\n=========Result=========" << std::endl;
-    for(Point point: result) {
-        std::cout << point << " ";
+    for (std::vector<Point> result: allResults)
+    {
+        std::cout << "\n\n=========Result=========" << std::endl;
+        std::cout << " " << result.size() << " hull points:" << std::endl;
+        for(Point point: result) {
+            std::cout << point << " ";
+        }
+        std::cout << std::endl;
+        FileWriter::writePointsToFile(result, "../Output/out_hull_points.dat", true);
     }
-    std::cout << std::endl;
 
-    FileWriter::writePointsToFile(result, "../Output/out_hull_points.dat", true);
 
     return 0;
 }
