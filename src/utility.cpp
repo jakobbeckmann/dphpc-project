@@ -12,6 +12,9 @@
 
 #include "utility.h"
 
+#ifndef WRITE_DEBUG
+#define WRITE_DEBUG 0
+#endif
 
 /**
     Returns the orientation of the angle between three points.
@@ -79,8 +82,10 @@ std::vector<Point> SplitVector(const std::vector<Point>& vec, size_t i, size_t n
     size_t length = vec.size() / n;
     size_t remain = vec.size() % n;
 
+#if WRITE_DEBUG
     if (i == 0)
         std::cout << "sub vectors contain " << length << " elements with remainder " << remain << std::endl;
+#endif
 
     size_t begin = i*length;
     size_t end = i+1 == n ? vec.size() : std::min((i+1)*length, vec.size());
