@@ -36,12 +36,12 @@ int main(int argc, char const *argv[]) {
         ChanAlgorithm chan;
         // measure time
 		timer timer;
-        result = chan.run(points, numberOfCores);
+        result = chan.run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
     } else if (algorithm == "chan2") {
         ChanAlgorithm2Merge chan;
         // measure time
 		timer timer;
-        result = chan.run(points, numberOfCores);
+        result = chan.run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
     } else  if (algorithm == "graham") {
         GrahamScanAlgorithm graham;
         // measure time

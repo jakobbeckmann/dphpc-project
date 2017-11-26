@@ -12,11 +12,11 @@ protected:
     std::vector<Point> mergeAllHulls(const std::vector<std::vector<Point>>& hulls);
     std::vector<Point> mergeTwoHulls(const std::vector<Point>& a, const std::vector<Point>& b);
 public:
-    std::vector<Point> run(const std::vector<Point>& points, size_t parallel_idx);
+    std::vector<Point> run(const std::vector<Point>& points, int parallel_idx, size_t parts);
 
 };
 
 class ChanAlgorithm2Merge : private ChanAlgorithm {
 public:
-    std::vector<Point> run(const std::vector<Point>& points, size_t parallel_idx);
+    std::vector<Point> run(const std::vector<Point>& points, int parallel_idx, size_t parts);
 };

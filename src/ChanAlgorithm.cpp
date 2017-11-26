@@ -21,6 +21,8 @@ algorithm contains only collinear points.
 #include <iostream>
 #include <vector>
 
+#include <omp.h>
+
 #include "ChanAlgorithm.h"
 
 #ifndef WRITE_DEBUG
@@ -226,14 +228,16 @@ std::vector<Point> ChanAlgorithm::mergeTwoHulls(const std::vector<Point>& a, con
     @param points: std::vector of points the be analysed
     @param parallel_idx: parallelism index determining the amount of parallel computation
 */
-std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t parallel_idx) {
+std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, int parallel_idx, size_t parts) {
 
     std::vector<std::vector<Point> > hulls;
     hulls.resize(parallel_idx);
 
+    omp_set_num_threads(parallel_idx);
+
     #pragma omp parallel for
-    for (size_t i = 0; i < parallel_idx; ++i) {
-        std::vector<Point> part = SplitVector(points, i, parallel_idx);
+    for (size_t i = 0; i < parts; ++i) {
+        std::vector<Point> part = SplitVector(points, i, parts);
         hulls[i] = grahamScan(part, i);
     }
 
@@ -241,9 +245,8 @@ std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t p
 }
 
 /**
- * Splits the points into @p parallel_idx parts (TODO: rename the parameter),
- * then computes convex hulls for each of the sets in parallel (OpenMP) with
- * Graham's scan.
+ * Splits the points into @p parts then computes convex hulls for each of the
+ * sets in parallel (OpenMP) with Graham's scan.
  * Afterwards these individual hulls are merged as outlined below:
  * 0 1 2 3 4 5 6 7 8 index
  * A B C D E F G H I
@@ -255,14 +258,16 @@ std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t p
  * Where the merges from one line to the next are performed in parallel with
  * OpenMP again.
 */
-std::vector<Point> ChanAlgorithm2Merge::run(const std::vector<Point>& points, size_t parallel_idx) {
+std::vector<Point> ChanAlgorithm2Merge::run(const std::vector<Point>& points, int parallel_idx, size_t parts)
+{
+	std::vector<std::vector<Point> > hulls;
+	hulls.resize(parts);
 
-    std::vector<std::vector<Point> > hulls;
-    hulls.resize(parallel_idx);
+	omp_set_num_threads(parallel_idx);
 
 	#pragma omp parallel for
-	for (size_t i = 0; i < parallel_idx; ++i) {
-		std::vector<Point> part = SplitVector(points, i, parallel_idx);
+	for (size_t i = 0; i < parts; ++i) {
+		std::vector<Point> part = SplitVector(points, i, parts);
 		hulls[i] = grahamScan(part, i);
 	}
 
