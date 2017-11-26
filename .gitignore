@@ -18,3 +18,4 @@ quickhull/Dependencies/
 quickhull/CMakeCache.txt
 quickhull/cmake_install.cmake
 quickhull/Makefile
+quickhull/quickhull
