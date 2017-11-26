@@ -9,6 +9,7 @@ private:
     std::vector<Point> grahamScan(std::vector<Point>& points, int subsetIdx);
     std::pair<int, int> findNextMergePoint(const std::vector<std::vector<Point>>& hulls, std::pair<int, int> base_pair);
 
+    std::vector<Point> mergeAllHulls(const std::vector<std::vector<Point>>& hulls);
 public:
     std::vector<Point> run(const std::vector<Point>& points, size_t parallel_idx);
 

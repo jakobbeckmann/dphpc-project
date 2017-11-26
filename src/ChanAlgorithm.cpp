@@ -173,6 +173,27 @@ std::pair<int, int> ChanAlgorithm::findNextMergePoint(const std::vector<std::vec
     return result;
 }
 
+std::vector<Point> ChanAlgorithm::mergeAllHulls(const std::vector<std::vector<Point>>& hulls)
+{
+    std::vector<Point> result;
+
+    FileWriter mergeWriter = FileWriter("out_merge_hulls.dat");
+
+    std::pair<int, int> next_point = findLowestPoint(hulls); // pair contains: subhullIdx and pointIdx on that hull
+    mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
+
+    result.push_back(hulls[next_point.first][next_point.second]);  // lowest point of all sub hulls
+    do {
+        next_point = findNextMergePoint(hulls, next_point);
+        result.push_back(hulls[next_point.first][next_point.second]);
+        mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
+    } while (result[0] != result[result.size() - 1]);
+
+    result.pop_back(); // due to previous double insertion of last point
+
+    return result;
+}
+
 /**
     Returns the 2D convex hull of the points given in the argument. The parallelism index determines how many subsets of
     points should be analysed in parallel using Graham's scan.
@@ -190,19 +211,5 @@ std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t p
         hulls[i] = grahamScan(part, i);
     }
 
-    FileWriter mergeWriter = FileWriter("out_merge_hulls.dat");
-
-    std::pair<int, int> next_point = findLowestPoint(hulls); // pair contains: subhullIdx and pointIdx on that hull
-    mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
-    std::vector<Point> result;
-
-    result.push_back(hulls[next_point.first][next_point.second]);  // lowest point of all sub hulls
-    do {
-        next_point = findNextMergePoint(hulls, next_point);
-        result.push_back(hulls[next_point.first][next_point.second]);
-        mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
-    } while (result[0] != result[result.size() - 1]);
-
-    result.pop_back(); // due to previous double insertion of last point
-    return result;
+    return mergeAllHulls(hulls);
 }
