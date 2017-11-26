@@ -21,8 +21,13 @@ algorithm contains only collinear points.
 #include <iostream>
 #include <vector>
 
+#include <omp.h>
 
 #include "ChanAlgorithm.h"
+
+#ifndef WRITE_DEBUG
+#define WRITE_DEBUG 0
+#endif
 
 /**
     Performs a Graham Scan on input std::vector of points.
@@ -30,11 +35,13 @@ algorithm contains only collinear points.
     @param points: std::vector of points in the graham subset.
 */
 std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point>& points, int subsetIdx) {
+#if WRITE_DEBUG
     FileWriter grahamWriter;
     grahamWriter.setGrahamSubsetIdx(subsetIdx);
     grahamWriter.setBaseName("out_graham_sub");
     grahamWriter.updateFileName();
     grahamWriter.cleanOutputFile();
+#endif
 
     if (points.size() <= 1) {
         return points;
@@ -53,8 +60,10 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point>& points, int sub
         return orient != CLOCKWISE;
     });
 
+#if WRITE_DEBUG
     const std::string subSortedName = std::string("../Output/out_sorted_sub_") + std::to_string(subsetIdx) + ".dat";
     FileWriter::writePointsToFile(points, subSortedName, true);
+#endif
 
     // Find the hull
     std::vector<Point> hull;
@@ -70,9 +79,9 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point>& points, int sub
         int last_idx = hull.size() - 1;
 
         while (hull.size() > 1 && getOrientation(hull[last_idx - 1], hull[last_idx], base) != ANTICLOCKWISE) {
-
+#if WRITE_DEBUG
             grahamWriter.writeGraham(hull[last_idx-1], hull[last_idx], base, 0, hull[last_idx], CLOCKWISE);
-
+#endif
 
             hull.pop_back();
             idxStack.pop_back();
@@ -82,13 +91,18 @@ std::vector<Point> ChanAlgorithm::grahamScan(std::vector<Point>& points, int sub
         }
 
         if (hull.empty() || hull[last_idx] != base) {
+#if WRITE_DEBUG
             grahamWriter.writeGraham(hull[last_idx-1], hull[last_idx], base, 1, base, ANTICLOCKWISE);
+#endif
             hull.push_back(base);
             idxStack.push_back(idx);
         }
     }
+
+#if WRITE_DEBUG
     const std::string subHullName = std::string("../Output/out_hull_points_") + std::to_string(subsetIdx) + ".dat";
     FileWriter::writePointsToFile(hull, subHullName, true);
+#endif
 
     return hull;
 }
@@ -173,38 +187,102 @@ std::pair<int, int> ChanAlgorithm::findNextMergePoint(const std::vector<std::vec
     return result;
 }
 
+std::vector<Point> ChanAlgorithm::mergeAllHulls(const std::vector<std::vector<Point>>& hulls)
+{
+    std::vector<Point> result;
+
+    std::pair<int, int> next_point = findLowestPoint(hulls); // pair contains: subhullIdx and pointIdx on that hull
+#if WRITE_DEBUG
+    FileWriter mergeWriter = FileWriter("out_merge_hulls.dat");
+    mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
+#endif
+
+    result.push_back(hulls[next_point.first][next_point.second]);  // lowest point of all sub hulls
+    do {
+        next_point = findNextMergePoint(hulls, next_point);
+        result.push_back(hulls[next_point.first][next_point.second]);
+#if WRITE_DEBUG
+        mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
+#endif
+    } while (result[0] != result[result.size() - 1]);
+
+    result.pop_back(); // due to previous double insertion of last point
+
+    return result;
+}
+
+std::vector<Point> ChanAlgorithm::mergeTwoHulls(const std::vector<Point>& a, const std::vector<Point>& b)
+{
+	std::vector<Point> result;
+
+	// TODO: Hack
+	std::vector<std::vector<Point>> tmp = { a, b };
+
+	return mergeAllHulls(tmp);
+}
+
+
 /**
     Returns the 2D convex hull of the points given in the argument. The parallelism index determines how many subsets of
     points should be analysed in parallel using Graham's scan.
     @param points: std::vector of points the be analysed
     @param parallel_idx: parallelism index determining the amount of parallel computation
 */
-std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, size_t parallel_idx) {
+std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, int parallel_idx, size_t parts) {
 
     std::vector<std::vector<Point> > hulls;
     hulls.resize(parallel_idx);
 
-    int currentSubsetIdx = 0;
+    omp_set_num_threads(parallel_idx);
 
     #pragma omp parallel for
-    for (size_t i = 0; i < parallel_idx; ++i) {
-        std::vector<Point> part = SplitVector(points, i, parallel_idx);
+    for (size_t i = 0; i < parts; ++i) {
+        std::vector<Point> part = SplitVector(points, i, parts);
         hulls[i] = grahamScan(part, i);
     }
 
-    FileWriter mergeWriter = FileWriter("out_merge_hulls.dat");
+    return mergeAllHulls(hulls);
+}
 
-    std::pair<int, int> next_point = findLowestPoint(hulls); // pair contains: subhullIdx and pointIdx on that hull
-    mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
-    std::vector<Point> result;
+/**
+ * Splits the points into @p parts then computes convex hulls for each of the
+ * sets in parallel (OpenMP) with Graham's scan.
+ * Afterwards these individual hulls are merged as outlined below:
+ * 0 1 2 3 4 5 6 7 8 index
+ * A B C D E F G H I
+ * AB  CD  EF  GH  I
+ * ABCD    EFGH    I
+ * ABCDEFGH        I
+ * ABCDEFGHI
+ * 
+ * Where the merges from one line to the next are performed in parallel with
+ * OpenMP again.
+*/
+std::vector<Point> ChanAlgorithm2Merge::run(const std::vector<Point>& points, int parallel_idx, size_t parts)
+{
+	std::vector<std::vector<Point> > hulls;
+	hulls.resize(parts);
 
-    result.push_back(hulls[next_point.first][next_point.second]);  // lowest point of all sub hulls
-    do {
-        next_point = findNextMergePoint(hulls, next_point);
-        result.push_back(hulls[next_point.first][next_point.second]);
-        mergeWriter.writeMerge(hulls[next_point.first][next_point.second]);
-    } while (result[0] != result[result.size() - 1]);
+	omp_set_num_threads(parallel_idx);
 
-    result.pop_back(); // due to previous double insertion of last point
-    return result;
+	#pragma omp parallel for
+	for (size_t i = 0; i < parts; ++i) {
+		std::vector<Point> part = SplitVector(points, i, parts);
+		hulls[i] = grahamScan(part, i);
+	}
+
+	// step_size = 2, 4, 8, ...
+	for (size_t i = hulls.size(), step_size = 2; step_size/2 < i; step_size <<= 1)
+	{
+		// The loop operates on j and j+step_size/2, but iterates over j+step_size/2
+		// this is needed to fit openmp loop restrictions.
+		#pragma omp parallel for
+		for (size_t j_h = step_size/2; j_h < i; j_h += step_size)
+		{
+			size_t j = j_h-step_size/2; // 0, step_size, 2*step_size, 3*step_size, ...
+			hulls[j] = mergeTwoHulls(hulls[j], hulls[j_h]);
+		}
+	}
+
+	return hulls[0];
 }

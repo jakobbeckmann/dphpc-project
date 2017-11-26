@@ -18,3 +18,8 @@ Visualisation/__pycache__/
 Visualisation/*.pyc
 .idea/dphpc-project.iml___jb_tmp___
 
+*.pyc
+*.o
+build/
+src/Evaluation/result_*
+src/Evaluation/data_*
