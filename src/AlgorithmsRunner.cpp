@@ -32,7 +32,7 @@ int main(int argc, char const *argv[]) {
     std::vector<Point> result;
     double totalTime = 0;
 
-    if (algorithm == "version1") {
+    if (algorithm == "chan1") {
         ChanAlgorithm chan;
         // measure time
         result = chan.run(points, numberOfCores);
