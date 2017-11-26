@@ -36,7 +36,7 @@ public:
         return output;
     }
 
-    void print() {
-        std::cout << x << " " << y << std::endl;
+    void print() const {
+        std::cout << x << " " << y << "\n";
     }
 };

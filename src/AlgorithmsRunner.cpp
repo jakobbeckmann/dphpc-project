@@ -10,18 +10,22 @@
 #include "GrahamScanAlgorithm.h"
 #include "JarvisAlgorithm.h"
 
-using namespace std;
-
 int main(int argc, char const *argv[]) {
+    if (argc < 4) {
+        std::cout << "Usage: " << argv[0] << " numcores numpoints algorithm\n";
+        std::cout << "  algorithm := version1|graham|jarvis\n";
+		return -1;
+    }
+
     int numberOfCores = atoi(argv[1]);
     int numberOfPoints = atoi(argv[2]);
-    string algorithm = argv[3];
+    std::string algorithm = argv[3];
 
     std::vector<Point> points;
 
     for (int idx = 0; idx < numberOfPoints; idx++) {
         double x, y;
-        cin >> x >> y;
+        std::cin >> x >> y;
         points.push_back(Point(x, y));
     }
 
@@ -48,9 +52,9 @@ int main(int argc, char const *argv[]) {
         std::exit(EXIT_FAILURE);
     }
 
-    std::cout << totalTime << endl;
-    for (vector<Point>::iterator it = result.begin(); it != result.end(); ++it) {
-        it->print();
+    std::cout << totalTime << std::endl;
+    for (const Point& p : result) {
+        p.print();
     }
 
     return 0;
