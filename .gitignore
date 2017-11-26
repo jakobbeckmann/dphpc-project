@@ -7,3 +7,5 @@ Dependencies/
 Output/out_*
 Visualisation/__pycache__/
 Visualisation/*.pyc
+*.o
+build/
