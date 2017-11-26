@@ -9,3 +9,5 @@ Visualisation/__pycache__/
 *.pyc
 *.o
 build/
+src/Evaluation/result_*
+src/Evaluation/data_*
