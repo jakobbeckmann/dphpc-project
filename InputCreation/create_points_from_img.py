@@ -15,8 +15,9 @@ import matplotlib.pyplot as plt
 
 input_image         = 'bird.jpg'
 output_file         = 'bird_points.dat'
-number_of_points    = 2000
+number_of_points    = 100000
 show_points         = True
+save_png            = True
 
 # ------------------------------------------ #
 
@@ -29,4 +30,4 @@ if show_points:
     plt.scatter(points[:, 0], points[:, 1], alpha=0.7, edgecolors='none', s=3)
     plt.show()
 
-creator.write_points_to_file(points)
+creator.write_points_to_file(points, save_png=save_png)

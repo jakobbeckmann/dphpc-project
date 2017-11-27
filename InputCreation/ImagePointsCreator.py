@@ -8,14 +8,15 @@ import numpy as np
 import os
 import random
 import cv2
+import matplotlib.pyplot as plt
 
 
 class ImagePointsCreator:
-    def __init__(self, n_points, image_file, output_file):
+    def __init__(self, n_points, image_file, output_file, output_dir='default'):
         self.n_points = n_points
         self.image_file = image_file
         self.exe_file = os.path.realpath(__file__)
-        self.output_file_path = self.check_output_file(output_file, overwrite_file=True)
+        self.output_file_path = self.check_output_file(output_file, output_dir, overwrite_file=True)
         self.image_shape = {}
 
     def load_image(self, show_image=False):
@@ -60,21 +61,31 @@ class ImagePointsCreator:
                 sampled_points += 1
         return np.array(points)
 
-    def check_output_file(self, output_file, overwrite_file=False):
+    def check_output_file(self, output_file, output_dir, overwrite_file=False):
         """Checks whether output file is .csv and doesn't overwrite existing file."""
-        output_file_path = os.path.join(os.path.dirname(self.exe_file), '..', 'Input', output_file)
+        if output_dir == 'default':
+            output_file_path = os.path.join(os.path.dirname(self.exe_file), '..', 'Input', output_file)
+        else:
+            output_file_path = os.path.join(output_dir, output_file)
+
         if not overwrite_file:
             if os.path.isfile(output_file_path):
                 raise IOError('Output file {file_path} already exists. Abort.'.format(file_path=output_file_path))
         return output_file_path
 
-    def write_points_to_file(self, points):
+    def write_points_to_file(self, points, save_png):
         np.savetxt(self.output_file_path, points, '%5.2f')
-        print("Written output to " + self.output_file_path + '\n')
 
-    def create_points_pipeline(self):
+        if save_png:
+            fig, ax = plt.subplots()
+            ax.scatter(points[:, 0], points[:, 1], alpha=0.7, edgecolors='none', s=3)
+            img_file = self.output_file_path[:-4] + '.png'
+            plt.savefig(img_file)
+
+    def create_points_pipeline(self, save_png=False):
         """Pipeline to create point distribution from a single image."""
-        image = self.load_image()
-        processed_image = self.extract_largest_patch(image)
+        image = self.load_image(show_image=False)
+        processed_image = self.create_dark_shape_mask(image)
         points = self.monte_carlo_sampling(processed_image)
-        self.write_points_to_file(points)
+        self.write_points_to_file(points, save_png)
+
