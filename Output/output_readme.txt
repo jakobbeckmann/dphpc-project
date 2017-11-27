@@ -4,5 +4,7 @@
 #                                          #
 ############################################
 
-This file exists such that everyone has an empty output folder to store their results in.
-Files in this folder will NOT be tracked by git.
+-> Files in this folder will NOT be tracked by git <-
+
+This folder contains the output directories for the param grid runs you run locally on your machine.
+
