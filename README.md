@@ -3,21 +3,23 @@ Group work for the Design of Parallel and High Performance Computing course 2017
 
 ## How-To
 A tipical usage could look like this:  
-- Place a .png or .jpg file in the Input folder.
-- Run the input creation script (see below).
-- In main.cpp specify input data and nCores array.  
-- Compile using cmake and run dphpc_project.exe.
-- Run the visualization script (see below).
-- Run the benchmark script (see below).
+- Compile your dphc-project executable
+1. Place .png or .jpg files you want to use for point generation into the Input folder
+2. Set the desired parameters in run_config.py
+3. Run the grid_run_exe.py python script.
 
 ## Input Creation
-From the **InputCreation**, run the **create_points_from_img.py** (specify parameters at top section of file) to create point distributions using images. The input image specified has to be located in the **Input** folder (.png or .jpg is fine)!  
+In case you just want to create input data files from images without doing full grid runs:  
+From the **InputCreation** directory, run the **create_points_from_img.py** 
+(specify parameters at top section of file) to create point distributions using images. 
+The input image specified has to be located in the **Input** folder (.png or .jpg is fine)!  
 The Input data will be stored in a .dat file in the **Input** folder.
 
 ## Benchmark plots
-From the **Benchmarking** folder, run the **benchmark_postprocessing.py** script to do speedup plots vs number of cores. Data is provided with the **Output/timing.txt** which is being created during the algorithm runs.  
-Usage should be self-explanatory.
+--> Will be merged into the grid runs soon... Have to work on generalizing functionality.
+
 
 ## Visualization
-Run **AnimationWrapper.py** script in the **Visualization** folder. First specify the desired parameters at the top section of the script.
+Run **AnimationWrapper.py** script in the **Visualization** folder. 
+First specify the desired parameters at the top section of the script.
 
