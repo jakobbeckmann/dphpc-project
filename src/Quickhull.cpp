@@ -2,6 +2,7 @@
  * Implementation of the quickhull algorithm.
  */
 
+#include <tuple>
 #include "Quickhull.hpp"
 
 

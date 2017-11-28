@@ -2,12 +2,11 @@
  * Quickhull class containing utility functions for algorithm
  */
 
-#ifndef DPHPC_PROJECT_QUICKHULL_H
-#define DPHPC_PROJECT_QUICKHULL_H
+#pragma once
 
 #include <vector>
 
-#include "../../src/Point.h"
+#include "Point.h"
 
 class Quickhull {
 public:
@@ -26,8 +25,8 @@ private:
     static void subquickhull(std::vector<Point>& input,
                              std::vector<int>& indeces,
                              std::vector<int>& output_idces,
-                             const int first,
-                             const int second);
+                             int first,
+                             int second);
 
     /*
      * Returns all points with a positive distance from the set and the point with
@@ -35,8 +34,8 @@ private:
      */
     static std::tuple<std::vector<int>, int> get_dist_set(std::vector<Point>& input,
                                                           std::vector<int>& indeces,
-                                                          const int first,
-                                                          const int second);
+                                                          int first,
+                                                          int second);
 
     /*
      * Computes distance to point.
@@ -48,10 +47,7 @@ private:
      * result > 0: target is left of segment
      */
     static double compute_dist(std::vector<Point>& input,
-                               const int target,
-                               const int first,
-                               const int second);
+                               int target,
+                               int first,
+                               int second);
 };
-
-
-#endif // DPHPC_PROJECT_QUICKHULL_H
