@@ -84,7 +84,7 @@ class GridRunHandler:
             json.dump(sub_params, outfile, indent=4, sort_keys=True)
 
         # step2: run the algorithm specified by parameter grid inside of this folder
-        exe_file = glob(join_paths(project_path, self.exe_dir_name, '*exe'))
+        exe_file = glob(join_paths(project_path, self.exe_dir_name, 'dphpc_project*'))
         assert len(exe_file) == 1
         input_file_path = join_paths(self.output_dir_path, 'input_data', input_dat)
 
