@@ -7,23 +7,28 @@ set(SOURCE_FILES src/ChanAlgorithm.cpp src/utility.h src/utility.cpp src/Point.h
 		src/JarvisAlgorithm.cpp src/JarvisAlgorithm.h src/GrahamScanAlgorithm.cpp src/GrahamScanAlgorithm.h)
 add_executable(dphpc_project ${SOURCE_FILES})
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g")
+if(APPLE)
+    set(CMAKE_CXX_COMPILER g++-7)
 endif()
 
+if(WINDOWS)
+    if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g")
+    endif()
 
-message(STATUS "Checking OpenMP")
-find_package(OpenMP)
-IF(OPENMP_FOUND)
-	message("Found OpenMP! ^_^")
-	# add flags for OpenMP
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_SHARED_LINKER_FLAGS}")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-ELSE()
-	message("Missed OpenMP! x_x")
-ENDIF()
+
+    message(STATUS "Checking OpenMP")
+    find_package(OpenMP)
+    IF(OPENMP_FOUND)
+        message("Found OpenMP! ^_^")
+        # add flags for OpenMP
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${OpenMP_SHARED_LINKER_FLAGS}")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+    ELSE()
+        message("Missed OpenMP! x_x")
+    ENDIF()
+endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-
