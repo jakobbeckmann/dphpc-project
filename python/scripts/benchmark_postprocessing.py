@@ -4,7 +4,7 @@ timing data provided in the Output folder.
 For use, see Benchmark.py class.
 """
 
-from Benchmark import Benchmark
+from python.libs.postprocessing.Benchmark import Benchmark
 
 benchmark = Benchmark()
 benchmark.load_timing_data()

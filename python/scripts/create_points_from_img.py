@@ -7,9 +7,9 @@ Note:
 """
 
 
-from ImagePointsCreator import ImagePointsCreator
 import matplotlib.pyplot as plt
 
+from python.libs.execution import ImagePointsCreator
 
 # ------------ PARAMETER SECTION ----------- #
 

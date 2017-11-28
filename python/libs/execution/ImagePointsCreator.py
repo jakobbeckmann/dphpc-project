@@ -10,18 +10,20 @@ import random
 import cv2
 import matplotlib.pyplot as plt
 
+from python.libs.paths import project_path
+
 
 class ImagePointsCreator:
     def __init__(self, n_points, image_file, output_file, output_dir='default'):
         self.n_points = n_points
         self.image_file = image_file
-        self.exe_file = os.path.realpath(__file__)
+        self.this_file = os.path.realpath(__file__)
         self.output_file_path = self.check_output_file(output_file, output_dir, overwrite_file=True)
         self.image_shape = {}
 
     def load_image(self, show_image=False):
         """Loads the provided image into numpy array."""
-        image = cv2.imread(os.path.join(os.path.dirname(self.exe_file), '..', 'Input', self.image_file))
+        image = cv2.imread(os.path.join(project_path, 'Input', self.image_file))
         if show_image:
             cv2.imshow('image', image)
             cv2.waitKey(0)
@@ -61,10 +63,13 @@ class ImagePointsCreator:
                 sampled_points += 1
         return np.array(points)
 
-    def check_output_file(self, output_file, output_dir, overwrite_file=False):
+    @staticmethod
+    def check_output_file(output_file, output_dir, overwrite_file=False):
         """Checks whether output file is .csv and doesn't overwrite existing file."""
+        assert 'project_path' in globals(), 'Need to import project_path first.'
+
         if output_dir == 'default':
-            output_file_path = os.path.join(os.path.dirname(self.exe_file), '..', 'Input', output_file)
+            output_file_path = os.path.join(project_path, 'Input', output_file)
         else:
             output_file_path = os.path.join(output_dir, output_file)
 

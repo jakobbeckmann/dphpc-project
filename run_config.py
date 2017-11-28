@@ -9,20 +9,19 @@ run_config = {
 
     'run_params':
         {
-            'n_cores':              [1, 4, 8],
-            'n_points':             [2000],
+            'n_cores':              [1, 4],
+            'n_points':             [100, 1000],
             'img_files':            ['homer.jpg'],
             'algorithms':           ['chan_normal'],
             'sub_size':             [None],
-            'n_iterations':         5,
-            'write_output_files':   True
+            'n_iterations':         3,
         },
 
     'post_process_params':
         {
-            'store_final_plots':    True,
+            'store_final_plots':    False,
             'store_movies':         False,
-            'store_bm_plots':       True
+            'store_bm_plots':       False
         }
 }
 

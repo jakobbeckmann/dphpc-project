@@ -2,18 +2,16 @@
 Top level module reading run_config json file and holding functionality to execute the whole pipeline.
 """
 
-import os
-import shutil
-from os.path import join as join_paths
 import datetime
-import subprocess
 import json
+import os
+import subprocess
 from glob import glob
+from os.path import join as join_paths
 
-from InputCreation.ImagePointsCreator import ImagePointsCreator
-
-# Getting run configuration from the run_config.py parameter file...
 from run_config import run_config
+from python.libs.execution.ImagePointsCreator import ImagePointsCreator
+from python.libs.paths import project_path
 
 
 class GridRunHandler:
@@ -31,6 +29,7 @@ class GridRunHandler:
         self.run_name = self.create_run_name()
         self.run_config_file = self.set_run_config_file(custom_config_file)
         self.output_dir_path = self.setup_output_folder()
+        self.store_run_config_json()
         self.input_files = {}
         self.exe_dir_name = exe_dir_name
 
@@ -45,7 +44,7 @@ class GridRunHandler:
         Creates the output directory for the current run in the projects output folder.
         Copies the run_config.py file to the new location with adapted name.
         """
-        output_dir_path = join_paths(join_paths(os.path.dirname(os.path.dirname(self.this_path)), 'Output', self.run_name))
+        output_dir_path = join_paths(project_path, 'Output', self.run_name)
 
         if not os.path.isdir(output_dir_path):
             os.mkdir(output_dir_path)
@@ -53,9 +52,11 @@ class GridRunHandler:
             print("You fool run twice in a second... Exit.")
             exit(1)
 
-        shutil.copy(self.run_config_file, join_paths(output_dir_path, self.run_name + '_config.py'))
-
         return output_dir_path
+
+    def store_run_config_json(self):
+        with open(join_paths(self.output_dir_path, self.run_name + '_config.json'), 'w') as outfile:
+            outfile.write('{}\n'.format(json.dumps(run_config, outfile, indent=4)))
 
     def create_input_files(self, save_png):
         input_dir_path = join_paths(self.output_dir_path, 'input_data')
@@ -69,7 +70,7 @@ class GridRunHandler:
                 print('Creating points for {np} points using {img}.'.format(np=n_points, img=img_file))
 
     def run_algorithm(self, n_cores, n_points, input_dat, input_png, algorithm, sub_size, n_iterations, dir_index,
-                      sub_dir, iter_idx):
+                      sub_dir, iter_idx, img):
         """
         Function executing subprocess calls to .cpp executable forwarding parameter as
         command line inputs.
@@ -77,12 +78,13 @@ class GridRunHandler:
 
         # step1: store run parameters of sub run in sub run folder
         sub_params = {'n_points': n_points, 'n_cores': n_cores, 'input_dat': input_dat, 'input_png': input_png,
-                      'algorithm': algorithm, 'sub_size': sub_size, 'n_iterations': n_iterations, 'run_idx': dir_index}
+                      'algorithm': algorithm, 'sub_size': sub_size, 'n_iterations': n_iterations, 'run_idx': dir_index,
+                      'img': img}
         with open(join_paths(sub_dir, 'params.json'), 'w') as outfile:
             json.dump(sub_params, outfile, indent=4, sort_keys=True)
 
         # step2: run the algorithm specified by parameter grid inside of this folder
-        exe_file = glob(join_paths(os.path.dirname(os.path.dirname(self.this_path)), self.exe_dir_name, '*exe'))
+        exe_file = glob(join_paths(project_path, self.exe_dir_name, '*exe'))
         input_file_path = join_paths(self.output_dir_path, 'input_data', input_dat)
 
         call_command = [exe_file, str(n_cores), input_file_path, algorithm, str(iter_idx)]
@@ -118,6 +120,7 @@ class GridRunHandler:
                                                    n_points=n_points,
                                                    input_dat=input_file,
                                                    input_png=input_file.split('.')[0] + '.png',
+                                                   img=img_file,
                                                    algorithm=algorithm,
                                                    sub_size=sub_size,
                                                    n_iterations=n_iterations,

@@ -5,11 +5,10 @@ Loads data output from the C++ output files into python dictionary for easy acce
 from os.path import join as join_paths
 from glob import glob
 import pandas as pd
-import numpy as np
 import os
 
 
-class DataLoader:
+class AnimDataLoader:
 
     def __init__(self, output_folder):
         self.output_folder = output_folder
@@ -84,9 +83,3 @@ class DataLoader:
             return True
         except ValueError:
             return False
-
-if __name__ == '__main__':
-
-    '''Example usage...'''
-    loader = DataLoader('../Output')
-    data_dict = loader.load_all_data()

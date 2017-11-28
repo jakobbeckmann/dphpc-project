@@ -9,6 +9,7 @@ import numpy as np
 import cv2
 import os
 
+
 class ChanAnimation:
     def __init__(self, data_dict, label_points, original_image):
         """
