@@ -9,7 +9,7 @@ Note:
 
 import matplotlib.pyplot as plt
 
-from python.libs.execution import ImagePointsCreator
+from python.libs.execution.ImagePointsCreator import ImagePointsCreator
 
 # ------------ PARAMETER SECTION ----------- #
 
