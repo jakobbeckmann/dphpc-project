@@ -7,6 +7,7 @@ A tipical usage could look like this:
 1. Place .png or .jpg files you want to use for point generation into the **Input** folder
 2. Set the desired parameters in run_config.py in the **Execution** folder.
 3. Run the grid_run_exe.py python script from the **Execution** folder.
+4. The output will be created in the **Output** folder in a directory formatted to <run_name_from_run_config>_mmdd_hhmmss.
 
 ## Input Creation
 In case you just want to create input data files from images without doing full grid runs:  
