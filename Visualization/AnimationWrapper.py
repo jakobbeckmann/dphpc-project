@@ -13,7 +13,7 @@ import matplotlib.animation as animation
 
 # ----- SPECIFY PARAMETERS ----- #
 
-save_movie      = True
+save_movie      = False
 show_labels     = False
 interval        = 10  # controls the play-back speed
 output_name     = 'animation.mp4'
