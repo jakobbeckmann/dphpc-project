@@ -23,3 +23,10 @@ Visualisation/*.pyc
 build/
 src/Evaluation/result_*
 src/Evaluation/data_*
+
+
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+dphpc_project
