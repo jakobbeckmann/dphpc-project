@@ -4,6 +4,7 @@
 
 #include <sys/time.h>
 #include <cwchar>  // for NULL
+#include <fstream>
 
 class timer {
 public:
@@ -26,9 +27,10 @@ public:
 		return (stop_time.tv_sec - start_time.tv_sec) + (stop_time.tv_usec - start_time.tv_usec)*1e-6;
 	}
 
-	void write_to_file(int const n_cores) const {
+	void write_to_file(int iterIdx) const {
         std::ofstream file(TIMING_FILE, std::ios_base::app);
-        file << n_cores << "," << get_timing() << "\n";
+		file << iterIdx << ' ' << get_timing() << "\n";
+		file.close();
 	}
 
 	void clean_timing_file() {
@@ -40,6 +42,6 @@ public:
 
 private:
 	struct timeval start_time, stop_time;
-    std::string const TIMING_FILE = "../Output/timing.txt";
+    std::string const TIMING_FILE = "timing.txt";
 };
 

@@ -1,65 +1,88 @@
 /**
-    Main function for the chan 2d algorithm implementation.
+ *
+ * Main function to call different algorithms.
+ *
  */
 
-#include <fstream>
+#include <cstdio>
 #include <iostream>
-#include <random>
-#include <sstream>
+#include <vector>
 #include <omp.h>
 
-#include "ChanAlgorithm.h"
 #include "timer.hpp"
+#include "Point.h"
+#include "ChanAlgorithm.h"
+#include "GrahamScanAlgorithm.h"
+#include "JarvisAlgorithm.h"
 
 
 int main(int argc, char const *argv[]) {
+    if (argc < 5) {
+        std::cout << "Usage: " << " n_cores input_file algorithm iter_idx\n";
+        std::cout << "  algorithm := chan_normal | chan_merge_var | graham | jarvis \n";
+        return -1;
+    }
+
+    int n_cores             = atoi(argv[1]);
+    auto numberOfCores      = (size_t)n_cores;
+    std::string inputFile   = argv[2];
+    std::string algorithm   = argv[3];
+    int iterIdx             = atoi(argv[4]);
+
+    std::vector<Point> points = readPointsFromFile(inputFile);
+
+    timer timer;
+
+    std::vector<Point> result;
 
     std::cout << "[Information]: Max n threads possible - " << omp_get_max_threads() << std::endl;
 
-    //-------------------------------------------------------------------------------
-    // USER INPUT SECTION
-    std::string inputFile = "../Input/bird_points.dat";
-    std::vector<int> nCores = {1, 2, 3, 4, 5, 6, 7, 8};
+    if (algorithm == "chan_normal") {
+        ChanAlgorithm chan;
 
+        timer.start();
+        result = chan.run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
+        timer.stop();
+        std::cout << "Chan time: "  << timer.get_timing() << std::endl;
 
-    //-------------------------------------------------------------------------------
-    // ALGORITHM SECTION
-    std::vector<Point> points = readPointsFromFile(inputFile);
-    size_t PARALLELISM_IDX = nCores.size();
-    ChanAlgorithm chan;
-    timer t;
-    t.clean_timing_file();
+    } else if (algorithm == "chan_merge_var") {
+        ChanAlgorithm2Merge chan;
+        timer.start();
+        result = chan.run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
+        timer.stop();
+        std::cout << "Chan merge time: "  << timer.get_timing() << std::endl;
 
-    std::vector<std::vector<Point>> allResults;
+    } else  if (algorithm == "graham") {
+        GrahamScanAlgorithm graham;
+        timer.start();
+        // TODO: Fix linking error.
+        //result = graham.run(points, numberOfCores);
+        timer.stop();
+        std::cout << "Graham time: "  << timer.get_timing() << std::endl;
 
-    for (int threadCount: nCores)
-    {
-        omp_set_dynamic(0);                 // Explicitly disable dynamic teams
-        omp_set_num_threads(threadCount);
+    } else  if (algorithm == "jarvis") {
+        JarvisAlgorithm jarvis;
+        timer.start();
+        // TODO: Fix linking error.
+        //result = jarvis.run(points, numberOfCores);
+        timer.stop();
+        std::cout << "Jarvis time: "  << timer.get_timing() << std::endl;
 
-        t.start();
-        std::vector<Point> result = chan.run(points, PARALLELISM_IDX);
-        t.stop();
-        allResults.emplace_back(result);
-        std::cout << "Chan algorithm took:" << t.get_timing() << " seconds." << std::endl;
-        t.write_to_file(threadCount);
-
+    } else {
+        std::cout << "No such algorithm!";
+        std::exit(EXIT_FAILURE);
     }
 
-    //-------------------------------------------------------------------------------
-    // OUTPUT SECTION
-
-    for (std::vector<Point> result: allResults)
-    {
-        std::cout << "\n\n=========Result=========" << std::endl;
-        std::cout << " " << result.size() << " hull points:" << std::endl;
-        for(Point point: result) {
-            std::cout << point << " ";
-        }
-        std::cout << std::endl;
-        FileWriter::writePointsToFile(result, "../Output/out_hull_points.dat", true);
+    std::cout << "\n\n=========Result=========" << std::endl;
+    std::cout << " " << result.size() << " hull points:" << std::endl;
+    for(Point point: result) {
+        std::cout << point << " ";
     }
+    std::cout << std::endl;
 
+    FileWriter::writePointsToFile(result, "out_hull_points.dat", true);
+    timer.write_to_file(iterIdx);
 
     return 0;
 }
+
