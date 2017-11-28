@@ -41,8 +41,6 @@ int main(int argc, char const *argv[]) {
 
     std::vector<Point> result;
 
-    std::cout << "[Information]: Max n threads possible - " << omp_get_max_threads() << std::endl;
-
     if (algorithm == "chan_normal") {
         ChanAlgorithm chan;
 
@@ -76,7 +74,6 @@ int main(int argc, char const *argv[]) {
 
     } else if (algorithm == "quickhull") {
         std::vector<int> result_idxs;
-        std::vector<Point> result;
         timer.start();
         Quickhull::run(points, result_idxs);
         for(int idx: result_idxs) {
@@ -91,10 +88,13 @@ int main(int argc, char const *argv[]) {
     }
 
     std::cout << "\n\n=========Result=========" << std::endl;
-    std::cout << " " << result.size() << " hull points:" << std::endl;
+    std::cout << "Algorithm: " << algorithm << std::endl;
+    std::cout << "N hull points:" << result.size() << std::endl;
+    /*
     for(Point point: result) {
         std::cout << point << " ";
     }
+     */
     std::cout << std::endl;
 
     FileWriter::writePointsToFile(result, "out_hull_points.dat", true);
