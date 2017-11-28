@@ -77,6 +77,17 @@ class GridRunHandler:
         sub_params = {'n_points': n_points, 'n_cores': n_cores, 'input_dat': input_dat, 'input_png': input_png,
                       'algorithm': algorithm, 'sub_size': sub_size, 'n_iterations': n_iterations, 'run_idx': dir_index,
                       'img': img}
+
+        # ------------- Print parameters
+        '''
+        print '\n' + 30*'= '
+        print '\tRun parameters:'
+        for key, value in sub_params.iteritems():
+            print '{:15}: {}'.format(key, value)
+        print '{:15}: {}'.format('iter_idx', iter_idx)
+        '''
+        # -------------
+
         with open(join_paths(sub_dir, 'params.json'), 'w') as outfile:
             json.dump(sub_params, outfile, indent=4, sort_keys=True)
 

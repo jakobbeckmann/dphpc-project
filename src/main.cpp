@@ -31,8 +31,8 @@ int main(int argc, char const *argv[]) {
 
     Timer timer;
     Timer file_write_timer;
-    Timer total_timer;
     Timer file_read_timer;
+    Timer total_timer;
 
     total_timer.start();
 

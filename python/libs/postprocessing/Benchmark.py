@@ -18,12 +18,21 @@ class Benchmark:
         self.all_data_dict = all_data_dict
 
     def plot_runtimes_comparison(self, save=False, show=False, file_name=None):
-        """Plots the absolute runtime vs input size for all algorithms in the run."""
-        fig, ax = plt.subplots()
-        fig.set_size_inches(13, 9)
-        ax.set_xlabel('Input size [number of points]')
-        ax.set_ylabel('Run time [s]')
+        """
+        Plots the absolute runtime vs input size for all algorithms in the run.
 
+        For now, the runtimes are the mean over all iterations for a run configuration.
+        """
+
+        if len(self.run_config['run_params']['n_cores']) > 1 or len(self.run_config['run_params']['sub_size']) > 1 \
+                or len(self.run_config['run_params']['img_files']) > 1:
+            raise NotImplementedError("You can't do that. Only multiple input sizes and multiple algos.")
+
+        fig, ax = self.setup_figure_1ax(size=(13, 9),
+                                        x_label='Input size [number of points]',
+                                        y_label='Run time [s]')
+
+        # set up empty data container
         algo_runtimes = {algorithm: {'input_sizes': [], 'run_times': []}
                          for algorithm in self.run_config['run_params']['algorithms']}
 
@@ -37,11 +46,6 @@ class Benchmark:
             input_sizes = [algo_data['input_sizes'][i] for i in sort_indices]
             run_times = [algo_data['run_times'][i] for i in sort_indices]
 
-            print('--------\n')
-            print('algo: ' + algorithm)
-            print('input sizes:', input_sizes)
-            print('run times:  ', run_times)
-
             ax.plot(input_sizes, run_times, linewidth=3, label=algorithm, alpha=0.5)
             # ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.5, color='black', markeredgecolor='none')
 
@@ -51,35 +55,43 @@ class Benchmark:
 
     # TODO: This is an old version. Implement for new framework.
     def plot_speedup_vs_cores(self, save=False, show=False, file_name=None):
-        raise NotImplementedError
-        fig, ax = plt.subplots()
-        fig.set_size_inches(13, 9)
-        ax.set_xlabel('Number of cores')
-        ax.set_ylabel('Speedup')
+        """
+        Plots the speedup vs number of cores for all algorithms in the run.
+        """
+        if len(self.run_config['run_params']['n_points']) > 1 or len(self.run_config['run_params']['sub_size']) > 1 \
+                or len(self.run_config['run_params']['img_files']) > 1:
+            raise NotImplementedError("You can't do that. Only multiple numbers of cores and multiple algos.")
 
-        time_1core = self.timing_data[1]
-        n_cores = self.timing_data.keys()
-        speedup = [time_1core / self.timing_data[n] for n in n_cores]
+        fig, ax = self.setup_figure_1ax(size=(13, 9),
+                                        x_label='# cores',
+                                        y_label='Speedup')
 
-        ax.plot(n_cores, speedup, linewidth=2, color='green')
-        ax.plot(n_cores, speedup, 'go', linewidth=2, color='green')
+        # set up empty data container holding n cores, run times
+        algo_t_core = {algorithm: {'n_cores': [], 'run_times': [], 'time_1core': 0.0}
+                       for algorithm in self.run_config['run_params']['algorithms']}
 
-        self.evaluate_save_show(save, show, file_name)
+        for _, data in self.all_data_dict.iteritems():
+            algo = data['algorithm']
+            algo_t_core[algo]['n_cores'].append(data['n_cores'])
+            algo_t_core[algo]['run_times'].append(data['mean_run_tim'])
+            if data['n_cores'] == 1:
+                algo_t_core[algo]['time_1core'] = data['mean_run_tim']
 
-    # TODO: This is an old version. Implement for new framework.
-    def plot_time_vs_cores(self, save=False, show=False, file_name=None):
-        raise NotImplementedError
-        fig, ax = plt.subplots()
-        fig.set_size_inches(13, 9)
-        ax.set_xlabel('Number of cores')
-        ax.set_ylabel('Time')
+        max_n_core = 1
+        for algorithm, algo_data in algo_t_core.iteritems():
 
-        n_cores = self.timing_data.keys()
-        speedup = [self.timing_data[n] for n in n_cores]
+            n_cores, run_times = self.sort_two_lists_wrt_first(algo_data['n_cores'], algo_data['run_times'])
+            speedups = [algo_data['time_1core'] / run_times[n] for n in range(len(run_times))]
 
-        ax.plot(n_cores, speedup, linewidth=2, color='blue')
-        ax.plot(n_cores, speedup, 'o', linewidth=2, color='blue')
+            if max(n_cores) > max_n_core:
+                max_n_core = max(n_cores)
 
+            ax.plot(n_cores, speedups, linewidth=3, label=algorithm, alpha=0.5)
+            # ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.5, color='black', markeredgecolor='none')
+
+        ax.plot([1, max_n_core], [1.0, max_n_core], 'k--', linewidth=1, alpha=0.5, label='linear speedup')
+
+        plt.legend()
         self.evaluate_save_show(save, show, file_name)
 
     def evaluate_save_show(self, save, show, file_name):
@@ -94,3 +106,19 @@ class Benchmark:
 
         if show:
             plt.show()
+
+    @staticmethod
+    def setup_figure_1ax(size, x_label, y_label):
+        fig, ax = plt.subplots()
+        fig.set_size_inches(size)
+        ax.set_xlabel(x_label)
+        ax.set_ylabel(y_label)
+
+        return fig, ax
+
+    @staticmethod
+    def sort_two_lists_wrt_first(list1, list2):
+        sort_indices = np.argsort(np.array(list1))
+        list1_sorted = [list1[i] for i in sort_indices]
+        list2_sorted = [list2[i] for i in sort_indices]
+        return list1_sorted, list2_sorted
