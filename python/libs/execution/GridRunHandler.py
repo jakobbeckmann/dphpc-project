@@ -148,7 +148,7 @@ class GridRunHandler:
     @staticmethod
     def create_run_name():
         dt = datetime.datetime.now()
-        dt_appendix = '%s%s_%s%s%s' % (dt.month, dt.day, dt.hour, dt.minute, dt.second)
+        dt_appendix = '{:02d}{:02d}_{:02d}{:02d}{:02d}'.format(dt.month, dt.day, dt.hour, dt.minute, dt.second)
         return run_config['run_name'] + '_' + dt_appendix
 
     @staticmethod

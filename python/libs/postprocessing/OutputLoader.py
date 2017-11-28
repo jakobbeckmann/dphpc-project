@@ -33,8 +33,6 @@ class OutputLoader:
     @staticmethod
     def set_output_dir_name(output_dir_name, latest_output):
         if latest_output:
-            # TODO: Fix the bug
-            raise NotImplementedError('Need bugfix: Some folder names leave out the zero and and this function fails.')
             global_out_dir = join_paths(project_path, 'Output')
 
             all_output_paths = [d for d in os.listdir(global_out_dir) if os.path.isdir(join_paths(global_out_dir, d))]
@@ -53,7 +51,7 @@ class OutputLoader:
                         latest_hhmmss = hhmmss
                         latest_out_dir = out_dir
             output_dir_name = os.path.split(latest_out_dir)[-1]
-            print('Chose latest output run: ' + output_dir_name)
+            print('\nChose latest output run: ' + output_dir_name)
             return output_dir_name
         else:
             return output_dir_name

@@ -43,7 +43,7 @@ class Benchmark:
             print('run times:  ', run_times)
 
             ax.plot(input_sizes, run_times, linewidth=3, label=algorithm, alpha=0.5)
-            ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.5, color='black', markeredgecolor='none')
+            # ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.5, color='black', markeredgecolor='none')
 
         plt.legend()
 
