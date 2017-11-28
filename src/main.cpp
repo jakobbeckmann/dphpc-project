@@ -14,6 +14,7 @@
 #include "ChanAlgorithm.h"
 #include "GrahamScanAlgorithm.h"
 #include "JarvisAlgorithm.h"
+#include "Quickhull.hpp"
 
 
 int main(int argc, char const *argv[]) {
@@ -73,6 +74,17 @@ int main(int argc, char const *argv[]) {
         timer.stop();
         std::cout << "Jarvis time: "  << timer.get_timing() << std::endl;
 
+    } else if (algorithm == "quickhull") {
+        std::vector<int> result_idxs;
+        std::vector<Point> result;
+        timer.start();
+        Quickhull::run(points, result_idxs);
+        for(int idx: result_idxs) {
+            result.push_back(points[idx]);
+        }
+        timer.stop();
+        std::cout << "Quickhull time: "  << timer.get_timing() << std::endl;
+
     } else {
         std::cout << "No such algorithm!";
         std::exit(EXIT_FAILURE);
@@ -90,4 +102,3 @@ int main(int argc, char const *argv[]) {
 
     return 0;
 }
-
