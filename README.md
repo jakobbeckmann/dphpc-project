@@ -4,9 +4,9 @@ Group work for the Design of Parallel and High Performance Computing course 2017
 ## How-To
 A tipical usage could look like this:  
 - Compile your dphc-project executable
-1. Place .png or .jpg files you want to use for point generation into the Input folder
-2. Set the desired parameters in run_config.py
-3. Run the grid_run_exe.py python script.
+1. Place .png or .jpg files you want to use for point generation into the **Input** folder
+2. Set the desired parameters in run_config.py in the **Execution** folder.
+3. Run the grid_run_exe.py python script from the **Execution** folder.
 
 ## Input Creation
 In case you just want to create input data files from images without doing full grid runs:  
