@@ -4,11 +4,13 @@ Class which defines the functionality to plot a graham scan.
 Need to pass a data_dict to the constructor which we get using the DataLoader class.
 """
 from matplotlib.pyplot import cm
-import numpy as np
 
+import numpy as np
+import cv2
+import os
 
 class ChanAnimation:
-    def __init__(self, data_dict, label_points):
+    def __init__(self, data_dict, label_points, original_image):
         """
             - state represents the 3 indices of base_idx, last_idx, last_idx - 1, used to draw the arrows
             - hull_points is the stack of points that lie on the hull (at a given moment)
@@ -47,6 +49,7 @@ class ChanAnimation:
         self.n_steps_merge      = len(self.merge_history['x'])
         self.merge_color        = 'black'
         self.merge_lines        = None
+        self.original_image     = original_image
 
         # self.idx_stack = [len(self.all_points['x']) - 1, 0, 1]  # unused
 
@@ -119,11 +122,16 @@ class ChanAnimation:
             self.ax.plot([self.final_sub_hulls[idx]['x'][0], self.final_sub_hulls[idx]['x'][-1]],
                          [self.final_sub_hulls[idx]['y'][0], self.final_sub_hulls[idx]['y'][-1]], c=hull_color, alpha=0.8, linewidth=0.4)
 
-        #self.ax.plot(self.final_hull['x'], self.final_hull['y'], c=self.merge_color, alpha=0.8, linewidth=6)
-        #self.ax.plot([self.final_hull['x'][0], self.final_hull['x'][-1]],
-                     #[self.final_hull['y'][0], self.final_hull['y'][-1]], c=self.merge_color, alpha=0.8, linewidth=6)
+        # self.ax.plot(self.final_hull['x'], self.final_hull['y'], c=self.merge_color, alpha=0.8, linewidth=6)
+        # self.ax.plot([self.final_hull['x'][0], self.final_hull['x'][-1]],
+                     # [self.final_hull['y'][0], self.final_hull['y'][-1]], c=self.merge_color, alpha=0.8, linewidth=6)
 
-        ''' Outcomment to label points '''
+        if self.original_image is not None:
+            image = cv2.imread(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'Input',
+                                            self.original_image))
+            self.ax.imshow(np.flipud(image), origin='lower', alpha=0.7)
+
+        ''' Out comment to label points '''
         if self.label_points:
             for idx in range(self.n_graham_subs):
                 for i in range(len(self.all_points[idx]['x'])):
