@@ -17,9 +17,14 @@
 
 
 int main(int argc, char const *argv[]) {
+    #ifdef WRITE_DEBUG
+        std::cout << "Running in DEBUG mode - writing ALL output files." << std::endl;
+    #endif
+
     if (argc < 5) {
         std::cout << "Usage: " << " n_cores input_file algorithm iter_idx\n";
         std::cout << "  algorithm := chan_normal | chan_merge_var | graham | jarvis \n";
+
         return -1;
     }
 
