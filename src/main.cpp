@@ -1,82 +1,99 @@
 /**
-    Main function for the chan 2d algorithm implementation.
+ *
+ * Main function to call different algorithms.
+ *
  */
 
-#include <fstream>
+#include <cstdio>
 #include <iostream>
-#include <random>
-#include <sstream>
 #include <vector>
+#include <omp.h>
 
-
+#include "timer.hpp"
 #include "Point.h"
-#include "PointsGenerator/ShapeGenerator.h"
-#include "utility.h"
 #include "ChanAlgorithm.h"
+#include "GrahamScanAlgorithm.h"
+#include "JarvisAlgorithm.h"
+#include "Quickhull.hpp"
+
 
 int main(int argc, char const *argv[]) {
-
-    //-------------------------------------------------------------------------------
-    // CLEAR OUTPUT FOLDER
-
-
-
-    // USER INPUT SECTION
-
-    int RANGE = 10;
-    size_t POINT_COUNT = 0;
-    size_t PARALLELISM_IDX = 0;
-
-    if (argc == 3) {
-        std::stringstream sstream(argv[1]);
-		sstream >> PARALLELISM_IDX;
-    } else {
-        std::cout << "Enter number of subsets for Graham Scans... " << std::endl;
-        std::cin >> PARALLELISM_IDX;
-    }
-    if(PARALLELISM_IDX < 1) return -1;
-    FileWriter::writeNumberToFile(PARALLELISM_IDX, "../Output/out_n_graham_subs.dat", true);
-
-    if (argc == 3) {
-        std::stringstream sstream(argv[2]);
-        sstream >> POINT_COUNT;
-    } else {
-        std::cout << "Enter number of points..." << std::endl;
-        std::cin >> POINT_COUNT;
-    }
-    if(POINT_COUNT < PARALLELISM_IDX * 3) {
-        std::cout << "Please need more points or less parallelism." << std::endl;
+    if (argc < 5) {
+        std::cout << "Usage: " << " n_cores input_file algorithm iter_idx\n";
+        std::cout << "  algorithm := chan_normal | chan_merge_var | graham | jarvis \n";
         return -1;
     }
 
-    /*
-    std::cout << "Enter MIN value for x/y coordinates..." << std::endl;
-    std::cin >> MIN;
-    std::cout << "Enter MAX value for x/y coordinates..." << std::endl;
-    std::cin >> MAX;
-    */
+    int n_cores             = atoi(argv[1]);
+    auto numberOfCores      = (size_t)n_cores;
+    std::string inputFile   = argv[2];
+    std::string algorithm   = argv[3];
+    int iterIdx             = atoi(argv[4]);
 
-    //-------------------------------------------------------------------------------
-    // ALGORITHM SECTION
+    std::vector<Point> points = readPointsFromFile(inputFile);
 
-    ChanAlgorithm chan;
-    std::vector<Point> points = randomShapeGenerator(POINT_COUNT, RANGE);
-    std::vector<Point> result = chan.run(points, PARALLELISM_IDX);
+    timer timer;
 
-    for (std::vector<Point>::iterator it = result.begin(); it != result.end(); ++it) {
-        it->print();
+    std::vector<Point> result;
+
+    std::cout << "[Information]: Max n threads possible - " << omp_get_max_threads() << std::endl;
+
+    if (algorithm == "chan_normal") {
+        ChanAlgorithm chan;
+
+        timer.start();
+        result = chan.run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
+        timer.stop();
+        std::cout << "Chan time: "  << timer.get_timing() << std::endl;
+
+    } else if (algorithm == "chan_merge_var") {
+        ChanAlgorithm2Merge chan;
+        timer.start();
+        result = chan.run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
+        timer.stop();
+        std::cout << "Chan merge time: "  << timer.get_timing() << std::endl;
+
+    } else  if (algorithm == "graham") {
+        GrahamScanAlgorithm graham;
+        timer.start();
+        // TODO: Fix linking error.
+        //result = graham.run(points, numberOfCores);
+        timer.stop();
+        std::cout << "Graham time: "  << timer.get_timing() << std::endl;
+
+    } else  if (algorithm == "jarvis") {
+        JarvisAlgorithm jarvis;
+        timer.start();
+        // TODO: Fix linking error.
+        //result = jarvis.run(points, numberOfCores);
+        timer.stop();
+        std::cout << "Jarvis time: "  << timer.get_timing() << std::endl;
+
+    } else if (algorithm == "quickhull") {
+        std::vector<int> result_idxs;
+        std::vector<Point> result;
+        timer.start();
+        Quickhull::run(points, result_idxs);
+        for(int idx: result_idxs) {
+            result.push_back(points[idx]);
+        }
+        timer.stop();
+        std::cout << "Quickhull time: "  << timer.get_timing() << std::endl;
+
+    } else {
+        std::cout << "No such algorithm!";
+        std::exit(EXIT_FAILURE);
     }
 
-    //-------------------------------------------------------------------------------
-    // OUTPUT SECTION
-
     std::cout << "\n\n=========Result=========" << std::endl;
+    std::cout << " " << result.size() << " hull points:" << std::endl;
     for(Point point: result) {
         std::cout << point << " ";
     }
     std::cout << std::endl;
 
-    FileWriter::writePointsToFile(result, "../Output/out_hull_points.dat", true);
+    FileWriter::writePointsToFile(result, "out_hull_points.dat", true);
+    timer.write_to_file(iterIdx);
 
     return 0;
 }
