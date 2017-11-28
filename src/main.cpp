@@ -8,7 +8,6 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
-#include <omp.h>
 
 #include "timer.hpp"
 #include "Point.h"

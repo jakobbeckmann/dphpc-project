@@ -20,7 +20,6 @@ algorithm contains only collinear points.
 #include <functional>
 #include <iostream>
 #include <vector>
-
 #include <omp.h>
 
 #include "ChanAlgorithm.h"
