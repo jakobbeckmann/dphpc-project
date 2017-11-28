@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <iostream>
 #include <vector>
+#include <sstream>
 #include <omp.h>
 
 #include "timer.hpp"
@@ -47,28 +48,24 @@ int main(int argc, char const *argv[]) {
         timer.start();
         result = chan.run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
         timer.stop();
-        std::cout << "Chan time: "  << timer.get_timing() << std::endl;
 
     } else if (algorithm == "chan_merge_var") {
         ChanAlgorithm2Merge chan;
         timer.start();
         result = chan.run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
         timer.stop();
-        std::cout << "Chan merge time: "  << timer.get_timing() << std::endl;
 
     } else  if (algorithm == "graham") {
         GrahamScanAlgorithm graham;
         timer.start();
         result = graham.run(points);
         timer.stop();
-        std::cout << "Graham time: "  << timer.get_timing() << std::endl;
 
     } else  if (algorithm == "jarvis") {
         JarvisAlgorithm jarvis;
         timer.start();
         result = jarvis.run(points);
         timer.stop();
-        std::cout << "Jarvis time: "  << timer.get_timing() << std::endl;
 
     } else if (algorithm == "quickhull") {
         std::vector<int> result_idxs;
@@ -78,7 +75,6 @@ int main(int argc, char const *argv[]) {
             result.push_back(points[idx]);
         }
         timer.stop();
-        std::cout << "Quickhull time: "  << timer.get_timing() << std::endl;
 
     } else {
         std::cout << "No such algorithm!";
@@ -86,16 +82,14 @@ int main(int argc, char const *argv[]) {
     }
 
     std::cout << "\n\n=========Result=========" << std::endl;
-    std::cout << "Algorithm: " << algorithm << std::endl;
-    std::cout << "N hull points:" << result.size() << std::endl;
-    /*
-    for(Point point: result) {
-        std::cout << point << " ";
-    }
-     */
-    std::cout << std::endl;
+    std::cout << "Algorithm:     " << algorithm << std::endl;
+    std::cout << "N hull points: " << result.size() << std::endl;
+    std::cout << "Iteration:     " << iterIdx << std::endl;
+    std::cout << "Time used:     " << timer.get_timing() << std::endl;
 
-    FileWriter::writePointsToFile(result, "out_hull_points.dat", true);
+    std::stringstream fileName;
+    fileName << "hull_points_" << iterIdx << ".dat";
+    FileWriter::writePointsToFile(result, fileName.str(), true);
     timer.write_to_file(iterIdx);
 
     return 0;
