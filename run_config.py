@@ -10,11 +10,11 @@ run_config = {
     'run_params':
         {
             'n_cores':              [1],
-            'n_points':             [1000],
+            'n_points':             [200],
             'img_files':            ['homer.jpg'],
             'algorithms':           ['chan_normal', 'quickhull'],
             'sub_size':             [None],
-            'n_iterations':         3,
+            'n_iterations':         1,
         },
 
     'post_process_params':

@@ -85,10 +85,13 @@ class GridRunHandler:
 
         # step2: run the algorithm specified by parameter grid inside of this folder
         exe_file = glob(join_paths(project_path, self.exe_dir_name, '*exe'))
+        assert len(exe_file) == 1
         input_file_path = join_paths(self.output_dir_path, 'input_data', input_dat)
 
-        call_command = [exe_file, str(n_cores), input_file_path, algorithm, str(iter_idx)]
-        subprocess.call(call_command, cwd=sub_dir)
+        call_command = [exe_file[0], str(n_cores), input_file_path, algorithm, str(iter_idx)]
+        call_command_str = ' '.join(call_command)
+
+        subprocess.call(call_command_str, shell=True, cwd=sub_dir)
 
         # step3: postprocessing options
         # TODO: Postprocessing should be handled outside the GridRunHandler. Do not mix data acquisition and
