@@ -9,6 +9,6 @@
 
 class GrahamScanAlgorithm {
 public:
-    std::vector<Point> run(const std::vector<Point>& points, size_t parallel_idx);
+    std::vector<Point> run(const std::vector<Point>& points);
 };
 

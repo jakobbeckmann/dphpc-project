@@ -59,16 +59,14 @@ int main(int argc, char const *argv[]) {
     } else  if (algorithm == "graham") {
         GrahamScanAlgorithm graham;
         timer.start();
-        // TODO: Fix linking error.
-        //result = graham.run(points, numberOfCores);
+        result = graham.run(points);
         timer.stop();
         std::cout << "Graham time: "  << timer.get_timing() << std::endl;
 
     } else  if (algorithm == "jarvis") {
         JarvisAlgorithm jarvis;
         timer.start();
-        // TODO: Fix linking error.
-        //result = jarvis.run(points, numberOfCores);
+        result = jarvis.run(points);
         timer.stop();
         std::cout << "Jarvis time: "  << timer.get_timing() << std::endl;
 

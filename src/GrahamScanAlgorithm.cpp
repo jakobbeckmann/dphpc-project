@@ -7,7 +7,7 @@
 /**
     Retruns list of points belonging to a convex hull after running Graham Scan algorithm.
  */
-std::vector<Point> GrahamScanAlgorithm::run(const std::vector<Point>& constPoints, size_t parallel_idx) {
+std::vector<Point> GrahamScanAlgorithm::run(const std::vector<Point>& constPoints) {
     if (constPoints.size() <= 1) {
         return constPoints;
     }
