@@ -82,7 +82,8 @@ class GridRunHandler:
 
         # step2: run the algorithm specified by parameter grid inside of this folder
         exe_file = glob(join_paths(project_path, self.exe_dir_name, 'dphpc_project*'))
-        assert len(exe_file) == 1
+        assert len(exe_file) == 1, 'Could not find executable. Check you config file for correct exe_dir_name param!'
+
         input_file_path = join_paths(self.output_dir_path, 'input_data', input_dat)
 
         call_command = [exe_file[0], str(n_cores), input_file_path, algorithm, str(iter_idx)]
@@ -128,6 +129,21 @@ class GridRunHandler:
                                                    dir_index=dir_index,
                                                    sub_dir=sub_dir)
                                 run_index += 1
+
+        self.store_all_sub_json_params()
+
+    def store_all_sub_json_params(self):
+        """Stores a single json file holding all the parameters in main run output folder."""
+        all_params = {}
+        all_sub_dir_paths = glob(join_paths(self.output_dir_path, 'sub_?', 'params.json'))
+
+        for sub_idx, sub_dir in enumerate(sorted(all_sub_dir_paths)):
+            with open(sub_dir, 'r') as infile:
+                json_data = json.load(infile)
+                all_params[sub_idx] = json_data
+
+        with open(join_paths(self.output_dir_path, self.run_name + '_all_params.json'), 'w') as outfile:
+            json.dump(all_params, outfile, indent=4)
 
     @staticmethod
     def create_run_name():
