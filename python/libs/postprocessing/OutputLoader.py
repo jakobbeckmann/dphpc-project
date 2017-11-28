@@ -8,11 +8,13 @@ from os.path import join as join_paths
 import json
 from glob import glob
 
+from python.libs.paths import project_path
+
 
 class OutputLoader:
     def __init__(self, output_dir_name):
         self.output_dir_name = output_dir_name
-        self.output_dir_path = join_paths(os.path.abspath(__file__), '../../../', 'Output', output_dir_name)
+        self.output_dir_path = join_paths(project_path, 'Output', output_dir_name)
         self.run_config = self.parse_run_config()
         self.sub_run_params = self.parse_sub_run_params()
 

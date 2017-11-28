@@ -5,7 +5,9 @@
 #############################################################################
 
 run_config = {
-    'run_name': 'test',
+    'run_name':         'test',
+    'exe_dir_name':     'cmake_build_debug',
+    'save_png_input':   False,
 
     'run_params':
         {

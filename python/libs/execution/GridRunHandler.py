@@ -15,11 +15,8 @@ from python.libs.paths import project_path
 
 
 class GridRunHandler:
-    def __init__(self, exe_dir_name, custom_config_file=None):  # TODO: Implement custom run_config location
+    def __init__(self, custom_config_file=None):  # TODO: Implement custom run_config location
         """
-
-        :param exe_dir_name: The folder name in which the executable is located (no full path needed).
-                             The folder must be located in the main dphpc-project directory.
         :param custom_config_file: In case you want to specify another config file (e.g. to re-run a whole run),
                                    give the whole path to this config file.
         """
@@ -31,7 +28,7 @@ class GridRunHandler:
         self.output_dir_path = self.setup_output_folder()
         self.store_run_config_json()
         self.input_files = {}
-        self.exe_dir_name = exe_dir_name
+        self.exe_dir_name = run_config['exe_dir_name']
 
     def set_run_config_file(self, custom_config_file):
         if custom_config_file is not None:
@@ -58,7 +55,7 @@ class GridRunHandler:
         with open(join_paths(self.output_dir_path, self.run_name + '_config.json'), 'w') as outfile:
             outfile.write('{}\n'.format(json.dumps(run_config, outfile, indent=4)))
 
-    def create_input_files(self, save_png):
+    def create_input_files(self):
         input_dir_path = join_paths(self.output_dir_path, 'input_data')
         os.mkdir(input_dir_path)
 
@@ -66,7 +63,7 @@ class GridRunHandler:
             for img_file in self.run_params['img_files']:
                 point_file_name = self.create_input_filename(n_points, img_file, 'dat')
                 point_creator = ImagePointsCreator(n_points, img_file, point_file_name, input_dir_path)
-                point_creator.create_points_pipeline(save_png=save_png)
+                point_creator.create_points_pipeline(save_png=run_config['save_png_input'])
                 print('Creating points for {np} points using {img}.'.format(np=n_points, img=img_file))
 
     def run_algorithm(self, n_cores, n_points, input_dat, input_png, algorithm, sub_size, n_iterations, dir_index,
