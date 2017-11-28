@@ -9,7 +9,7 @@
 #include <vector>
 #include <sstream>
 
-#include "timer.hpp"
+#include "timer.h"
 #include "Point.h"
 #include "ChanAlgorithm.h"
 #include "GrahamScanAlgorithm.h"
@@ -29,15 +29,22 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
+    Timer timer;
+    Timer file_write_timer;
+    Timer total_timer;
+    Timer file_read_timer;
+
+    total_timer.start();
+
     int n_cores             = atoi(argv[1]);
     auto numberOfCores      = (size_t)n_cores;
     std::string inputFile   = argv[2];
     std::string algorithm   = argv[3];
     int iterIdx             = atoi(argv[4]);
 
+    file_read_timer.start();
     std::vector<Point> points = readPointsFromFile(inputFile);
-
-    timer timer;
+    file_read_timer.stop();
 
     std::vector<Point> result;
 
@@ -82,14 +89,23 @@ int main(int argc, char const *argv[]) {
 
     std::cout << "\n\n=========Result=========" << std::endl;
     std::cout << "Algorithm:     " << algorithm << std::endl;
+    std::cout << "Input size:    " << points.size() << std::endl;
     std::cout << "N hull points: " << result.size() << std::endl;
     std::cout << "Iteration:     " << iterIdx << std::endl;
     std::cout << "Time used:     " << timer.get_timing() << std::endl;
 
+    file_write_timer.start();
     std::stringstream fileName;
     fileName << "hull_points_" << iterIdx << ".dat";
     FileWriter::writePointsToFile(result, fileName.str(), true);
+
     timer.write_to_file(iterIdx);
+    file_write_timer.stop();
+    std::cout << "Write time:    " << file_write_timer.get_timing() << std::endl;
+    std::cout << "Read time:     " << file_read_timer.get_timing() << std::endl;
+
+    total_timer.stop();
+    std::cout << "Total time:    " << total_timer.get_timing() << "\n" << std::endl;
 
     return 0;
 }
