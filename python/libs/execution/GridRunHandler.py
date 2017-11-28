@@ -61,10 +61,10 @@ class GridRunHandler:
 
         for n_points in self.run_params['n_points']:
             for img_file in self.run_params['img_files']:
+                print('\nCreating points for {np} points using {img}.'.format(np=n_points, img=img_file))
                 point_file_name = self.create_input_filename(n_points, img_file, 'dat')
                 point_creator = ImagePointsCreator(n_points, img_file, point_file_name, input_dir_path)
                 point_creator.create_points_pipeline(save_png=run_config['save_png_input'])
-                print('Creating points for {np} points using {img}.'.format(np=n_points, img=img_file))
 
     def run_algorithm(self, n_cores, n_points, input_dat, input_png, algorithm, sub_size, n_iterations, dir_index,
                       sub_dir, iter_idx, img):
@@ -89,7 +89,7 @@ class GridRunHandler:
         call_command = [exe_file[0], str(n_cores), input_file_path, algorithm, str(iter_idx)]
         call_command_str = ' '.join(call_command)
 
-        subprocess.call(call_command_str, shell=True, cwd=sub_dir)
+        subprocess.check_call(call_command_str, shell=True, cwd=sub_dir)
 
         # step3: postprocessing options
         # TODO: Postprocessing should be handled outside the GridRunHandler. Do not mix data acquisition and
@@ -135,7 +135,7 @@ class GridRunHandler:
     def store_all_sub_json_params(self):
         """Stores a single json file holding all the parameters in main run output folder."""
         all_params = {}
-        all_sub_dir_paths = glob(join_paths(self.output_dir_path, 'sub_?', 'params.json'))
+        all_sub_dir_paths = glob(join_paths(self.output_dir_path, 'sub_*', 'params.json'))
 
         for sub_idx, sub_dir in enumerate(sorted(all_sub_dir_paths)):
             with open(sub_dir, 'r') as infile:
