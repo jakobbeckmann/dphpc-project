@@ -8,19 +8,50 @@ from os.path import join as join_paths
 import numpy as np
 import matplotlib.pyplot as plt
 
+from python.libs.paths import project_path
+
 
 class Benchmark:
-    def __init__(self, timing_file='timing.txt'):
-        self.timing_file = join_paths(os.path.realpath(__file__), '../../Output', timing_file)
-        self.timing_data = {}
-        self.output_dir = join_paths(os.path.realpath(__file__), '../../FiguresAndMovies')
+    def __init__(self, run_config, all_params, all_data_dict):
+        self.run_config = run_config
+        self.all_params = all_params
+        self.all_data_dict = all_data_dict
 
-    def load_timing_data(self):
-        raw_data = np.loadtxt(self.timing_file, delimiter=',')
-        for item in raw_data:
-            self.timing_data[int(item[0])] = item[1]
+    def plot_runtimes_comparison(self, save=False, show=False, file_name=None):
+        """Plots the absolute runtime vs input size for all algorithms in the run."""
+        fig, ax = plt.subplots()
+        fig.set_size_inches(13, 9)
+        ax.set_xlabel('Input size [number of points]')
+        ax.set_ylabel('Run time [s]')
 
-    def plot_speedup_vs_cores(self, save=False, show=False):
+        algo_runtimes = {algorithm: {'input_sizes': [], 'run_times': []}
+                         for algorithm in self.run_config['run_params']['algorithms']}
+
+        for _, data in self.all_data_dict.iteritems():
+            algo_runtimes[data['algorithm']]['input_sizes'].append(data['n_points'])
+            algo_runtimes[data['algorithm']]['run_times'].append(data['mean_run_tim'])
+
+        for algorithm, algo_data in algo_runtimes.iteritems():
+            sort_indices = np.argsort(np.array(algo_data['input_sizes']))
+
+            input_sizes = [algo_data['input_sizes'][i] for i in sort_indices]
+            run_times = [algo_data['run_times'][i] for i in sort_indices]
+
+            print('--------\n')
+            print('algo: ' + algorithm)
+            print('input sizes:', input_sizes)
+            print('run times:  ', run_times)
+
+            ax.plot(input_sizes, run_times, linewidth=3, label=algorithm, alpha=0.5)
+            ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.5, color='black', markeredgecolor='none')
+
+        plt.legend()
+
+        self.evaluate_save_show(save, show, file_name)
+
+    # TODO: This is an old version. Implement for new framework.
+    def plot_speedup_vs_cores(self, save=False, show=False, file_name=None):
+        raise NotImplementedError
         fig, ax = plt.subplots()
         fig.set_size_inches(13, 9)
         ax.set_xlabel('Number of cores')
@@ -33,13 +64,11 @@ class Benchmark:
         ax.plot(n_cores, speedup, linewidth=2, color='green')
         ax.plot(n_cores, speedup, 'go', linewidth=2, color='green')
 
-        if save:
-            plt.savefig(join_paths(self.output_dir, 'speedup_vs_cores.png'))
+        self.evaluate_save_show(save, show, file_name)
 
-        if show:
-            plt.show()
-
-    def plot_time_vs_cores(self, save=False, show=False):
+    # TODO: This is an old version. Implement for new framework.
+    def plot_time_vs_cores(self, save=False, show=False, file_name=None):
+        raise NotImplementedError
         fig, ax = plt.subplots()
         fig.set_size_inches(13, 9)
         ax.set_xlabel('Number of cores')
@@ -51,11 +80,17 @@ class Benchmark:
         ax.plot(n_cores, speedup, linewidth=2, color='blue')
         ax.plot(n_cores, speedup, 'o', linewidth=2, color='blue')
 
+        self.evaluate_save_show(save, show, file_name)
+
+    def evaluate_save_show(self, save, show, file_name):
         if save:
-            plt.savefig(join_paths(self.output_dir, 'time_vs_cores.png'))
+            assert file_name is not None
+            # create post processing folder
+            post_proc_dir = join_paths(project_path, 'Output', self.run_config['run_name'], 'post_processing')
+            if not os.path.isdir(post_proc_dir):
+                os.mkdir(post_proc_dir)
+
+            plt.savefig(join_paths(post_proc_dir, file_name + '.png'))
 
         if show:
             plt.show()
-
-
-
