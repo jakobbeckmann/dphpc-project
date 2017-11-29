@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(SOURCE_FILES src/ChanAlgorithm.cpp src/utility.h src/utility.cpp src/Point.h src/constants.h src/main.cpp src/ChanAlgorithm.h src/FileWriter.h src/Quickhull.hpp src/Quickhull.cpp
 src/JarvisAlgorithm.cpp src/JarvisAlgorithm.h src/GrahamScanAlgorithm.cpp src/GrahamScanAlgorithm.h src/timer.h src/Jarvis_BinJarvis.hpp src/Jarvis_BinJarvis.cpp src/Jarvis_Jarvis.hpp
 src/Jarvis_Jarvis.cpp src/Jarvis_Graham.hpp src/Jarvis_Graham.cpp src/Jarvis_Quickhull.hpp src/Jarvis_Quickhull.cpp src/Graham_Jarvis.hpp src/Graham_Jarvis.cpp src/Graham_Graham.hpp src/Graham_Graham.cpp
-src/Graham_Quickhull.hpp src/Graham_Quickhull.cpp src/Quickhull_BinJarvis.hpp src/Quickhull_BinJarvis.cpp src/Quickhull_Jarvis.hpp src/Quickhull_Jarvis.cpp)
+src/Graham_Quickhull.hpp src/Graham_Quickhull.cpp src/Quickhull_BinJarvis.hpp src/Quickhull_BinJarvis.cpp src/Quickhull_Jarvis.hpp src/Quickhull_Jarvis.cpp src/Quickhull_Graham.hpp src/Quickhull_Graham.cpp)
 add_executable(dphpc_project ${SOURCE_FILES})
 
 if(APPLE)
