@@ -6,15 +6,15 @@
 
 run_config = {
     'run_name':         'test',
-    'exe_dir_name':     'cmake-build-debug',
+    'exe_dir_name':     '',
     'save_png_input':   True,
 
     'run_params':
         {
             'n_cores':              [1],
-            'n_points':             [30000, 50000, 100000, 500000, 1000000],
-            'img_files':            ['square.png'],
-            'algorithms':           ['chan_normal', 'chan_merge_var', 'jarvis', 'graham', 'quickhull'],
+            'n_points':             [30000, 50000],
+            'img_files':            ['homer.jpg'],
+            'algorithms':           ['chan_normal', 'jarvis_quickhull'],
             'sub_size':             [None],
             'n_iterations':         5,
         },
@@ -41,4 +41,3 @@ run_config = {
 #      'chan_normal', 'chan_merge_var', 'jarvis', 'graham'. 'quickhull'     #
 #                                                                           #
 #############################################################################
-
