@@ -37,4 +37,3 @@ std::vector<Point> JarvisAlgorithm::run(const std::vector<Point>& constPoints) {
 
     return hull;
 }
-

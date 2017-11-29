@@ -2,11 +2,10 @@
 #include <vector>
 #include <omp.h>
 
-#include "Jarvis_BinJarvis.hpp"
+#include "Jarvis_Jarvis.hpp"
 #include "JarvisAlgorithm.h"
-#include "ChanAlgorithm.h"
 
-std::vector<Point> Jarvis_BinJarvis::run(const std::vector<Point>& points, int parallel_idx, size_t parts) {
+std::vector<Point> Jarvis_Jarvis::run(const std::vector<Point>& points, int parallel_idx, size_t parts) {
     std::vector<std::vector<Point> > hulls;
     hulls.resize(parallel_idx);
 
@@ -18,5 +17,12 @@ std::vector<Point> Jarvis_BinJarvis::run(const std::vector<Point>& points, int p
         hulls[i] = JarvisAlgorithm::run(part);
     }
 
-    return ChanAlgorithm::mergeAllHulls(hulls);
+    std::vector<Point> hull_points;
+    for(std::vector<Point> hull: hulls) {
+        for(Point point: hull) {
+            hull_points.push_back(point);
+        }
+    }
+
+    return JarvisAlgorithm::run(hull_points);
 }
