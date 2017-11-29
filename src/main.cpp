@@ -17,6 +17,7 @@
 #include "Quickhull.hpp"
 #include "Jarvis_Jarvis.hpp"
 #include "Jarvis_BinJarvis.hpp"
+#include "Jarvis_Graham.hpp"
 
 
 int main(int argc, char const *argv[]) {
@@ -78,6 +79,11 @@ int main(int argc, char const *argv[]) {
     } else  if (algorithm == "jarvis_binjarvis") {
         timer.start();
         result = Jarvis_BinJarvis::run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
+        timer.stop();
+
+    } else  if (algorithm == "jarvis_graham") {
+        timer.start();
+        result = Jarvis_Graham::run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
         timer.stop();
 
     } else if (algorithm == "quickhull") {
