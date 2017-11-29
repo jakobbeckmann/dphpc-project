@@ -25,6 +25,7 @@
 #include "Quickhull_BinJarvis.hpp"
 #include "Quickhull_Jarvis.hpp"
 #include "Quickhull_Graham.hpp"
+#include "Quickhull_Quickhull.hpp"
 
 
 int main(int argc, char const *argv[]) {
@@ -126,6 +127,11 @@ int main(int argc, char const *argv[]) {
     } else  if (algorithm == "quickhull_graham") {
         timer.start();
         result = Quickhull_Graham::run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
+        timer.stop();
+
+    } else  if (algorithm == "quickhull_quickhull") {
+        timer.start();
+        result = Quickhull_Quickhull::run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
         timer.stop();
 
     } else if (algorithm == "quickhull") {
