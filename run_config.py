@@ -11,10 +11,14 @@ run_config = {
 
     'run_params':
         {
-            'n_cores':              [1],
-            'n_points':             [30000, 50000],
+            'n_cores':              [2],
+            'n_points':             [50000],
             'img_files':            ['homer.jpg'],
-            'algorithms':           ['chan_normal', 'jarvis_quickhull'],
+            'algorithms':           ['chan_normal', 'chan_merge_var', 'graham', 'jarvis',
+                                     'jarvis_jarvis', 'jarvis_binjarvis', 'jarvis_graham',
+                                     'jarvis_quickhull', 'graham_jarvis', 'graham_graham',
+                                     'graham_quickhull', 'quickhull_binjarvis', 'quickhull_jarvis',
+                                     'quickhull_graham', 'quickhull_quickhull', 'quickhull'],
             'sub_size':             [None],
             'n_iterations':         5,
         },
