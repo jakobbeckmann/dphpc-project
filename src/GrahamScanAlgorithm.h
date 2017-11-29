@@ -9,6 +9,5 @@
 
 class GrahamScanAlgorithm {
 public:
-    std::vector<Point> run(const std::vector<Point>& points);
+    static std::vector<Point> run(std::vector<Point>& points, int subsetIdx);
 };
-

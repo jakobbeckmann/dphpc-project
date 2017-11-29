@@ -49,22 +49,18 @@ int main(int argc, char const *argv[]) {
     std::vector<Point> result;
 
     if (algorithm == "chan_normal") {
-        ChanAlgorithm chan;
-
         timer.start();
-        result = chan.run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
+        result = ChanAlgorithm::run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
         timer.stop();
 
     } else if (algorithm == "chan_merge_var") {
-        ChanAlgorithm2Merge chan;
         timer.start();
-        result = chan.run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
+        result = ChanAlgorithm2Merge::run(points, numberOfCores, numberOfCores /* TODO number of parts*/);
         timer.stop();
 
     } else  if (algorithm == "graham") {
-        GrahamScanAlgorithm graham;
         timer.start();
-        result = graham.run(points);
+        result = GrahamScanAlgorithm::run(points, 0);
         timer.stop();
 
     } else  if (algorithm == "jarvis") {
