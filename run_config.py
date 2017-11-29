@@ -12,7 +12,7 @@ run_config = {
     'run_params':
         {
             'n_cores':              [1],
-            'n_points':             [30000, 50000, 100000, 500000, 1000000],
+            'n_points':             [5000, 10000, 20000],
             'img_files':            ['square.png'],
             'algorithms':           ['chan_normal', 'chan_merge_var', 'jarvis', 'graham', 'quickhull'],
             'sub_size':             [None],

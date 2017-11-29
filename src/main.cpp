@@ -19,7 +19,7 @@
 
 int main(int argc, char const *argv[]) {
     #ifdef WRITE_DEBUG
-        std::cout << "Running in DEBUG mode - writing ALL output files." << std::endl;
+        std::cout << "Running in DEBUG mode - writing ALL output files." << "\n";
     #endif
 
     if (argc < 5) {
@@ -87,12 +87,12 @@ int main(int argc, char const *argv[]) {
         std::exit(EXIT_FAILURE);
     }
 
-    std::cout << "\n\n=========Result=========" << std::endl;
-    std::cout << "Algorithm:     " << algorithm << std::endl;
-    std::cout << "Input size:    " << points.size() << std::endl;
-    std::cout << "N hull points: " << result.size() << std::endl;
-    std::cout << "Iteration:     " << iterIdx << std::endl;
-    std::cout << "Time used:     " << timer.get_timing() << std::endl;
+    std::cout << "\n\n=========Result=========" << "\n";
+    std::cout << "Algorithm:     " << algorithm << "\n";
+    std::cout << "Input size:    " << points.size() << "\n";
+    std::cout << "N hull points: " << result.size() << "\n";
+    std::cout << "Iteration:     " << iterIdx << "\n";
+    std::cout << "Time used:     " << timer.get_timing() << "\n";
 
     file_write_timer.start();
     std::stringstream fileName;
@@ -101,11 +101,12 @@ int main(int argc, char const *argv[]) {
 
     timer.write_to_file(iterIdx);
     file_write_timer.stop();
-    std::cout << "Write time:    " << file_write_timer.get_timing() << std::endl;
-    std::cout << "Read time:     " << file_read_timer.get_timing() << std::endl;
+    std::cout << "Write time:    " << file_write_timer.get_timing() << "\n";
+    std::cout << "Read time:     " << file_read_timer.get_timing() << "\n";
 
     total_timer.stop();
-    std::cout << "Total time:    " << total_timer.get_timing() << "\n" << std::endl;
+    std::cout << "Total time:    " << total_timer.get_timing() << "\n";
+    std::cout << std::endl;
 
     return 0;
 }
