@@ -1,5 +1,5 @@
 /*
- * Jarvis - quickhull class containing utility functions for algorithm
+ * Graham - jarvis class containing utility functions for algorithm
  */
 
 #pragma once
@@ -9,9 +9,9 @@
 
 #include "Point.h"
 #include "JarvisAlgorithm.h"
-#include "Quickhull.hpp"
+#include "GrahamScanAlgorithm.h"
 
-class Jarvis_Quickhull {
+class Graham_Jarvis {
 public:
     static std::vector<Point> run(const std::vector<Point>& points, int parallel_idx, size_t parts);
 };
