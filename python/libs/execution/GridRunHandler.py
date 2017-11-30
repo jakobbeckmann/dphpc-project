@@ -79,13 +79,11 @@ class GridRunHandler:
                       'img': img}
 
         # ------------- Print parameters
-        '''
         print '\n' + 30*'= '
         print '\tRun parameters:'
         for key, value in sub_params.iteritems():
             print '{:15}: {}'.format(key, value)
         print '{:15}: {}'.format('iter_idx', iter_idx)
-        '''
         # -------------
 
         with open(join_paths(sub_dir, 'params.json'), 'w') as outfile:

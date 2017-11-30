@@ -4,19 +4,18 @@
 #include "utility.h"
 
 class ChanAlgorithm {
-protected:
-    int findTangentIndex(const std::vector<Point>& points, Point base);
-    std::vector<Point> grahamScan(std::vector<Point>& points, int subsetIdx);
-    std::pair<int, int> findNextMergePoint(const std::vector<std::vector<Point>>& hulls, std::pair<int, int> base_pair);
-
-    std::vector<Point> mergeAllHulls(const std::vector<std::vector<Point>>& hulls);
-    std::vector<Point> mergeTwoHulls(const std::vector<Point>& a, const std::vector<Point>& b);
 public:
-    std::vector<Point> run(const std::vector<Point>& points, int parallel_idx, size_t parts);
+    static int findTangentIndex(const std::vector<Point>& points, Point base);
+    static std::pair<int, int> findNextMergePoint(const std::vector<std::vector<Point>>& hulls, std::pair<int, int> base_pair);
+
+    static std::vector<Point> mergeAllHulls(const std::vector<std::vector<Point>>& hulls);
+    static std::vector<Point> mergeTwoHulls(const std::vector<Point>& a, const std::vector<Point>& b);
+
+    static std::vector<Point> run(const std::vector<Point>& points, int parallel_idx, size_t parts);
 
 };
 
 class ChanAlgorithm2Merge : private ChanAlgorithm {
 public:
-    std::vector<Point> run(const std::vector<Point>& points, int parallel_idx, size_t parts);
+    static std::vector<Point> run(const std::vector<Point>& points, int parallel_idx, size_t parts);
 };
