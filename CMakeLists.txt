@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 2.8)
 project(dphpc-project)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -34,4 +34,4 @@ if(WINDOWS)
 endif()
 
 add_executable(dphpc_project ${SOURCE_FILES})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp")
