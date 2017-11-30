@@ -1,5 +1,6 @@
 Output/
 !Output/output_readme.txt
+!Output/job_output/dummy.txt
 Input/
 !Input/input_readme.txt
 
