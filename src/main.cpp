@@ -80,12 +80,12 @@ int main(int argc, char const *argv[]) {
 
     if (algorithm == "chan_normal") {
         timer.start();
-        result = ChanAlgorithm::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = ChanAlgorithm::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else if (algorithm == "chan_merge_var") {
         timer.start();
-        result = ChanAlgorithm2Merge::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = ChanAlgorithm2Merge::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "graham") {
@@ -100,57 +100,57 @@ int main(int argc, char const *argv[]) {
 
     } else  if (algorithm == "jarvis_jarvis") {
         timer.start();
-        result = Jarvis_Jarvis::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Jarvis_Jarvis::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "jarvis_binjarvis") {
         timer.start();
-        result = Jarvis_BinJarvis::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Jarvis_BinJarvis::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "jarvis_graham") {
         timer.start();
-        result = Jarvis_Graham::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Jarvis_Graham::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "jarvis_quickhull") {
         timer.start();
-        result = Jarvis_Quickhull::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Jarvis_Quickhull::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "graham_jarvis") {
         timer.start();
-        result = Graham_Jarvis::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Graham_Jarvis::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "graham_graham") {
         timer.start();
-        result = Graham_Graham::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Graham_Graham::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "graham_quickhull") {
         timer.start();
-        result = Graham_Quickhull::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Graham_Quickhull::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "quickhull_binjarvis") {
         timer.start();
-        result = Quickhull_BinJarvis::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Quickhull_BinJarvis::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "quickhull_jarvis") {
         timer.start();
-        result = Quickhull_Jarvis::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Quickhull_Jarvis::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "quickhull_graham") {
         timer.start();
-        result = Quickhull_Graham::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Quickhull_Graham::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else  if (algorithm == "quickhull_quickhull") {
         timer.start();
-        result = Quickhull_Quickhull::run(points, numberOfCores, part_size /* TODO number of parts*/);
+        result = Quickhull_Quickhull::run(points, numberOfCores, part_size);
         timer.stop();
 
     } else if (algorithm == "quickhull") {

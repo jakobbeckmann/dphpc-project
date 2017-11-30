@@ -8,30 +8,33 @@ import os
 import subprocess
 from glob import glob
 from os.path import join as join_paths
+import numpy as np
+import shutil
 
 from run_config import run_config
-from python.libs.execution.ImagePointsCreator import ImagePointsCreator
+from python.libs.data_acquisition.ImagePointsCreator import ImagePointsCreator
 from python.libs.paths import project_path
+from python.libs.postprocessing.HullPlotter import HullPlotter
 
 
 class GridRunHandler:
-    def __init__(self, custom_config_file=None):  # TODO: Implement custom run_config location
+    def __init__(self, reproduce_run_name=None):  # TODO: Implement custom run_config location
         """
-        :param custom_config_file: In case you want to specify another config file (e.g. to re-run a whole run),
-                                   give the whole path to this config file.
+        :param reproduce_run_name: In case you want to specify another config file (e.g. to re-run a whole run),
+                                   give the name of the run, e.g. reproduce_run_name = 'test_1130_180553'
         """
         self.this_path = os.path.abspath(__file__)
         self.run_params = run_config['run_params']
         self.post_process_params = run_config['post_process_params']
         self.run_name = self.create_run_name()
-        self.run_config_file = self.set_run_config_file(custom_config_file)
+        self.run_config_file = self.set_run_config_file(reproduce_run_name)
         self.output_dir_path = self.setup_output_folder()
         self.store_run_config_json()
         self.input_files = {}
         self.exe_dir_name = run_config['exe_dir_name']
 
-    def set_run_config_file(self, custom_config_file):
-        if custom_config_file is not None:
+    def set_run_config_file(self, reproduce_run_name):
+        if reproduce_run_name is not None:
             raise NotImplementedError
         else:
             return join_paths(os.path.dirname(self.this_path), 'run_config.py')
@@ -65,6 +68,8 @@ class GridRunHandler:
                 point_file_name = self.create_input_filename(n_points, img_file, 'dat')
                 point_creator = ImagePointsCreator(n_points, img_file, point_file_name, input_dir_path)
                 point_creator.create_points_pipeline(save_png=run_config['save_png_input'])
+                shutil.copy(join_paths(project_path, 'Input', img_file),
+                            join_paths(input_dir_path))
 
     def run_algorithm(self, n_cores, n_points, input_dat, input_png, algorithm, sub_size, n_iterations, dir_index,
                       sub_dir, iter_idx, img):
@@ -89,16 +94,26 @@ class GridRunHandler:
 
         input_file_path = join_paths(self.output_dir_path, 'input_data', input_dat)
 
-        call_command = [exe_file[0], str(n_cores), input_file_path, algorithm, str(iter_idx)]
+        call_command = [exe_file[0], str(n_cores), str(sub_size), input_file_path, algorithm, str(iter_idx)]
         call_command_str = ' '.join(call_command)
 
         subprocess.check_call(call_command_str, shell=True, cwd=sub_dir)
 
-        # step3: postprocessing options
-        # TODO: Postprocessing should be handled outside the GridRunHandler. Do not mix data acquisition and
-        # TODO: post processing. But for now we leave it like that...
+        # step3: for debugging purposes, you can directly create the final hull plot of the last iteration
+        if self.post_process_params['store_final_plots']:
+            if iter_idx == self.run_params['n_iterations'] - 1:
+                # loading hull points
+                hull_data = np.loadtxt(join_paths(sub_dir, 'hull_points_{iter_idx}.dat'.format(iter_idx=iter_idx)),
+                                       delimiter=',')
+                hull_points = {'x': hull_data[:, 0], 'y': hull_data[:, 1]}
+                # loading input points
+                in_data = np.loadtxt(join_paths(self.output_dir_path, 'input_data', input_dat))
+                input_points = {'x': in_data[:, 0], 'y': in_data[:, 1]}
 
-        # TODO: Implement postprocessing
+                plot_name = 'last_iter_hull.png'
+                plotter = HullPlotter(input_points, hull_points, save_path=join_paths(sub_dir, plot_name),
+                                      input_img_path=join_paths(self.output_dir_path, 'input_data', img))
+                plotter.plot_input_and_hull_points(save=True, show=False, plot_img=True)
 
     def main_grid_loop(self):
         """Main function looping over all possible parameter configurations executing the algorithms."""
@@ -164,3 +179,8 @@ class GridRunHandler:
         print '\n' + 30*'= '
         for key, value in dictionary.iteritems():
             print '{:15}: {}'.format(key, value)
+
+    @staticmethod
+    def parse_json_points(directory, file_name):
+        with open(join_paths(directory, file_name), 'r') as json_file:
+            return json.load(json_file)

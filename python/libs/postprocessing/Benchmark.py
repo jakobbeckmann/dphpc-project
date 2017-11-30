@@ -113,36 +113,3 @@ class Benchmark:
         if show:
             plt.show()
 
-    @staticmethod
-    def setup_figure_1ax(size, x_label, y_label):
-        fig, ax = plt.subplots()
-        fig.set_size_inches(size)
-        ax.set_xlabel(x_label)
-        ax.set_ylabel(y_label)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['bottom'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-        # Shrink current axis by 20%
-        box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-
-        # Put a legend to the right of the current axis
-        return fig, ax
-
-    @staticmethod
-    def sort_two_lists_wrt_first(list1, list2):
-        sort_indices = np.argsort(np.array(list1))
-        list1_sorted = [list1[i] for i in sort_indices]
-        list2_sorted = [list2[i] for i in sort_indices]
-        return list1_sorted, list2_sorted
-
-    @staticmethod
-    def ordered_legend(ax, order=None):
-        """
-        Returns tuple of handles, labels for axis ax, after reordering them to conform to the label order `order`, and if unique is True, after removing entries with duplicate labels.
-        """
-        ax.legend()
-        handles, labels = plt.gca().get_legend_handles_labels()
-        ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order],
-                  loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)

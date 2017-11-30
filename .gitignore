@@ -9,6 +9,7 @@ build/
 
 src/Evaluation/result_*
 src/Evaluation/data_*
+test/
 
 CMakeCache.txt
 CMakeFiles/

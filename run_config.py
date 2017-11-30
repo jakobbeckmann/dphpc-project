@@ -5,29 +5,27 @@
 #############################################################################
 
 run_config = {
-    'run_name':         'test',
-    'exe_dir_name':     'cmake-build-debug',
+    'run_name':              'test',
+    'exe_dir_name':          'cmake-build-debug',
     'save_png_input':   True,
 
     'run_params':
         {
-            'n_cores':              [8],
-            'n_points':             [5000, 10000, 15000],
-            'img_files':            ['square.png'],
+            'n_cores':              [4],
+            'n_points':             [3000],
+            'img_files':            ['bird.jpg'],
             'algorithms':           ['chan_normal', 'chan_merge_var', 'graham', 'jarvis',
                                      'jarvis_jarvis', 'jarvis_graham',
                                      'jarvis_quickhull', 'graham_jarvis', 'graham_graham',
                                      'graham_quickhull', 'quickhull_binjarvis', 'quickhull_jarvis',
-                                     'quickhull_graham', 'quickhull_quickhull', 'quickhull'],
-            'sub_size':             [None],
+                                     'quickhull_graham', 'quickhull'],
+            'sub_size':             [8],
             'n_iterations':         2,
         },
 
     'post_process_params':
         {
-            'store_final_plots':    False,
-            'store_movies':         False,
-            'store_bm_plots':       False
+            'store_final_plots':    True,
         }
 }
 
