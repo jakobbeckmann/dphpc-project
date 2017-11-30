@@ -5,6 +5,7 @@
  */
 
 #include <cstdio>
+#include <functional>
 #include <iostream>
 #include <vector>
 #include <sstream>
@@ -27,6 +28,41 @@
 #include "Quickhull_Graham.hpp"
 #include "Quickhull_Quickhull.hpp"
 
+struct algo {
+    std::string name;
+	std::function<std::vector<Point>(const std::vector<Point>&, int, size_t)> func;
+};
+
+// TODO add that to the class, instead of having it here.
+static std::vector<Point> plain_quickhull(const std::vector<Point>& points, int parallel_idx, size_t parts)
+{
+    std::vector<Point> result;
+    std::vector<int> result_idxs;
+    Quickhull::run(points, result_idxs);
+    for(int idx: result_idxs) {
+        result.push_back(points[idx]);
+    }
+    return result;
+}
+
+static const std::vector<algo> algos = {
+    { "chan_normal", ChanAlgorithm::run },
+    { "chan_merge_var", ChanAlgorithm2Merge::run },
+//    { "graham", GrahamScanAlgorithm::run }, //(points, 0); // TODO: wrong params
+//    { "jarvis", JarvisAlgorithm::run }, //(points); // TODO: wrong params
+    { "jarvis_jarvis", Jarvis_Jarvis::run },
+    { "jarvis_binjarvis", Jarvis_BinJarvis::run },
+    { "jarvis_graham", Jarvis_Graham::run },
+    { "jarvis_quickhull", Jarvis_Quickhull::run },
+    { "graham_jarvis", Graham_Jarvis::run },
+    { "graham_graham", Graham_Graham::run },
+    { "graham_quickhull", Graham_Quickhull::run },
+    { "quickhull_binjarvis", Quickhull_BinJarvis::run },
+    { "quickhull_jarvis", Quickhull_Jarvis::run },
+    { "quickhull_graham", Quickhull_Graham::run },
+    { "quickhull_quickhull", Quickhull_Quickhull::run },
+    { "quickhull", plain_quickhull }
+};
 
 int main(int argc, char const *argv[]) {
     #ifdef WRITE_DEBUG
@@ -78,90 +114,22 @@ int main(int argc, char const *argv[]) {
 
     std::vector<Point> result;
 
-    if (algorithm == "chan_normal") {
-        timer.start();
-        result = ChanAlgorithm::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else if (algorithm == "chan_merge_var") {
-        timer.start();
-        result = ChanAlgorithm2Merge::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else  if (algorithm == "graham") {
+    std::vector<algo>::const_iterator it;
+	// TODO: Fix these functions to adhere to the interface.
+    if (algorithm == "graham") {
         timer.start();
         result = GrahamScanAlgorithm::run(points, 0);
         timer.stop();
-
-    } else  if (algorithm == "jarvis") {
+    } else if (algorithm == "jarvis") {
         timer.start();
         result = JarvisAlgorithm::run(points);
         timer.stop();
-
-    } else  if (algorithm == "jarvis_jarvis") {
+    } else if ((it = std::find_if(algos.begin(), algos.end(), [algorithm](const algo& a) {
+            return algorithm == a.name;
+        })) != algos.end()) {
         timer.start();
-        result = Jarvis_Jarvis::run(points, numberOfCores, part_size);
+        result = it->func(points, numberOfCores, part_size);
         timer.stop();
-
-    } else  if (algorithm == "jarvis_binjarvis") {
-        timer.start();
-        result = Jarvis_BinJarvis::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else  if (algorithm == "jarvis_graham") {
-        timer.start();
-        result = Jarvis_Graham::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else  if (algorithm == "jarvis_quickhull") {
-        timer.start();
-        result = Jarvis_Quickhull::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else  if (algorithm == "graham_jarvis") {
-        timer.start();
-        result = Graham_Jarvis::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else  if (algorithm == "graham_graham") {
-        timer.start();
-        result = Graham_Graham::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else  if (algorithm == "graham_quickhull") {
-        timer.start();
-        result = Graham_Quickhull::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else  if (algorithm == "quickhull_binjarvis") {
-        timer.start();
-        result = Quickhull_BinJarvis::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else  if (algorithm == "quickhull_jarvis") {
-        timer.start();
-        result = Quickhull_Jarvis::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else  if (algorithm == "quickhull_graham") {
-        timer.start();
-        result = Quickhull_Graham::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else  if (algorithm == "quickhull_quickhull") {
-        timer.start();
-        result = Quickhull_Quickhull::run(points, numberOfCores, part_size);
-        timer.stop();
-
-    } else if (algorithm == "quickhull") {
-        std::vector<int> result_idxs;
-        timer.start();
-        Quickhull::run(points, result_idxs);
-        for(int idx: result_idxs) {
-            result.push_back(points[idx]);
-        }
-        timer.stop();
-
     } else {
         std::cout << std::string("No such algorithm! Given ") + algorithm;
         std::exit(EXIT_FAILURE);
