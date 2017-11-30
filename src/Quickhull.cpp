@@ -6,7 +6,7 @@
 #include "Quickhull.hpp"
 
 
-void Quickhull::run(std::vector<Point>& input, std::vector<int>& hull_idxs) {
+void Quickhull::run(const std::vector<Point>& input, std::vector<int>& hull_idxs) {
     int point_min_x = find_extreme(input, true);
     int point_max_x = find_extreme(input, false);
 
@@ -31,7 +31,7 @@ void Quickhull::run(std::vector<Point>& input, std::vector<int>& hull_idxs) {
 }
 
 
-int Quickhull::find_extreme(std::vector<Point>& input, bool left) {
+int Quickhull::find_extreme(const std::vector<Point>& input, bool left) {
     int pivot_idx = 0;
     for(int idx = 0; idx < input.size(); idx++) {
         if((left && input[idx].x < input[pivot_idx].x) ||
@@ -42,7 +42,7 @@ int Quickhull::find_extreme(std::vector<Point>& input, bool left) {
     return pivot_idx;
 }
 
-void Quickhull::subquickhull(std::vector<Point>& input,
+void Quickhull::subquickhull(const std::vector<Point>& input,
                              std::vector<int>& indeces,
                              std::vector<int>& output_idxs,
                              const int first,
@@ -68,7 +68,7 @@ void Quickhull::subquickhull(std::vector<Point>& input,
     }
 }
 
-double Quickhull::compute_dist(std::vector<Point>& input,
+double Quickhull::compute_dist(const std::vector<Point>& input,
                     const int target,
                     const int first,
                     const int second) {
@@ -82,7 +82,7 @@ double Quickhull::compute_dist(std::vector<Point>& input,
     return vec_target_y * segment_x - vec_target_x * segment_y;
 }
 
-std::tuple<std::vector<int>, int> Quickhull::get_dist_set(std::vector<Point>& input,
+std::tuple<std::vector<int>, int> Quickhull::get_dist_set(const std::vector<Point>& input,
                                                           std::vector<int>& indeces,
                                                           const int first,
                                                           const int second) {
