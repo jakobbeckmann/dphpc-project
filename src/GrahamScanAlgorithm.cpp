@@ -7,7 +7,9 @@
 /**
     Retruns list of points belonging to a convex hull after running Graham Scan algorithm.
  */
- std::vector<Point> GrahamScanAlgorithm::run(std::vector<Point>& points, int subsetIdx) {
+ std::vector<Point> GrahamScanAlgorithm::run(const std::vector<Point>& points_, int subsetIdx, size_t) {
+     std::vector<Point> points = points_;
+
  #if WRITE_DEBUG
      FileWriter grahamWriter;
      grahamWriter.setGrahamSubsetIdx(subsetIdx);

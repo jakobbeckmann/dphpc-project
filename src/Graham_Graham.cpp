@@ -13,7 +13,7 @@ std::vector<Point> Graham_Graham::run(const std::vector<Point>& points, int para
     #pragma omp parallel for
     for (size_t i = 0; i < parts; ++i) {
         std::vector<Point> part = SplitVector(points, i, parts);
-        hulls[i] = GrahamScanAlgorithm::run(part, i);
+        hulls[i] = GrahamScanAlgorithm::run(part, i, 0/*unused*/);
     }
 
     std::vector<Point> hull_points;
@@ -23,5 +23,5 @@ std::vector<Point> Graham_Graham::run(const std::vector<Point>& points, int para
         }
     }
 
-    return GrahamScanAlgorithm::run(hull_points, 0);
+    return GrahamScanAlgorithm::run(hull_points, 0/*unused*/, 0/*unused*/);
 }

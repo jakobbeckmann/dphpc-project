@@ -5,5 +5,5 @@
 
 class JarvisAlgorithm {
 public:
-    static std::vector<Point> run(const std::vector<Point>& points);
+    static std::vector<Point> run(const std::vector<Point>& points, int, size_t);
 };

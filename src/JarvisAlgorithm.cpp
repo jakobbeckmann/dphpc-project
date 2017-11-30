@@ -4,7 +4,7 @@
 
 #include "JarvisAlgorithm.h"
 
-std::vector<Point> JarvisAlgorithm::run(const std::vector<Point>& constPoints) {
+std::vector<Point> JarvisAlgorithm::run(const std::vector<Point>& constPoints, int, size_t) {
     if (constPoints.size() <= 1) {
         return constPoints;
     }

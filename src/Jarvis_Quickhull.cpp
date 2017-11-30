@@ -13,7 +13,7 @@ std::vector<Point> Jarvis_Quickhull::run(const std::vector<Point>& points, int p
     #pragma omp parallel for
     for (size_t i = 0; i < parts; ++i) {
         std::vector<Point> part = SplitVector(points, i, parts);
-        hulls[i] = JarvisAlgorithm::run(part);
+        hulls[i] = JarvisAlgorithm::run(part, 0/*unused*/, 0/*unused*/);
     }
 
     std::vector<Point> hull_points;

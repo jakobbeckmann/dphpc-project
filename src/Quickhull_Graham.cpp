@@ -27,5 +27,5 @@ std::vector<Point> Quickhull_Graham::run(const std::vector<Point>& points, int p
         }
     }
 
-    return GrahamScanAlgorithm::run(hull_points, 0);
+    return GrahamScanAlgorithm::run(hull_points, 0/*unused*/, 0/*unused*/);
 }

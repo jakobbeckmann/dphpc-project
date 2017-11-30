@@ -161,7 +161,7 @@ std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, int para
     #pragma omp parallel for
     for (size_t i = 0; i < parts; ++i) {
         std::vector<Point> part = SplitVector(points, i, parts);
-        hulls[i] = GrahamScanAlgorithm::run(part, i);
+        hulls[i] = GrahamScanAlgorithm::run(part, i, 0/*unused*/);
     }
 
     return mergeAllHulls(hulls);
@@ -191,7 +191,7 @@ std::vector<Point> ChanAlgorithm2Merge::run(const std::vector<Point>& points, in
 	#pragma omp parallel for
 	for (size_t i = 0; i < parts; ++i) {
 		std::vector<Point> part = SplitVector(points, i, parts);
-		hulls[i] = GrahamScanAlgorithm::run(part, i);
+		hulls[i] = GrahamScanAlgorithm::run(part, i, 0/*unused*/);
 	}
 
 	// step_size = 2, 4, 8, ...

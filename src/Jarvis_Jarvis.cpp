@@ -14,7 +14,7 @@ std::vector<Point> Jarvis_Jarvis::run(const std::vector<Point>& points, int para
     #pragma omp parallel for
     for (size_t i = 0; i < parts; ++i) {
         std::vector<Point> part = SplitVector(points, i, parts);
-        hulls[i] = JarvisAlgorithm::run(part);
+        hulls[i] = JarvisAlgorithm::run(part, 0/*unused*/, 0/*unused*/);
     }
 
     std::vector<Point> hull_points;
@@ -24,5 +24,5 @@ std::vector<Point> Jarvis_Jarvis::run(const std::vector<Point>& points, int para
         }
     }
 
-    return JarvisAlgorithm::run(hull_points);
+    return JarvisAlgorithm::run(hull_points, 0/*unused*/, 0/*unused*/);
 }

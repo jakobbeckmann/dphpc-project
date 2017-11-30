@@ -27,5 +27,5 @@ std::vector<Point> Quickhull_Jarvis::run(const std::vector<Point>& points, int p
         }
     }
 
-    return JarvisAlgorithm::run(hull_points);
+    return JarvisAlgorithm::run(hull_points, 0/*unused*/, 0/*unused*/);
 }

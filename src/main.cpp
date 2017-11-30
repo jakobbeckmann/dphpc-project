@@ -48,8 +48,8 @@ static std::vector<Point> plain_quickhull(const std::vector<Point>& points, int 
 static const std::vector<algo> algos = {
     { "chan_normal", ChanAlgorithm::run },
     { "chan_merge_var", ChanAlgorithm2Merge::run },
-//    { "graham", GrahamScanAlgorithm::run }, //(points, 0); // TODO: wrong params
-//    { "jarvis", JarvisAlgorithm::run }, //(points); // TODO: wrong params
+    { "graham", GrahamScanAlgorithm::run }, // Ignores all parameters apart from points.
+    { "jarvis", JarvisAlgorithm::run }, // Ignores all parameters apart from points.
     { "jarvis_jarvis", Jarvis_Jarvis::run },
     { "jarvis_binjarvis", Jarvis_BinJarvis::run },
     { "jarvis_graham", Jarvis_Graham::run },
@@ -102,16 +102,7 @@ int main(int argc, char const *argv[]) {
     std::vector<Point> result;
 
     std::vector<algo>::const_iterator it;
-	// TODO: Fix these functions to adhere to the interface.
-    if (algorithm == "graham") {
-        timer.start();
-        result = GrahamScanAlgorithm::run(points, 0);
-        timer.stop();
-    } else if (algorithm == "jarvis") {
-        timer.start();
-        result = JarvisAlgorithm::run(points);
-        timer.stop();
-    } else if ((it = std::find_if(algos.begin(), algos.end(), [algorithm](const algo& a) {
+    if ((it = std::find_if(algos.begin(), algos.end(), [algorithm](const algo& a) {
             return algorithm == a.name;
         })) != algos.end()) {
         timer.start();
