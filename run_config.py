@@ -11,8 +11,8 @@ run_config = {
 
     'run_params':
         {
-            'n_cores':              [1, 2, 4, 6, 8],
-            'n_points':             [50000],
+            'n_cores':              [8],
+            'n_points':             [5000, 10000, 15000],
             'img_files':            ['square.png'],
             'algorithms':           ['chan_normal', 'chan_merge_var', 'graham', 'jarvis',
                                      'jarvis_jarvis', 'jarvis_graham',

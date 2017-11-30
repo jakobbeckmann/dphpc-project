@@ -11,8 +11,8 @@ run_name                   = 'test_1128_18231'
 chose_latest_output_folder = True            # Overwrites run_name with latest run in the Output folder
 save_all_data_dict         = True
 
-do_runtime_plot            = False
-do_speedup_plot            = True
+do_runtime_plot            = True
+do_speedup_plot            = False
 
 # ------------------------------------------ #
 

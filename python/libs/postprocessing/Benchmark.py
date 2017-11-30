@@ -40,21 +40,23 @@ class Benchmark:
             algo_runtimes[data['algorithm']]['input_sizes'].append(data['n_points'])
             algo_runtimes[data['algorithm']]['run_times'].append(data['mean_run_tim'])
 
+        last_runtimes = []
         for algorithm, algo_data in algo_runtimes.iteritems():
             sort_indices = np.argsort(np.array(algo_data['input_sizes']))
 
             input_sizes = [algo_data['input_sizes'][i] for i in sort_indices]
             run_times = [algo_data['run_times'][i] for i in sort_indices]
 
+            last_runtimes.append(run_times[-1])
             ax.plot(input_sizes, run_times, linewidth=3, label=algorithm, alpha=0.5)
             # ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.3, color='black', markeredgecolor='none')
 
-        legend = plt.legend(frameon=False)
-        legend.get_frame().set_facecolor('#FFFFFF')
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)
 
+        order = np.argsort(last_runtimes)[::-1]
+        self.ordered_legend(ax, order)
         self.evaluate_save_show(save, show, file_name)
 
-    # TODO: This is an old version. Implement for new framework.
     def plot_speedup_vs_cores(self, save=False, show=False, file_name=None):
         """
         Plots the speedup vs number of cores for all algorithms in the run.
@@ -67,10 +69,11 @@ class Benchmark:
                                         x_label='# cores',
                                         y_label='Speedup')
 
-        # set up empty data container holding n cores, run times
-        algo_t_core = {algorithm: {'n_cores': [], 'run_times': [], 'time_1core': 0.0}
+        # set up empty data container holding n cores, run times, speedup of max n cores
+        algo_t_core = {algorithm: {'n_cores': [], 'run_times': [], 'time_1core': 0.0, 'last_speedup': 0.0}
                        for algorithm in self.run_config['run_params']['algorithms']}
 
+        # sorting wrt increasing n_cores
         for _, data in self.all_data_dict.iteritems():
             algo = data['algorithm']
             algo_t_core[algo]['n_cores'].append(data['n_cores'])
@@ -79,20 +82,22 @@ class Benchmark:
                 algo_t_core[algo]['time_1core'] = data['mean_run_tim']
 
         max_n_core = 1
+        last_speedups = []
         for algorithm, algo_data in algo_t_core.iteritems():
-
             n_cores, run_times = self.sort_two_lists_wrt_first(algo_data['n_cores'], algo_data['run_times'])
             speedups = [algo_data['time_1core'] / run_times[n] for n in range(len(run_times))]
 
             if max(n_cores) > max_n_core:
                 max_n_core = max(n_cores)
+            last_speedups.append(speedups[-1])
 
             ax.plot(n_cores, speedups, linewidth=3, label=algorithm, alpha=0.5)
             ax.plot(n_cores, speedups, 'o', linewidth=3, alpha=0.3, color='black', markeredgecolor='none')
-
+            print algorithm
         ax.plot([1, max_n_core], [1.0, max_n_core], 'k--', linewidth=1, alpha=0.5, label='linear speedup')
 
-        plt.legend(frameon=False)
+        order = np.argsort(last_speedups)[::-1]
+        self.ordered_legend(ax, order)
         self.evaluate_save_show(save, show, file_name)
 
     def evaluate_save_show(self, save, show, file_name):
@@ -118,7 +123,11 @@ class Benchmark:
         ax.spines['right'].set_visible(False)
         ax.spines['bottom'].set_visible(False)
         ax.spines['left'].set_visible(False)
+        # Shrink current axis by 20%
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
+        # Put a legend to the right of the current axis
         return fig, ax
 
     @staticmethod
@@ -127,3 +136,13 @@ class Benchmark:
         list1_sorted = [list1[i] for i in sort_indices]
         list2_sorted = [list2[i] for i in sort_indices]
         return list1_sorted, list2_sorted
+
+    @staticmethod
+    def ordered_legend(ax, order=None):
+        """
+        Returns tuple of handles, labels for axis ax, after reordering them to conform to the label order `order`, and if unique is True, after removing entries with duplicate labels.
+        """
+        ax.legend()
+        handles, labels = plt.gca().get_legend_handles_labels()
+        ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order],
+                  loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)
