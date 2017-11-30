@@ -4,29 +4,26 @@
 
 #pragma once
 
-#include <sys/time.h>
-#include <cwchar>  // for NULL
+#include <chrono>
 #include <fstream>
+
+using c = std::chrono::steady_clock;
 
 class Timer {
 public:
     Timer() {
-        start_time.tv_sec  = 0;
-        start_time.tv_usec = 0;
-        stop_time.tv_sec   = 0;
-        stop_time.tv_usec  = 0;
     }
 
     inline void start() {
-        gettimeofday(&start_time, nullptr);
+        start_time = c::now();
     }
 
     inline void stop() {
-        gettimeofday(&stop_time, nullptr);
+        stop_time = c::now();
     }
 
-    double get_timing() const {
-        return (stop_time.tv_sec - start_time.tv_sec) + (stop_time.tv_usec - start_time.tv_usec)*1e-6;
+    c::rep get_timing() const {
+        return std::chrono::duration_cast<std::chrono::microseconds>(stop_time-start_time).count();
     }
 
     void write_to_file(int iterIdx) const {
@@ -37,12 +34,12 @@ public:
 
     void clean_timing_file() {
         if( remove( TIMING_FILE.c_str() ) != 0 )
-            std::cout << "Could NOT delete timing file: " << TIMING_FILE.c_str() << std::endl;
+            std::cout << "Could NOT delete timing file: " << TIMING_FILE.c_str() << "\n";
         else
-            std::cout << "Deleted timing file: " << TIMING_FILE.c_str() << std::endl;
+            std::cout << "Deleted timing file: " << TIMING_FILE.c_str() << "\n";
     }
 
 private:
-    struct timeval start_time, stop_time;
+    c::time_point start_time, stop_time;
     std::string const TIMING_FILE = "timing.txt";
 };
