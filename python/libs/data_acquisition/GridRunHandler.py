@@ -90,7 +90,7 @@ class GridRunHandler:
 
         # step2: run the algorithm specified by parameter grid inside of this folder
         exe_file = glob(join_paths(project_path, self.exe_dir_name, 'dphpc_project*'))
-        assert len(exe_file) == 1, 'Could not find executable. Check you config file for correct exe_dir_name param!'
+        assert len(exe_file) == 1, 'Could not find executable. Check your config file for correct exe_dir_name param!'
 
         input_file_path = join_paths(self.output_dir_path, 'input_data', input_dat)
 
