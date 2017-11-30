@@ -154,7 +154,7 @@ std::vector<Point> ChanAlgorithm::mergeTwoHulls(const std::vector<Point>& a, con
 std::vector<Point> ChanAlgorithm::run(const std::vector<Point>& points, int parallel_idx, size_t parts) {
 
     std::vector<std::vector<Point> > hulls;
-    hulls.resize(parallel_idx);
+    hulls.resize(parts);
 
     omp_set_num_threads(parallel_idx);
 
