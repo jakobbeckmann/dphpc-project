@@ -71,24 +71,11 @@ int main(int argc, char const *argv[]) {
 
     if (argc < 6) {
         std::cout << "Usage: " << " n_cores part_size input_file algorithm iter_idx\n"
-                     "  algorithm := "
-                                    "chan_normal"
-                                 " | chan_merge_var"
-                                 " | graham"
-                                 " | jarvis"
-                                 " | jarvis_jarvis"
-                                 " | jarvis_binjarvis"
-                                 " | jarvis_graham"
-                                 " | jarvis_quickhull"
-                                 " | graham_jarvis"
-                                 " | graham_graham"
-                                 " | graham_quickhull"
-                                 " | quickhull_binjarvis"
-                                 " | quickhull_jarvis"
-                                 " | quickhull_graham"
-                                 " | quickhull_quickhull"
-                                 " | quickhull"
-                                 "\n";
+                     "  algorithm := ";
+        for (const algo& a : algos) {
+            std::cout << a.name << " | ";
+        }
+        std::cout << "\n";
 
         return -1;
     }
