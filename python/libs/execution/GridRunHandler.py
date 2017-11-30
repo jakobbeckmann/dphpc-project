@@ -75,16 +75,10 @@ class GridRunHandler:
 
         # step1: store run parameters of sub run in sub run folder
         sub_params = {'n_points': n_points, 'n_cores': n_cores, 'input_dat': input_dat, 'input_png': input_png,
-                      'algorithm': algorithm, 'sub_size': sub_size, 'n_iterations': n_iterations, 'run_idx': dir_index,
-                      'img': img}
+                      'algorithm': algorithm, 'sub_size': sub_size, 'n_iterations': n_iterations,
+                      'img': img, 'dir_idx': dir_index}
 
-        # ------------- Print parameters
-        print '\n' + 30*'= '
-        print '\tRun parameters:'
-        for key, value in sub_params.iteritems():
-            print '{:15}: {}'.format(key, value)
-        print '{:15}: {}'.format('iter_idx', iter_idx)
-        # -------------
+        self.print_dict(sub_params)
 
         with open(join_paths(sub_dir, 'params.json'), 'w') as outfile:
             json.dump(sub_params, outfile, indent=4, sort_keys=True)
@@ -108,7 +102,6 @@ class GridRunHandler:
 
     def main_grid_loop(self):
         """Main function looping over all possible parameter configurations executing the algorithms."""
-        run_index = 0
         dir_index = 0
         for n_points in self.run_params['n_points']:
             for img_file in self.run_params['img_files']:
@@ -121,7 +114,6 @@ class GridRunHandler:
 
                             sub_dir = join_paths(self.output_dir_path, 'sub_' + str(dir_index))
                             os.mkdir(sub_dir)
-                            dir_index += 1
 
                             n_iterations = self.run_params['n_iterations']
                             for iter_idx in range(n_iterations):
@@ -137,7 +129,8 @@ class GridRunHandler:
                                                    iter_idx=iter_idx,
                                                    dir_index=dir_index,
                                                    sub_dir=sub_dir)
-                                run_index += 1
+                                iter_idx += 1
+                            dir_index += 1
 
         self.store_all_sub_json_params()
 
@@ -146,7 +139,8 @@ class GridRunHandler:
         all_params = {}
         all_sub_dir_paths = glob(join_paths(self.output_dir_path, 'sub_*', 'params.json'))
 
-        for sub_idx, sub_dir in enumerate(sorted(all_sub_dir_paths)):
+        for sub_dir in all_sub_dir_paths:
+            sub_idx = os.path.split(sub_dir)[-2].split('_')[-1]  # parsing the sub_idx out of the sub_dir path
             with open(sub_dir, 'r') as infile:
                 json_data = json.load(infile)
                 all_params[sub_idx] = json_data
@@ -164,3 +158,9 @@ class GridRunHandler:
     def create_input_filename(n_points, img_name, suffix):
         img_name_no_suffix = img_name.split('.')[0]
         return 'points_n_{np}_img_{img}.{suffix}'.format(np=n_points, img=img_name_no_suffix, suffix=suffix)
+
+    @staticmethod
+    def print_dict(dictionary):
+        print '\n' + 30*'= '
+        for key, value in dictionary.iteritems():
+            print '{:15}: {}'.format(key, value)

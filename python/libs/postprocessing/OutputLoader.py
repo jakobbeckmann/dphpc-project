@@ -12,13 +12,13 @@ from python.libs.paths import project_path
 
 
 class OutputLoader:
-    def __init__(self, output_dir_name, latest_output=False):
+    def __init__(self, output_dir_name, latest_output=False, save_all_data=True):
         self.output_dir_name = self.set_output_dir_name(output_dir_name, latest_output)
         self.output_dir_path = join_paths(project_path, 'Output', self.output_dir_name)
         self.all_data_dict = {}
         self.run_config = self.parse_run_config()
         self.sub_run_params = self.parse_sub_run_params()
-
+        pass
     def parse_run_config(self):
         """Loads the json run_config file in the output folder into a dictionary."""
         config_file_name = self.output_dir_name + '_config.json'
@@ -64,13 +64,17 @@ class OutputLoader:
             self.all_data_dict = sub_run_params  # initially they are the same, data is being added later
         return sub_run_params
 
-    def load_all_data_dict(self):
+    def load_all_data_dict(self, save_all_data=True):
         sub_indices = self.sub_run_params.keys()
 
         for sub_idx in sub_indices:
             times = np.loadtxt(join_paths(self.output_dir_path, 'sub_{}'.format(sub_idx), 'timing.txt'))
-            self.all_data_dict[sub_idx]['run_times'] = times[:, 1]
+            self.all_data_dict[sub_idx]['run_times'] = list(times[:, 1])
             self.all_data_dict[sub_idx]['mean_run_tim'] = np.mean(times[:, 1])
+
+        if save_all_data:
+            with open(join_paths(self.output_dir_path, 'all_data.json'), 'w') as outfile:
+                json.dump(self.all_data_dict, outfile, indent=4, sort_keys=True)
 
     '''Use those functions to pass data on to post processing module.'''
     def get_all_data_dict(self):

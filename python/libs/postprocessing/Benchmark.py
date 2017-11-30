@@ -36,7 +36,7 @@ class Benchmark:
         algo_runtimes = {algorithm: {'input_sizes': [], 'run_times': []}
                          for algorithm in self.run_config['run_params']['algorithms']}
 
-        for _, data in self.all_data_dict.iteritems():
+        for key, data in self.all_data_dict.iteritems():
             algo_runtimes[data['algorithm']]['input_sizes'].append(data['n_points'])
             algo_runtimes[data['algorithm']]['run_times'].append(data['mean_run_tim'])
 
@@ -47,9 +47,10 @@ class Benchmark:
             run_times = [algo_data['run_times'][i] for i in sort_indices]
 
             ax.plot(input_sizes, run_times, linewidth=3, label=algorithm, alpha=0.5)
-            # ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.5, color='black', markeredgecolor='none')
+            # ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.3, color='black', markeredgecolor='none')
 
-        plt.legend()
+        legend = plt.legend(frameon=False)
+        legend.get_frame().set_facecolor('#FFFFFF')
 
         self.evaluate_save_show(save, show, file_name)
 
@@ -87,11 +88,11 @@ class Benchmark:
                 max_n_core = max(n_cores)
 
             ax.plot(n_cores, speedups, linewidth=3, label=algorithm, alpha=0.5)
-            # ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.5, color='black', markeredgecolor='none')
+            ax.plot(n_cores, speedups, 'o', linewidth=3, alpha=0.3, color='black', markeredgecolor='none')
 
         ax.plot([1, max_n_core], [1.0, max_n_core], 'k--', linewidth=1, alpha=0.5, label='linear speedup')
 
-        plt.legend()
+        plt.legend(frameon=False)
         self.evaluate_save_show(save, show, file_name)
 
     def evaluate_save_show(self, save, show, file_name):
@@ -113,6 +114,10 @@ class Benchmark:
         fig.set_size_inches(size)
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.spines['left'].set_visible(False)
 
         return fig, ax
 

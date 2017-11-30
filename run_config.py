@@ -6,21 +6,21 @@
 
 run_config = {
     'run_name':         'test',
-    'exe_dir_name':     '',
+    'exe_dir_name':     'cmake-build-debug',
     'save_png_input':   True,
 
     'run_params':
         {
-            'n_cores':              [2],
+            'n_cores':              [1, 2, 4, 6, 8],
             'n_points':             [50000],
-            'img_files':            ['homer.jpg'],
+            'img_files':            ['square.png'],
             'algorithms':           ['chan_normal', 'chan_merge_var', 'graham', 'jarvis',
-                                     'jarvis_jarvis', 'jarvis_binjarvis', 'jarvis_graham',
+                                     'jarvis_jarvis', 'jarvis_graham',
                                      'jarvis_quickhull', 'graham_jarvis', 'graham_graham',
                                      'graham_quickhull', 'quickhull_binjarvis', 'quickhull_jarvis',
                                      'quickhull_graham', 'quickhull_quickhull', 'quickhull'],
             'sub_size':             [None],
-            'n_iterations':         5,
+            'n_iterations':         2,
         },
 
     'post_process_params':

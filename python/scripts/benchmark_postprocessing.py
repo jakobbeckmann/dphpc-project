@@ -9,15 +9,16 @@ from python.libs.postprocessing.Benchmark import Benchmark
 
 run_name                   = 'test_1128_18231'
 chose_latest_output_folder = True            # Overwrites run_name with latest run in the Output folder
+save_all_data_dict         = True
 
-do_runtime_plot            = True
-do_speedup_plot            = False
+do_runtime_plot            = False
+do_speedup_plot            = True
 
 # ------------------------------------------ #
 
 
 # --------------- DATA LOADING ------------- #
-data_loader     = OutputLoader(run_name, latest_output=chose_latest_output_folder)
+data_loader     = OutputLoader(run_name, latest_output=chose_latest_output_folder, save_all_data=save_all_data_dict)
 run_config      = data_loader.get_run_config()
 all_params      = data_loader.get_sub_run_params()
 all_data_dict   = data_loader.get_all_data_dict()

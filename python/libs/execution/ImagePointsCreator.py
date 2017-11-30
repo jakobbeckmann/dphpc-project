@@ -4,10 +4,12 @@ in the project directory.
 """
 
 
+import cv2
 import numpy as np
 import os
 import random
-import cv2
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
 from python.libs.paths import project_path
