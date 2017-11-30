@@ -22,8 +22,8 @@ public:
         stop_time = c::now();
     }
 
-    c::rep get_timing() const {
-        return std::chrono::duration_cast<std::chrono::microseconds>(stop_time-start_time).count();
+    double get_timing() const {
+        return std::chrono::duration_cast<std::chrono::microseconds>(stop_time-start_time).count() * 1.0e-6;
     }
 
     void write_to_file(int iterIdx) const {
