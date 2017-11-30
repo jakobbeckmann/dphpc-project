@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.7)
 project(dphpc-project)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -8,7 +8,6 @@ src/JarvisAlgorithm.cpp src/JarvisAlgorithm.h src/GrahamScanAlgorithm.cpp src/Gr
 src/Jarvis_Jarvis.cpp src/Jarvis_Graham.hpp src/Jarvis_Graham.cpp src/Jarvis_Quickhull.hpp src/Jarvis_Quickhull.cpp src/Graham_Jarvis.hpp src/Graham_Jarvis.cpp src/Graham_Graham.hpp src/Graham_Graham.cpp
 src/Graham_Quickhull.hpp src/Graham_Quickhull.cpp src/Quickhull_BinJarvis.hpp src/Quickhull_BinJarvis.cpp src/Quickhull_Jarvis.hpp src/Quickhull_Jarvis.cpp src/Quickhull_Graham.hpp src/Quickhull_Graham.cpp
 src/Quickhull_Quickhull.hpp src/Quickhull_Quickhull.cpp)
-add_executable(dphpc_project ${SOURCE_FILES})
 
 if(APPLE)
     set(CMAKE_CXX_COMPILER g++-7)
@@ -34,4 +33,5 @@ if(WINDOWS)
     ENDIF()
 endif()
 
+add_executable(dphpc_project ${SOURCE_FILES})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
