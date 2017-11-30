@@ -7,19 +7,20 @@
 run_config = {
     'run_name':              'test',
     'exe_dir_name':          'cmake-build-debug',
-    'save_png_input':   True,
+    'save_png_input':        False,
 
     'run_params':
         {
-            'n_cores':              [4],
-            'n_points':             [3000],
+            'n_cores':              [1, 2, 4, 6, 8],
+            'n_points':             [300000],
             'img_files':            ['bird.jpg'],
             'algorithms':           ['chan_normal', 'chan_merge_var', 'graham', 'jarvis',
                                      'jarvis_jarvis', 'jarvis_graham',
                                      'jarvis_quickhull', 'graham_jarvis', 'graham_graham',
                                      'graham_quickhull', 'quickhull_binjarvis', 'quickhull_jarvis',
                                      'quickhull_graham', 'quickhull'],
-            'sub_size':             [8],
+            'sub_size':             [],
+            'use_sub_sizes':        False,
             'n_iterations':         2,
         },
 

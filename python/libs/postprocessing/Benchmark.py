@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from python.libs.paths import project_path
+import plot_utils
 
 
 class Benchmark:
@@ -54,7 +55,7 @@ class Benchmark:
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)
 
         order = np.argsort(last_runtimes)[::-1]
-        self.ordered_legend(ax, order)
+        plot_utils.ordered_legend(ax, order)
         self.evaluate_save_show(save, show, file_name)
 
     def plot_speedup_vs_cores(self, save=False, show=False, file_name=None):
@@ -65,7 +66,7 @@ class Benchmark:
                 or len(self.run_config['run_params']['img_files']) > 1:
             raise NotImplementedError("You can't do that. Only multiple numbers of cores and multiple algos.")
 
-        fig, ax = self.setup_figure_1ax(size=(13, 9),
+        fig, ax = plot_utils.setup_figure_1ax(size=(13, 9),
                                         x_label='# cores',
                                         y_label='Speedup')
 
@@ -84,7 +85,7 @@ class Benchmark:
         max_n_core = 1
         last_speedups = []
         for algorithm, algo_data in algo_t_core.iteritems():
-            n_cores, run_times = self.sort_two_lists_wrt_first(algo_data['n_cores'], algo_data['run_times'])
+            n_cores, run_times = plot_utils.sort_two_lists_wrt_first(algo_data['n_cores'], algo_data['run_times'])
             speedups = [algo_data['time_1core'] / run_times[n] for n in range(len(run_times))]
 
             if max(n_cores) > max_n_core:
@@ -97,7 +98,7 @@ class Benchmark:
         ax.plot([1, max_n_core], [1.0, max_n_core], 'k--', linewidth=1, alpha=0.5, label='linear speedup')
 
         order = np.argsort(last_speedups)[::-1]
-        self.ordered_legend(ax, order)
+        plot_utils.ordered_legend(ax, order)
         self.evaluate_save_show(save, show, file_name)
 
     def evaluate_save_show(self, save, show, file_name):

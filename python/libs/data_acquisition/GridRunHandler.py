@@ -125,7 +125,12 @@ class GridRunHandler:
 
                 for n_cores in self.run_params['n_cores']:
                     for algorithm in self.run_params['algorithms']:
-                        for sub_size in self.run_params['sub_size']:
+
+                        sub_sizes = [n_cores]
+                        if self.run_params['use_sub_sizes']:
+                            sub_sizes = self.run_params['sub_size']
+
+                        for sub_size in sub_sizes:
 
                             sub_dir = join_paths(self.output_dir_path, 'sub_' + str(dir_index))
                             os.mkdir(sub_dir)
