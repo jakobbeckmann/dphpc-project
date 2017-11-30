@@ -34,9 +34,9 @@ public:
 
     void clean_timing_file() {
         if( remove( TIMING_FILE.c_str() ) != 0 )
-            std::cout << "Could NOT delete timing file: " << TIMING_FILE.c_str() << std::endl;
+            std::cout << "Could NOT delete timing file: " << TIMING_FILE.c_str() << "\n";
         else
-            std::cout << "Deleted timing file: " << TIMING_FILE.c_str() << std::endl;
+            std::cout << "Deleted timing file: " << TIMING_FILE.c_str() << "\n";
     }
 
 private:

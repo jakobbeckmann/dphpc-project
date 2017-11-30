@@ -30,12 +30,29 @@
 
 int main(int argc, char const *argv[]) {
     #ifdef WRITE_DEBUG
-        std::cout << "Running in DEBUG mode - writing ALL output files." << "\n";
+        std::cout << "Running in DEBUG mode - writing ALL output files.\n";
     #endif
 
     if (argc < 5) {
-        std::cout << "Usage: " << " n_cores input_file algorithm iter_idx\n";
-        std::cout << "  algorithm := chan_normal | chan_merge_var | graham | jarvis \n";
+        std::cout << "Usage: " << " n_cores input_file algorithm iter_idx\n"
+                     "  algorithm := "
+                                    "chan_normal"
+                                 " | chan_merge_var"
+                                 " | graham"
+                                 " | jarvis"
+                                 " | jarvis_jarvis"
+                                 " | jarvis_binjarvis"
+                                 " | jarvis_graham"
+                                 " | jarvis_quickhull"
+                                 " | graham_jarvis"
+                                 " | graham_graham"
+                                 " | graham_quickhull"
+                                 " | quickhull_binjarvis"
+                                 " | quickhull_jarvis"
+                                 " | quickhull_graham"
+                                 " | quickhull_quickhull"
+                                 " | quickhull"
+                                 "\n";
 
         return -1;
     }
@@ -148,12 +165,12 @@ int main(int argc, char const *argv[]) {
         std::exit(EXIT_FAILURE);
     }
 
-    std::cout << "\n\n=========Result=========" << "\n";
-    std::cout << "Algorithm:     " << algorithm << "\n";
-    std::cout << "Input size:    " << points.size() << "\n";
-    std::cout << "N hull points: " << result.size() << "\n";
-    std::cout << "Iteration:     " << iterIdx << "\n";
-    std::cout << "Time used:     " << timer.get_timing() << "\n";
+    std::cout << "\n\n=========Result=========\n"
+              << "Algorithm:     " << algorithm << "\n"
+              << "Input size:    " << points.size() << "\n"
+              << "N hull points: " << result.size() << "\n"
+              << "Iteration:     " << iterIdx << "\n"
+              << "Time used:     " << timer.get_timing() << "\n";
 
     file_write_timer.start();
     std::stringstream fileName;
@@ -162,12 +179,11 @@ int main(int argc, char const *argv[]) {
 
     timer.write_to_file(iterIdx);
     file_write_timer.stop();
-    std::cout << "Write time:    " << file_write_timer.get_timing() << "\n";
-    std::cout << "Read time:     " << file_read_timer.get_timing() << "\n";
+    std::cout << "Write time:    " << file_write_timer.get_timing() << "\n"
+              << "Read time:     " << file_read_timer.get_timing() << "\n";
 
     total_timer.stop();
-    std::cout << "Total time:    " << total_timer.get_timing() << "\n";
-    std::cout << std::endl;
+    std::cout << "Total time:    " << total_timer.get_timing() << "\n\n";
 
     return 0;
 }
