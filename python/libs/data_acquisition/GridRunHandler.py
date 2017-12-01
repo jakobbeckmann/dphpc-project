@@ -72,7 +72,7 @@ class GridRunHandler:
                             join_paths(input_dir_path))
 
     def run_algorithm(self, n_cores, n_points, input_dat, input_png, algorithm, sub_size, n_iterations, dir_index,
-                      sub_dir, iter_idx, img):
+                      sub_dir, img):
         """
         Function executing subprocess calls to .cpp executable forwarding parameter as
         command line inputs.
@@ -94,26 +94,25 @@ class GridRunHandler:
 
         input_file_path = join_paths(self.output_dir_path, 'input_data', input_dat)
 
-        call_command = [exe_file[0], str(n_cores), str(sub_size), input_file_path, algorithm, str(iter_idx)]
+        call_command = [exe_file[0], str(n_cores), str(sub_size), input_file_path, str(n_iterations), algorithm]
         call_command_str = ' '.join(call_command)
 
         subprocess.check_call(call_command_str, shell=True, cwd=sub_dir)
 
         # step3: for debugging purposes, you can directly create the final hull plot of the last iteration
         if self.post_process_params['store_final_plots']:
-            if iter_idx == self.run_params['n_iterations'] - 1:
-                # loading hull points
-                hull_data = np.loadtxt(join_paths(sub_dir, 'hull_points_{iter_idx}.dat'.format(iter_idx=iter_idx)),
-                                       delimiter=',')
-                hull_points = {'x': hull_data[:, 0], 'y': hull_data[:, 1]}
-                # loading input points
-                in_data = np.loadtxt(join_paths(self.output_dir_path, 'input_data', input_dat))
-                input_points = {'x': in_data[:, 0], 'y': in_data[:, 1]}
+            # loading hull points
+            hull_data = np.loadtxt(join_paths(sub_dir, 'hull_points_{iter_idx}.dat'.format(iter_idx=n_iterations-1)),
+                                   delimiter=',')
+            hull_points = {'x': hull_data[:, 0], 'y': hull_data[:, 1]}
+            # loading input points
+            in_data = np.loadtxt(join_paths(self.output_dir_path, 'input_data', input_dat))
+            input_points = {'x': in_data[:, 0], 'y': in_data[:, 1]}
 
-                plot_name = 'last_iter_hull.png'
-                plotter = HullPlotter(input_points, hull_points, save_path=join_paths(sub_dir, plot_name),
-                                      input_img_path=join_paths(self.output_dir_path, 'input_data', img))
-                plotter.plot_input_and_hull_points(save=True, show=False, plot_img=True)
+            plot_name = 'last_iter_hull.png'
+            plotter = HullPlotter(input_points, hull_points, save_path=join_paths(sub_dir, plot_name),
+                                  input_img_path=join_paths(self.output_dir_path, 'input_data', img))
+            plotter.plot_input_and_hull_points(save=True, show=False, plot_img=True)
 
     def main_grid_loop(self):
         """Main function looping over all possible parameter configurations executing the algorithms."""
@@ -136,20 +135,17 @@ class GridRunHandler:
                             os.mkdir(sub_dir)
 
                             n_iterations = self.run_params['n_iterations']
-                            for iter_idx in range(n_iterations):
 
-                                self.run_algorithm(n_cores=n_cores,
-                                                   n_points=n_points,
-                                                   input_dat=input_file,
-                                                   input_png=input_file.split('.')[0] + '.png',
-                                                   img=img_file,
-                                                   algorithm=algorithm,
-                                                   sub_size=sub_size,
-                                                   n_iterations=n_iterations,
-                                                   iter_idx=iter_idx,
-                                                   dir_index=dir_index,
-                                                   sub_dir=sub_dir)
-                                iter_idx += 1
+                            self.run_algorithm(n_cores=n_cores,
+                                               n_points=n_points,
+                                               input_dat=input_file,
+                                               input_png=input_file.split('.')[0] + '.png',
+                                               img=img_file,
+                                               algorithm=algorithm,
+                                               sub_size=sub_size,
+                                               n_iterations=n_iterations,
+                                               dir_index=dir_index,
+                                               sub_dir=sub_dir)
                             dir_index += 1
 
         self.store_all_sub_json_params()
