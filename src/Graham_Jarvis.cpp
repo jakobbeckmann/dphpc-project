@@ -8,7 +8,8 @@ std::vector<Point> Graham_Jarvis::run(const std::vector<Point>& points, int para
     std::vector<std::vector<Point> > hulls;
     hulls.resize(parts);
 
-    omp_set_num_threads(parallel_idx);
+    // commented this for now cause can't compile with it on mac...
+  //  omp_set_num_threads(parallel_idx);
 
     #pragma omp parallel for
     for (size_t i = 0; i < parts; ++i) {

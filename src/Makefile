@@ -1,25 +1,18 @@
-# MacOS is special :)
-OS := $(shell uname)
-ifeq ($(OS), Darwin)
-# Mac OS X
-CXX = g++-7
-else
-CXX = g++
-endif
-CXXFLAGS = -std=c++11 -Wall -fopenmp -O2 -w -g
- 
-EXEC = AlgorithmsRunner
+CXX = mpicc
+CXXFLAGS = -g -openmp
+
+EXEC = Mhull
 SOURCES = $(wildcard *.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
 
-all: AlgorithmsRunner
+all: Mhull
 
-AlgorithmsRunner.o: AlgorithmsRunner.cpp
-ChanAlgorithm.o: ChanAlgorithm.cpp ChanAlgorithm.h
-GrahamScanAlgorithm.o: GrahamScanAlgorithm.cpp GrahamScanAlgorithm.h
+Mhull.o: Mhull.cpp
+Graham_Jarvis.o: Graham_Jarvis.cpp Graham_Jarvis.hpp
 JarvisAlgorithm.o: JarvisAlgorithm.cpp JarvisAlgorithm.h
+GrahamScanAlgorithm.o: GrahamScanAlgorithm.cpp GrahamScanAlgorithm.h
 utility.o: utility.cpp utility.h
-AlgorithmsRunner: AlgorithmsRunner.o ChanAlgorithm.o GrahamScanAlgorithm.o JarvisAlgorithm.o utility.o
+Mhull: Mhull.o Graham_Jarvis.o Graham_Jarvis.o JarvisAlgorithm.o GrahamScanAlgorithm.o utility.o
 	$(CXX) $(CXXFLAGS) $^ -o $(EXEC)
 
 clean:
