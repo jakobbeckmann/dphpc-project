@@ -16,12 +16,7 @@ std::vector<Point> Graham_Quickhull::run(const std::vector<Point>& points, int p
         hulls[i] = GrahamScanAlgorithm::run(part, i, 0/*unused*/);
     }
 
-    std::vector<Point> hull_points;
-    for(std::vector<Point> hull: hulls) {
-        for(Point point: hull) {
-            hull_points.push_back(point);
-        }
-    }
+    std::vector<Point> hull_points = MergeVectors(std::move(hulls));
 
     std::vector<int> result;
 

@@ -20,12 +20,7 @@ std::vector<Point> Quickhull_Quickhull::run(const std::vector<Point>& points, in
         }
     }
 
-    std::vector<Point> hull_points;
-    for(std::vector<Point> hull: hulls) {
-        for(Point point: hull) {
-            hull_points.push_back(point);
-        }
-    }
+    std::vector<Point> hull_points = MergeVectors(std::move(hulls));
 
     std::vector<int> result;
 

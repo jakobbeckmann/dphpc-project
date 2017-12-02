@@ -134,14 +134,9 @@ std::vector<Point> ChanAlgorithm::mergeAllHulls(const std::vector<std::vector<Po
     return result;
 }
 
-std::vector<Point> ChanAlgorithm::mergeTwoHulls(const std::vector<Point>& a, const std::vector<Point>& b)
+std::vector<Point> ChanAlgorithm::mergeTwoHulls(std::vector<Point>&& a, std::vector<Point>&& b)
 {
-	std::vector<Point> result;
-
-	// TODO: Hack
-	std::vector<std::vector<Point>> tmp = { a, b };
-
-	return mergeAllHulls(tmp);
+	return mergeAllHulls({a, b});
 }
 
 
@@ -203,7 +198,7 @@ std::vector<Point> ChanAlgorithm2Merge::run(const std::vector<Point>& points, in
 		for (size_t j_h = step_size/2; j_h < i; j_h += step_size)
 		{
 			size_t j = j_h-step_size/2; // 0, step_size, 2*step_size, 3*step_size, ...
-			hulls[j] = mergeTwoHulls(hulls[j], hulls[j_h]);
+			hulls[j] = mergeTwoHulls(std::move(hulls[j]), std::move(hulls[j_h]));
 		}
 	}
 

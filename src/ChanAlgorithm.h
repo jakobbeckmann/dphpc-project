@@ -9,7 +9,7 @@ public:
     static std::pair<int, int> findNextMergePoint(const std::vector<std::vector<Point>>& hulls, std::pair<int, int> base_pair);
 
     static std::vector<Point> mergeAllHulls(const std::vector<std::vector<Point>>& hulls);
-    static std::vector<Point> mergeTwoHulls(const std::vector<Point>& a, const std::vector<Point>& b);
+    static std::vector<Point> mergeTwoHulls(std::vector<Point>&& a, std::vector<Point>&& b);
 
     static std::vector<Point> run(const std::vector<Point>& points, int parallel_idx, size_t parts);
 

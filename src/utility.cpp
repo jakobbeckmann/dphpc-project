@@ -150,3 +150,21 @@ std::vector<Point> SplitVector(const std::vector<Point>& vec, size_t i, size_t n
 
     return std::vector<Point>(vec.begin() + begin, vec.begin() + end);
 }
+
+/**
+ * Merges all the vectors into one vector. The original vectors are moved from and left in an unspecified state.
+ */
+std::vector<Point> MergeVectors(std::vector<std::vector<Point>>&& hulls)
+{
+    std::vector<Point> hull_points;
+    size_t sum_sizes = 0;
+    for (const std::vector<Point>& hull : hulls)
+        sum_sizes += hull.size();
+
+    hull_points.resize(sum_sizes);
+
+    for (std::vector<Point>& hull : hulls)
+        std::move(hull.begin(), hull.end(), std::back_inserter(hull_points));
+
+    return hull_points;
+}

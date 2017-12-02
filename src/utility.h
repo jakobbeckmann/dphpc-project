@@ -14,4 +14,4 @@ std::vector<Point> SplitVector(const std::vector<Point>& vec, size_t i, size_t n
 std::vector<Point> createPoints(int count, double min, double max);
 std::vector<Point> readPointsFromFile(const std::string& filePath);
 
-
+std::vector<Point> MergeVectors(std::vector<std::vector<Point>>&& hulls);

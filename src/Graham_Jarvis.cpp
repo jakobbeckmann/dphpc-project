@@ -16,12 +16,5 @@ std::vector<Point> Graham_Jarvis::run(const std::vector<Point>& points, int para
         hulls[i] = GrahamScanAlgorithm::run(part, i, 0/*unused*/);
     }
 
-    std::vector<Point> hull_points;
-    for(std::vector<Point> hull: hulls) {
-        for(Point point: hull) {
-            hull_points.push_back(point);
-        }
-    }
-
-    return JarvisAlgorithm::run(hull_points, 0/*unused*/, 0/*unused*/);
+    return JarvisAlgorithm::run(MergeVectors(std::move(hulls)), 0/*unused*/, 0/*unused*/);
 }
