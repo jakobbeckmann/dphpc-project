@@ -16,4 +16,4 @@ Bin_Mpi_Algo: $(BIN_OBJECTS)
 	$(CXX) $(CXXFLAGS) $^ -o Bin_Mpi_Algo
 
 clean:
-	rm -f $(EXEC) $(SIMPLE_OBJECTS) $(BIN_OBJECTS)
+	rm -f Simple_Mpi_Algo Bin_Mpi_Algo $(SIMPLE_OBJECTS) $(BIN_OBJECTS)
