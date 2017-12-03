@@ -30,6 +30,18 @@ void Quickhull::run(const std::vector<Point>& input, std::vector<int>& hull_idxs
                  point_min_x);
 }
 
+std::vector<Point> Quickhull::runAndReturnPoints(const std::vector<Point>& points, int parallel_idx, size_t parts) {
+    std::vector<int> result;
+
+    Quickhull::run(points, result);
+
+    std::vector<Point> result_points;
+    for(int idx: result) {
+        result_points.push_back(points[idx]);
+    }
+
+    return result_points;
+}
 
 int Quickhull::find_extreme(const std::vector<Point>& input, bool left) {
     int pivot_idx = 0;

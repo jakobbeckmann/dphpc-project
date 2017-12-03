@@ -11,7 +11,7 @@
 class Quickhull {
 public:
     static void run(const std::vector<Point>& input, std::vector<int>& hull_idxs);
-
+    static std::vector<Point> runAndReturnPoints(const std::vector<Point>& points, int parallel_idx, size_t parts);
 private:
     /*
      * Gets leftmost / rightmost point in input.
