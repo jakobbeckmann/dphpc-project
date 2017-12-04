@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
             total_hulls = 0;
             timer.start();
             // Distribute points to different processes in parallel
-            // omp_set_num_threads(2);
+            omp_set_num_threads(2);
             #pragma omp parallel for
             for (int i = 0; i < nprocesses; ++i) {
                 std::vector <Point> part = SplitVector(allPoints, i, nprocesses);
