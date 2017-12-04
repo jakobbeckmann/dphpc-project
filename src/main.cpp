@@ -80,12 +80,7 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
-    Timer timer;
-    Timer file_write_timer;
     Timer file_read_timer;
-    Timer total_timer;
-
-    total_timer.start();
 
     int n_cores             = atoi(argv[1]);
     auto part_size          = size_t(atoi(argv[2]));
@@ -110,6 +105,12 @@ int main(int argc, char const *argv[]) {
         }
 
         for (int iterIdx = 0; iterIdx < n_iterations; ++iterIdx) {
+            Timer timer;
+            Timer file_write_timer;
+            Timer total_timer;
+
+            total_timer.start();
+
             std::vector<Point> result;
 
             timer.start();
