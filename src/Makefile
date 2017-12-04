@@ -1,5 +1,5 @@
 CXX = mpic++
-CXXFLAGS = -g -openmp
+CXXFLAGS = -g -fopenmp -std=c++11
 
 EXEC = Mpi_Algo
 SOURCES = $(wildcard *.cpp)
