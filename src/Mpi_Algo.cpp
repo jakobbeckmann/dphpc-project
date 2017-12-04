@@ -46,17 +46,16 @@ static const std::vector <algo> simple_algos = {
 };
 
 int main(int argc, char *argv[]) {
-    // Data to keep track on the time
-    Timer timer;
-    Timer file_write_timer;
-    Timer file_read_timer;
-    Timer total_timer;
+    int tid, nprocesses, provided;
+    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+    MPI_Comm_rank(MPI_COMM_WORLD, &tid);
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocesses);
 
     // Data to keep track on the execution process
-    int tid, nprocesses, provided;
     int total_hulls = 0;
     int initial_points_size;
     std::vector <Point> points;
+    std::vector <Point> allPoints;
 
     // Configuration data
     int n_cores = atoi(argv[1]);
@@ -66,116 +65,125 @@ int main(int argc, char *argv[]) {
     std::string inputFile = argv[4];
     std::string algorithm = argv[5];
 
-    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
-    MPI_Comm_rank(MPI_COMM_WORLD, &tid);
-    MPI_Comm_size(MPI_COMM_WORLD, &nprocesses);
+    // Data to keep track on the time
+    Timer timer;
+    Timer file_write_timer;
+    Timer file_read_timer;
+    Timer total_timer;
 
     if (tid == MERGE_PROCESS_ID) {
         total_timer.start();
-    }
-
-    // Only merge process execution: reading input points and distributing across processes
-    if (tid == MERGE_PROCESS_ID) {
         file_read_timer.start();
-        std::vector <Point> allPoints = readPointsFromFile(inputFile);
+        allPoints = readPointsFromFile(inputFile);
         file_read_timer.stop();
         initial_points_size = allPoints.size();
-        timer.start();
+    }
 
-        // Distribute points to different processes in parallel
-//        omp_set_num_threads(2);
-        #pragma omp parallel for
-        for (int i = 0; i < nprocesses; ++i) {
-            std::vector <Point> part = SplitVector(allPoints, i, nprocesses);
-            if (i == MERGE_PROCESS_ID) {
-                // Merge process picks his points
-                points = part;
-            } else {
-                // Merge process sends points to other processes
-                MPI_Send(part.data(), part.size(), MPI_LONG_DOUBLE, i, INPUT_MESSAGE, MPI_COMM_WORLD);
+    // Running this iterIdx number of times
+    std::cout << "I am here " << tid << "\n";
+    for (int i = 0; i < iterIdx; ++i) {
+        std::cout << "I am at the beginning " << tid << " " << i << "\n";
+        // Only merge process execution: reading input points and distributing across processes
+        if (tid == MERGE_PROCESS_ID) {
+            total_hulls = 0;
+            timer.start();
+            // Distribute points to different processes in parallel
+            // omp_set_num_threads(2);
+            #pragma omp parallel for
+            for (int i = 0; i < nprocesses; ++i) {
+                std::vector <Point> part = SplitVector(allPoints, i, nprocesses);
+                if (i == MERGE_PROCESS_ID) {
+                    // Merge process picks his points
+                    points = part;
+                } else {
+                    // Merge process sends points to other processes
+                    MPI_Send(part.data(), part.size(), MPI_LONG_DOUBLE, i, INPUT_MESSAGE, MPI_COMM_WORLD);
+                }
             }
-        }
-    } else {
-        // Only non-merge processes execution: receiving points data input
-        std::vector <Point> input;
-
-        // Finding out the exact size of the received message
-        MPI_Status status;
-        int count;
-        MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-        MPI_Get_count(&status, MPI_LONG_DOUBLE, &count);
-        input.resize(count);
-
-        // Receiving the points data
-        MPI_Recv(&input[0], count, MPI_LONG_DOUBLE, MPI_ANY_SOURCE, INPUT_MESSAGE, MPI_COMM_WORLD,
-                 &status);
-        points = input;
-    }
-
-    // All processes execute fully the algorithm specified
-    std::vector <Point> intermediate_hull;
-    std::vector<algo>::const_iterator it;
-    if ((it = std::find_if(simple_algos.begin(), simple_algos.end(), [algorithm](const algo &a) {
-        return algorithm == a.name;
-    })) != simple_algos.end()) {
-        intermediate_hull = it->func(points, numberOfCores, part_size);
-    } else {
-        std::cout << std::string("No such algorithm! Given ") + algorithm;
-        std::exit(EXIT_FAILURE);
-    }
-
-    // Only non-merging processes execution: sending calculated hull
-    if (tid != MERGE_PROCESS_ID) {
-        MPI_Send(intermediate_hull.data(), intermediate_hull.size(), MPI_LONG_DOUBLE, MERGE_PROCESS_ID, HULL_MESSAGE,
-                 MPI_COMM_WORLD);
-    } else {
-        total_hulls++;
-        // Only merge process execution: receiving calculated hull
-        while (total_hulls < nprocesses) {
-            std::vector <Point> received_hull;
+        } else {
+            // Only non-merge processes execution: receiving points data input
+            std::vector <Point> input;
 
             // Finding out the exact size of the received message
             MPI_Status status;
-            std::vector<int> counts(nprocesses);
-            MPI_Probe(MPI_ANY_SOURCE, HULL_MESSAGE, MPI_COMM_WORLD, &status);
-            MPI_Get_count(&status, MPI_LONG_DOUBLE, &counts[status.MPI_SOURCE]);
-            received_hull.resize(counts[status.MPI_SOURCE]);
+            int count;
+            MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+            MPI_Get_count(&status, MPI_LONG_DOUBLE, &count);
+            input.resize(count);
 
-            // Receiving the calculated hull
-            MPI_Recv(&received_hull[0], counts[status.MPI_SOURCE], MPI_LONG_DOUBLE, status.MPI_SOURCE, HULL_MESSAGE,
-                     MPI_COMM_WORLD,
+            // Receiving the points data
+            MPI_Recv(&input[0], count, MPI_LONG_DOUBLE, MPI_ANY_SOURCE, INPUT_MESSAGE, MPI_COMM_WORLD,
                      &status);
-
-            for (Point point : received_hull) {
-                intermediate_hull.push_back(point);
-            }
-            total_hulls++;
+            points = input;
         }
 
-        std::vector <Point> final_hull = it->func(intermediate_hull, numberOfCores, part_size);
-        timer.stop();
+        // All processes execute fully the algorithm specified
+        std::vector <Point> intermediate_hull;
+        std::vector<algo>::const_iterator it;
+        if ((it = std::find_if(simple_algos.begin(), simple_algos.end(), [algorithm](const algo &a) {
+            return algorithm == a.name;
+        })) != simple_algos.end()) {
+            intermediate_hull = it->func(points, numberOfCores, part_size);
+        } else {
+            std::cout << std::string("No such algorithm! Given ") + algorithm;
+            std::exit(EXIT_FAILURE);
+        }
 
-        std::cout << "\n\n=========Result=========\n"
-                  << "Algorithm:     " << algorithm << "\n"
-                  << "Input size:    " << initial_points_size << "\n"
-                  << "N hull points: " << final_hull.size() << "\n"
-                  << "Iteration:     " << iterIdx << "\n"
-                  << "Time used:     " << timer.get_timing() << "\n";
+        // Only non-merging processes execution: sending calculated hull
+        if (tid != MERGE_PROCESS_ID) {
+            MPI_Send(intermediate_hull.data(), intermediate_hull.size(), MPI_LONG_DOUBLE, MERGE_PROCESS_ID,
+                     HULL_MESSAGE,
+                     MPI_COMM_WORLD);
+        } else {
+            total_hulls++;
+            // Only merge process execution: receiving calculated hull
+            while (total_hulls < nprocesses) {
+                std::vector <Point> received_hull;
 
-        file_write_timer.start();
-        std::stringstream fileName;
-        fileName << "hull_points_" << iterIdx << ".dat";
-        FileWriter::writePointsToFile(final_hull, fileName.str(), true);
+                // Finding out the exact size of the received message
+                MPI_Status status;
+                std::vector<int> counts(nprocesses);
+                MPI_Probe(MPI_ANY_SOURCE, HULL_MESSAGE, MPI_COMM_WORLD, &status);
+                MPI_Get_count(&status, MPI_LONG_DOUBLE, &counts[status.MPI_SOURCE]);
+                received_hull.resize(counts[status.MPI_SOURCE]);
 
-        timer.write_to_file(iterIdx);
-        file_write_timer.stop();
-        std::cout << "Write time:    " << file_write_timer.get_timing() << "\n"
-                  << "Read time:     " << file_read_timer.get_timing() << "\n";
+                // Receiving the calculated hull
+                MPI_Recv(&received_hull[0], counts[status.MPI_SOURCE], MPI_LONG_DOUBLE, status.MPI_SOURCE, HULL_MESSAGE,
+                         MPI_COMM_WORLD,
+                         &status);
 
-        total_timer.stop();
-        std::cout << "Total time:    " << total_timer.get_timing() << "\n\n";
+                for (Point point : received_hull) {
+                    intermediate_hull.push_back(point);
+                }
+                total_hulls++;
+            }
+            std::vector <Point> final_hull = it->func(intermediate_hull, numberOfCores, part_size);
+            timer.stop();
 
+            timer.write_to_file(iterIdx);
+
+            std::cout << "\n\n=========Result=========\n"
+                      << "Algorithm:     " << algorithm << "\n"
+                      << "Input size:    " << initial_points_size << "\n"
+                      << "N hull points: " << final_hull.size() << "\n"
+                      << "Iteration:     " << iterIdx << "\n"
+                      << "Time used:     " << timer.get_timing() << "\n";
+            file_write_timer.start();
+            std::stringstream fileName;
+            fileName << "hull_points_" << iterIdx << ".dat";
+            FileWriter::writePointsToFile(final_hull, fileName.str(), true);
+
+            file_write_timer.stop();
+            std::cout << "Write time:    " << file_write_timer.get_timing() << "\n"
+                      << "Read time:     " << file_read_timer.get_timing() << "\n";
+
+            total_timer.stop();
+            std::cout << "Total time:    " << total_timer.get_timing() << "\n\n";
+        }
+        std::cout << "I am at the end " << tid << " " << i <<  "\n";
+        MPI_Barrier(MPI_COMM_WORLD); // Making sure all processes will reenter the loop roughly the same time
     }
+
     MPI_Finalize();
     return (0);
 }
