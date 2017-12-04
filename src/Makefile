@@ -1,19 +1,15 @@
-CXX = mpicc
+CXX = mpic++
 CXXFLAGS = -g -openmp
 
+EXEC = Mpi_Algo
 SOURCES = $(wildcard *.cpp)
-SIMPLE_SOURCES := $(filter-out main.cpp Bin_Mpi_Algo.cpp, $(SOURCES))
-BIN_SOURCES := $(filter-out main.cpp Simple_Mpi_Algo.cpp, $(SOURCES))
-SIMPLE_OBJECTS = $(SIMPLE_SOURCES:.cpp=.o)
-BIN_OBJECTS = $(BIN_SOURCES:.cpp=.o)
+SOURCES := $(filter-out main.cpp, $(SOURCES))
+OBJECTS = $(SOURCES:.cpp=.o)
 
-all: Simple_Mpi_Algo Bin_Mpi_Algo
+all: $(EXEC)
 
-Simple_Mpi_Algo: $(SIMPLE_OBJECTS)
-	$(CXX) $(CXXFLAGS) $^ -o Simple_Mpi_Algo
-
-Bin_Mpi_Algo: $(BIN_OBJECTS)
-	$(CXX) $(CXXFLAGS) $^ -o Bin_Mpi_Algo
+Mpi_Algo: $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $^ -o $(EXEC)
 
 clean:
-	rm -f Simple_Mpi_Algo Bin_Mpi_Algo $(SIMPLE_OBJECTS) $(BIN_OBJECTS)
+	rm -f $(EXEC) $(OBJECTS) $(OBJECTS)

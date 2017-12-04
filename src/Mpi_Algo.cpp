@@ -8,9 +8,6 @@
 #include "timer.h"
 #include "Point.h"
 #include "FileWriter.h"
-#include "GrahamScanAlgorithm.h"
-#include "JarvisAlgorithm.h"
-#include "Quickhull.hpp"
 #include "Jarvis_Jarvis.hpp"
 #include "Jarvis_Graham.hpp"
 #include "Jarvis_Quickhull.hpp"
@@ -20,27 +17,32 @@
 #include "Quickhull_Jarvis.hpp"
 #include "Quickhull_Graham.hpp"
 #include "Quickhull_Quickhull.hpp"
+#include "ChanAlgorithm.h"
+#include "Jarvis_BinJarvis.hpp"
+#include "Quickhull_BinJarvis.hpp"
 
 #define INPUT_MESSAGE 0
 #define HULL_MESSAGE 1
 #define MERGE_PROCESS_ID 0
 
-struct mpi_simple_algo {
+struct algo {
     std::string name;
-    std::function<std::vector<Point>(const std::vector<Point> &, int, size_t)> whole_func;
-    std::function<std::vector<Point>(const std::vector<Point> &, int, size_t)> merge_func;
+    std::function<std::vector<Point>(const std::vector<Point> &, int, size_t)> func;
 };
 
-static const std::vector <mpi_simple_algo> simple_algos = {
-        {"jarvis_jarvis",       Jarvis_Jarvis::run,       JarvisAlgorithm::run},
-        {"jarvis_graham",       Jarvis_Graham::run,       GrahamScanAlgorithm::run},
-        {"jarvis_quickhull",    Jarvis_Quickhull::run,    Quickhull::runAndReturnPoints},
-        {"graham_jarvis",       Graham_Jarvis::run,       JarvisAlgorithm::run},
-        {"graham_graham",       Graham_Graham::run,       GrahamScanAlgorithm::run},
-        {"graham_quickhull",    Graham_Quickhull::run,    Quickhull::runAndReturnPoints},
-        {"quickhull_jarvis",    Quickhull_Jarvis::run,    JarvisAlgorithm::run},
-        {"quickhull_graham",    Quickhull_Graham::run,    GrahamScanAlgorithm::run},
-        {"quickhull_quickhull", Quickhull_Quickhull::run, Quickhull::runAndReturnPoints}
+static const std::vector <algo> simple_algos = {
+        {"jarvis_jarvis",       Jarvis_Jarvis::run },
+        {"jarvis_graham",       Jarvis_Graham::run },
+        {"jarvis_quickhull",    Jarvis_Quickhull::run },
+        {"graham_jarvis",       Graham_Jarvis::run },
+        {"graham_graham",       Graham_Graham::run },
+        {"graham_quickhull",    Graham_Quickhull::run },
+        {"quickhull_jarvis",    Quickhull_Jarvis::run },
+        {"quickhull_graham",    Quickhull_Graham::run },
+        {"quickhull_quickhull", Quickhull_Quickhull::run },
+        {"chan_normal",         ChanAlgorithm::run },
+        {"jarvis_binjarvis",    Jarvis_BinJarvis::run },
+        {"quickhull_binjarvis", Quickhull_BinJarvis::run }
 };
 
 int main(int argc, char *argv[]) {
@@ -81,7 +83,7 @@ int main(int argc, char *argv[]) {
         timer.start();
 
         // Distribute points to different processes in parallel
-        // omp_set_num_threads(parallel_idx);
+//        omp_set_num_threads(2);
         #pragma omp parallel for
         for (int i = 0; i < nprocesses; ++i) {
             std::vector <Point> part = SplitVector(allPoints, i, nprocesses);
@@ -112,11 +114,11 @@ int main(int argc, char *argv[]) {
 
     // All processes execute fully the algorithm specified
     std::vector <Point> intermediate_hull;
-    std::vector<mpi_simple_algo>::const_iterator it;
-    if ((it = std::find_if(simple_algos.begin(), simple_algos.end(), [algorithm](const mpi_simple_algo &a) {
+    std::vector<algo>::const_iterator it;
+    if ((it = std::find_if(simple_algos.begin(), simple_algos.end(), [algorithm](const algo &a) {
         return algorithm == a.name;
     })) != simple_algos.end()) {
-        intermediate_hull = it->whole_func(points, numberOfCores, part_size);
+        intermediate_hull = it->func(points, numberOfCores, part_size);
     } else {
         std::cout << std::string("No such algorithm! Given ") + algorithm;
         std::exit(EXIT_FAILURE);
@@ -150,7 +152,7 @@ int main(int argc, char *argv[]) {
             total_hulls++;
         }
 
-        std::vector <Point> final_hull = it->merge_func(intermediate_hull, 0/*unused*/, 0/*unused*/);
+        std::vector <Point> final_hull = it->func(intermediate_hull, numberOfCores, part_size);
         timer.stop();
 
         std::cout << "\n\n=========Result=========\n"
