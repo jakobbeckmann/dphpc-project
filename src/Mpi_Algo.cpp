@@ -80,15 +80,13 @@ int main(int argc, char *argv[]) {
     }
 
     // Running this iterIdx number of times
-    std::cout << "I am here " << tid << "\n";
     for (int i = 0; i < iterIdx; ++i) {
-        std::cout << "I am at the beginning " << tid << " " << i << "\n";
         // Only merge process execution: reading input points and distributing across processes
         if (tid == MERGE_PROCESS_ID) {
             total_hulls = 0;
             timer.start();
             // Distribute points to different processes in parallel
-            omp_set_num_threads(2);
+            omp_set_num_threads(nprocesses); // might need to set a different value
             #pragma omp parallel for
             for (int i = 0; i < nprocesses; ++i) {
                 std::vector <Point> part = SplitVector(allPoints, i, nprocesses);
@@ -160,17 +158,17 @@ int main(int argc, char *argv[]) {
             std::vector <Point> final_hull = it->func(intermediate_hull, numberOfCores, part_size);
             timer.stop();
 
-            timer.write_to_file(iterIdx);
+            timer.write_to_file(i + 1);
 
             std::cout << "\n\n=========Result=========\n"
                       << "Algorithm:     " << algorithm << "\n"
                       << "Input size:    " << initial_points_size << "\n"
                       << "N hull points: " << final_hull.size() << "\n"
-                      << "Iteration:     " << iterIdx << "\n"
+                      << "Iteration:     " << i + 1 << "\n"
                       << "Time used:     " << timer.get_timing() << "\n";
             file_write_timer.start();
             std::stringstream fileName;
-            fileName << "hull_points_" << iterIdx << ".dat";
+            fileName << "hull_points_" << i + 1 << ".dat";
             FileWriter::writePointsToFile(final_hull, fileName.str(), true);
 
             file_write_timer.stop();
@@ -180,7 +178,6 @@ int main(int argc, char *argv[]) {
             total_timer.stop();
             std::cout << "Total time:    " << total_timer.get_timing() << "\n\n";
         }
-        std::cout << "I am at the end " << tid << " " << i <<  "\n";
         MPI_Barrier(MPI_COMM_WORLD); // Making sure all processes will reenter the loop roughly the same time
     }
 
