@@ -11,6 +11,7 @@ import random
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+import itertools
 
 from python.libs.paths import project_path
 
@@ -51,7 +52,7 @@ class ImagePointsCreator:
         processed_image = image
         return processed_image
 
-    def monte_carlo_sampling(self, processed_image):
+    def monte_carlo_sampling(self, processed_image, groups=1):
         """Takes the pre-processed image and randomly samples self.n_points into the region of interest."""
         points = []
         sampled_points = 0
@@ -63,6 +64,27 @@ class ImagePointsCreator:
                 y_noise = random.uniform(-1, 1)
                 points.append([x + x_noise, (self.image_shape['y'] - y) + y_noise])
                 sampled_points += 1
+
+        if groups > 1:
+            assert len(points) > groups
+            centers = points[:groups]
+            cluster = []
+            for i in xrange(groups):
+				cluster.append([])
+
+            def dist(a, b):
+                return (a[0] - b[0])**2 + (a[1] - b[1])**2
+            for point in points:
+                nearest = [0, dist(centers[0], point)]
+                for i in xrange(1, len(centers)):
+                    d = dist(centers[i], point)
+                    if d < nearest[1]:
+                        nearest = [i, d]
+                cluster[nearest[0]].append(point)
+
+            points = list(itertools.chain.from_iterable(cluster))
+            assert len(points) == sampled_points
+
         return np.array(points)
 
     @staticmethod
@@ -89,10 +111,10 @@ class ImagePointsCreator:
             img_file = self.output_file_path[:-4] + '.png'
             plt.savefig(img_file)
 
-    def create_points_pipeline(self, save_png=False):
+    def create_points_pipeline(self, save_png=False, clusters=1):
         """Pipeline to create point distribution from a single image."""
         image = self.load_image(show_image=False)
         processed_image = self.create_dark_shape_mask(image)
-        points = self.monte_carlo_sampling(processed_image)
+        points = self.monte_carlo_sampling(processed_image, clusters)
         self.write_points_to_file(points, save_png)
 

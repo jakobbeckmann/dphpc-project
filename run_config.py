@@ -13,6 +13,7 @@ run_config = {
         {
             'n_cores':              [1, 2, 4, 6, 8],
             'n_points':             [300000],
+            'clusters':             4,
             'img_files':            ['bird.jpg'],
             'algorithms':           ['chan_normal', 'chan_merge_var', 'graham', 'jarvis',
                                      'jarvis_jarvis', 'jarvis_graham',

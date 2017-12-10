@@ -67,7 +67,7 @@ class GridRunHandler:
                 print('\nCreating points for {np} points using {img}.'.format(np=n_points, img=img_file))
                 point_file_name = self.create_input_filename(n_points, img_file, 'dat')
                 point_creator = ImagePointsCreator(n_points, img_file, point_file_name, input_dir_path)
-                point_creator.create_points_pipeline(save_png=run_config['save_png_input'])
+                point_creator.create_points_pipeline(save_png=run_config['save_png_input'], clusters=self.run_params['clusters'])
                 shutil.copy(join_paths(project_path, 'Input', img_file),
                             join_paths(input_dir_path))
 
