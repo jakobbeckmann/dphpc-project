@@ -124,7 +124,7 @@ class GridRunHandler:
                 input_file = self.create_input_filename(n_points, img_file, 'dat')
 
                 for n_cores in self.run_params['n_cores']:
-                    sub_sizes = [n_cores]
+                    sub_sizes = [n_points//n_cores]
                     if self.run_params['use_sub_sizes']:
                         sub_sizes = self.run_params['sub_size']
 

@@ -93,6 +93,10 @@ int main(int argc, char const *argv[]) {
     std::vector<Point> points = readPointsFromFile(inputFile);
     file_read_timer.stop();
 
+    size_t parts = points.size()/part_size;
+    if (!parts)
+        parts = 1;
+
     for (int i = 5; i < argc; ++i) {
         std::string algorithm = argv[i];
         std::vector<algo>::const_iterator it = std::find_if(algos.begin(), algos.end(), [algorithm](const algo& a) {
@@ -114,7 +118,7 @@ int main(int argc, char const *argv[]) {
             std::vector<Point> result;
 
             timer.start();
-            result = it->func(points, numberOfCores, part_size);
+            result = it->func(points, numberOfCores, parts);
             timer.stop();
 
             std::cout << "\n\n=========Result=========\n"
