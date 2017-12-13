@@ -30,7 +30,7 @@ void Quickhull::run(const std::vector<Point>& input, std::vector<int>& hull_idxs
                  point_min_x);
 }
 
-std::vector<Point> Quickhull::runAndReturnPoints(const std::vector<Point>& points, int parallel_idx, size_t parts) {
+std::vector<Point> Quickhull::runAndReturnPoints(const std::vector<Point>& points, int /*parallel_idx*/, size_t /*parts*/) {
     std::vector<int> result;
 
     Quickhull::run(points, result);
