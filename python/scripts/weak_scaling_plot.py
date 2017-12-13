@@ -8,6 +8,8 @@ from python.libs.postprocessing import plot_utils
 
 filename = sys.argv[1] # Containing the output of a grid_run_exe_weak_scaling run
 
+assume_correct = 'chan_normal' #'graham'
+
 def parse_result(s):
 	res = {}
 	entries = [re.split(': *', i) for i in s.split('\n')]
@@ -47,15 +49,15 @@ with open(filename, 'r') as infile:
 
 		per_size = per_algo_per_size[algo]
 		for size in per_size:
-			hull_size = per_algo_per_size['graham'][size]['size']
+			hull_size = per_algo_per_size[assume_correct][size]['size']
 			if per_size[size]['size'] != hull_size:
-				print(algo + " has different output size from graham at size " + size)
+				print(algo + " has different output size from "+assume_correct+" at size " + size)
 				print(per_size[size]['size'], hull_size)
 			else:
 				per_size_correct[size] = per_size[size]
 				per_size_correct[size]['mean_run_time'] = np.mean(per_size[size]['run_times'])
 
-	input_size_per_core = sorted(per_algo_per_size_correct['graham'])[0]
+	input_size_per_core = sorted(per_algo_per_size_correct[assume_correct])[0]
 
 	fig, ax = plot_utils.setup_figure_1ax(size=(13, 9), x_label='# cores\nInput size (scaled with #cores): '+input_size_per_core, y_label="Run time") # scale
 
