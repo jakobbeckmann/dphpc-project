@@ -34,7 +34,7 @@ struct algo {
 };
 
 // TODO add that to the class, instead of having it here.
-static std::vector<Point> plain_quickhull(const std::vector<Point>& points, int parallel_idx, size_t parts)
+static std::vector<Point> plain_quickhull(const std::vector<Point>& points, int /*parallel_idx*/, size_t /*parts*/)
 {
     std::vector<Point> result;
     std::vector<int> result_idxs;

@@ -10,23 +10,24 @@ std::vector<Point> JarvisAlgorithm::run(const std::vector<Point>& constPoints, i
     }
 
     std::vector<Point> points = constPoints;
-    int bottomLeftPointIdx = findLowestLeftmostPointIndex(points);
+    size_t bottomLeftPointIdx = findLowestLeftmostPointIndex(points);
 
     Point curr_point;
     std::vector<Point> hull;
-    int curr_idx = bottomLeftPointIdx, next_idx;
+    size_t curr_idx = bottomLeftPointIdx, next_idx;
 
     do {
         curr_point = points[curr_idx];
         hull.push_back(curr_point);
         next_idx = (curr_idx + 1) % points.size();
 
-        for (int idx = 0; idx < points.size(); idx++) {
+        for (size_t idx = 0; idx < points.size(); idx++) {
             if (idx != curr_idx && idx != next_idx) {
                 int linearity = getOrientation(points[curr_idx], points[idx], points[next_idx]);
                 if (linearity == CLOCKWISE || (linearity == COLLINEAR && getDistance(points[curr_idx], points[idx]) <
                                                                          getDistance(points[curr_idx], points[next_idx]))) {
                     next_idx = idx;
+
                 }
             }
         }
