@@ -34,6 +34,19 @@ int getOrientation(const Point& p1, const Point& p2, const Point& p3) {
 }
 
 /**
+ * 2d version of the cross product of OA and OB vectors. Returns a positive value if OAB makes
+ * a counter-clockwise turn, negative for clockwise turn, and zero if the poitns are collinear.
+ * @method cross
+ * @param  O          First point
+ * @param  A          Second point
+ * @param  B          Third point
+ * @return            Cross product of the vectors
+ */
+double cross(const Point& O, const Point& A, const Point& B) {
+    return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
+}
+
+/**
     Returns square of the distance between two 2D points.
     @param point1: first point.
     @param point2: second point.

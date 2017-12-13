@@ -27,6 +27,7 @@
 #include "Quickhull_Jarvis.hpp"
 #include "Quickhull_Graham.hpp"
 #include "Quickhull_Quickhull.hpp"
+#include "wiki_monotone_chain.hpp"
 
 struct algo {
     std::string name;
@@ -61,7 +62,8 @@ static const std::vector<algo> algos = {
     { "quickhull_jarvis", Quickhull_Jarvis::run },
     { "quickhull_graham", Quickhull_Graham::run },
     { "quickhull_quickhull", Quickhull_Quickhull::run },
-    { "quickhull", plain_quickhull }
+    { "quickhull", plain_quickhull },
+    { "wiki_monotone_chain", MonotoneChain::run }
 };
 
 int main(int argc, char const *argv[]) {

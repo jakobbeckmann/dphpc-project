@@ -7,6 +7,7 @@
 #include "Point.h"
 
 int getOrientation(const Point& p1, const Point& p2, const Point& p3);
+double cross(const Point& O, const Point& A, const Point& B);
 double getDistance(const Point& p1, const Point& p2);
 size_t findLowestLeftmostPointIndex(const std::vector<Point>& points);
 std::pair<int, int> findLowestPoint(const std::vector<std::vector<Point>>& hulls);

@@ -35,6 +35,9 @@ public:
         output << "(" << point.x << ", " << point.y << ")";
         return output;
     }
+    bool operator< (const Point& p) const {
+        return x < p.x || (x == p.x && y < p.y);
+    }
 
     void print() const {
         std::cout << x << " " << y << "\n";
