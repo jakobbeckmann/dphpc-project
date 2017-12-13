@@ -7,12 +7,13 @@ from python.libs.postprocessing.Benchmark import Benchmark
 
 # ------------ PARAMETER SECTION ----------- #
 
-run_name                   = 'test_1128_18231'
+run_name                   = 'test_1213_223835'
 chose_latest_output_folder = True            # Overwrites run_name with latest run in the Output folder
 save_all_data_dict         = True
 
-do_runtime_plot            = True
+do_runtime_plot            = False
 do_speedup_plot            = False
+do_shape_plot              = True
 
 # ------------------------------------------ #
 
@@ -33,5 +34,7 @@ if do_runtime_plot:
     post_processor.plot_runtimes_comparison(save=False, show=True, file_name='run_time_vs_input_all_algos')
 if do_speedup_plot:
     post_processor.plot_speedup_vs_cores(save=False, show=True, file_name='speedup_vs_ncores_all_algos')
+if do_shape_plot:
+    post_processor.plot_shape_comparison(save=False, show=True, file_name='shape_comparison')
 # ------------------------------------------ #
 

@@ -29,9 +29,9 @@ class Benchmark:
                 or len(self.run_config['run_params']['img_files']) > 1:
             raise NotImplementedError("You can't do that. Only multiple input sizes and multiple algos.")
 
-        fig, ax = self.setup_figure_1ax(size=(13, 9),
-                                        x_label='Input size [number of points]',
-                                        y_label='Run time [s]')
+        fig, ax = plot_utils.setup_figure_1ax(size=(13, 9),
+                                              x_label='Input size [number of points]',
+                                              y_label='Run time [s]')
 
         # set up empty data container
         algo_runtimes = {algorithm: {'input_sizes': [], 'run_times': []}
@@ -67,8 +67,8 @@ class Benchmark:
             raise NotImplementedError("You can't do that. Only multiple numbers of cores and multiple algos.")
 
         fig, ax = plot_utils.setup_figure_1ax(size=(13, 9),
-                                        x_label='# cores',
-                                        y_label='Speedup')
+                                              x_label='# cores',
+                                              y_label='Speedup')
 
         # set up empty data container holding n cores, run times, speedup of max n cores
         algo_t_core = {algorithm: {'n_cores': [], 'run_times': [], 'time_1core': 0.0, 'last_speedup': 0.0}
@@ -99,6 +99,67 @@ class Benchmark:
 
         order = np.argsort(last_speedups)[::-1]
         plot_utils.ordered_legend(ax, order)
+        self.evaluate_save_show(save, show, file_name)
+
+    def plot_shape_comparison(self, save=False, show=False, file_name=None):
+        """
+        Plots the absolute runtime vs input size for all algorithms in the run.
+
+        For now, the runtimes are the mean over all iterations for a run configuration.
+        """
+
+        if len(self.run_config['run_params']['n_cores']) > 1 or len(self.run_config['run_params']['sub_size']) > 1 \
+                or len(self.run_config['run_params']['n_points']) > 1:
+            raise NotImplementedError("You can't do that. Only multiple input images and multiple algos allowed.")
+
+        fig, ax = plot_utils.setup_figure_1ax(size=(13, 9),
+                                              y_label='Run time [s]')
+
+        # set up empty data container
+        algo_runtimes = {algorithm: {'input_imgs': [], 'run_times': []}
+                         for algorithm in self.run_config['run_params']['algorithms']}
+
+        for key, data in self.all_data_dict.iteritems():
+            algo_runtimes[data['algorithm']]['input_imgs'].append(data['img'])
+            algo_runtimes[data['algorithm']]['run_times'].append(data['mean_run_tim'])
+
+        img_names = self.run_config['run_params']['img_files']
+        img_names = [img_name.split('.')[0] for img_name in img_names]
+        n_images = len(img_names)
+        ind_pos = np.arange(n_images)
+
+        width = 0.2
+        offset = {}
+        algo_idx = 0
+
+        for algorithm in algo_runtimes.keys():
+            offset[algorithm] = algo_idx * width
+            algo_idx += 1
+
+        # sort wrt to JARVIS algorithm
+        sort_indices = np.argsort(np.array(algo_runtimes['jarvis']['run_times']))
+
+        for algorithm, algo_data in algo_runtimes.iteritems():
+            run_times = [algo_data['run_times'][i] for i in sort_indices]
+            img_names = [algo_data['input_imgs'][i] for i in sort_indices]
+
+            print ''
+            print '{:10} {}'.format('--- algo: ', algorithm)
+            print '{:10} {}'.format('images: ', img_names)
+            print '{:10} {}'.format('times: ', [round(t, 3) for t in run_times])
+
+            ax.bar(ind_pos + offset[algorithm], run_times, width, label=algorithm, alpha=0.7)
+            # ax.plot(input_imgs, run_times, 'o', linewidth=3, label=algorithm, alpha=0.5)
+            # ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.3, color='black', markeredgecolor='none')
+
+        ax.xaxis.set_ticks_position('none')
+        ax.set_xticks(np.arange(len(img_names)))
+        ax.set_xticklabels(img_names, rotation=45, ha="right")
+        ax.set_title("Input size: {n_points} points".format(n_points=self.run_config['run_params']['n_points'][0]))
+        plt.xticks(ha='left')
+
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)
+
         self.evaluate_save_show(save, show, file_name)
 
     def evaluate_save_show(self, save, show, file_name):
