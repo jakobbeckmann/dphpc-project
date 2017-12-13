@@ -3,6 +3,7 @@
 //
 
 #include "GrahamScanAlgorithm.h"
+#include "FileWriter.h"
 
 /**
     Retruns list of points belonging to a convex hull after running Graham Scan algorithm.

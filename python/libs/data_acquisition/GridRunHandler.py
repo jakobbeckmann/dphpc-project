@@ -58,18 +58,24 @@ class GridRunHandler:
         with open(join_paths(self.output_dir_path, self.run_name + '_config.json'), 'w') as outfile:
             outfile.write('{}\n'.format(json.dumps(run_config, outfile, indent=4)))
 
-    def create_input_files(self):
+    def create_input_files(self, weak_scaling=False):
         input_dir_path = join_paths(self.output_dir_path, 'input_data')
         os.mkdir(input_dir_path)
 
-        for n_points in self.run_params['n_points']:
+        for n_points_ in self.run_params['n_points']:
             for img_file in self.run_params['img_files']:
-                print('\nCreating points for {np} points using {img}.'.format(np=n_points, img=img_file))
-                point_file_name = self.create_input_filename(n_points, img_file, 'dat')
-                point_creator = ImagePointsCreator(n_points, img_file, point_file_name, input_dir_path)
-                point_creator.create_points_pipeline(save_png=run_config['save_png_input'], clusters=self.run_params['clusters'])
-                shutil.copy(join_paths(project_path, 'Input', img_file),
-                            join_paths(input_dir_path))
+                for scale in (self.run_params['n_cores'] if weak_scaling else [1]):
+                    if weak_scaling:
+                        n_points = n_points_*scale
+                    else:
+                        n_points = n_points_
+
+                    print('\nCreating points for {np} points using {img}.'.format(np=n_points, img=img_file))
+                    point_file_name = self.create_input_filename(n_points, img_file, 'dat')
+                    point_creator = ImagePointsCreator(n_points, img_file, point_file_name, input_dir_path)
+                    point_creator.create_points_pipeline(save_png=run_config['save_png_input'], clusters=self.run_params['clusters'])
+                    shutil.copy(join_paths(project_path, 'Input', img_file),
+                                join_paths(input_dir_path))
 
     def run_algorithms(self, n_cores, n_points, input_dat, input_png, algorithms, sub_size, n_iterations, dir_index,
                       sub_dir, img):
@@ -115,15 +121,19 @@ class GridRunHandler:
                                   input_img_path=join_paths(self.output_dir_path, 'input_data', img))
             plotter.plot_input_and_hull_points(save=True, show=False, plot_img=True)
 
-    def main_grid_loop(self):
+    def main_grid_loop(self, weak_scaling=False):
         """Main function looping over all possible parameter configurations executing the algorithms."""
         dir_index = 0
-        for n_points in self.run_params['n_points']:
+        for n_points_ in self.run_params['n_points']:
             for img_file in self.run_params['img_files']:
-
-                input_file = self.create_input_filename(n_points, img_file, 'dat')
-
                 for n_cores in self.run_params['n_cores']:
+                    if weak_scaling:
+                        n_points = n_points_ * n_cores
+                    else:
+                        n_points = n_points_
+
+                    input_file = self.create_input_filename(n_points, img_file, 'dat')
+
                     sub_sizes = [n_points//n_cores]
                     if self.run_params['use_sub_sizes']:
                         sub_sizes = self.run_params['sub_size']
