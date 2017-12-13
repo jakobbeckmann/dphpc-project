@@ -6,9 +6,9 @@
 
 std::vector<Point> Quickhull_Quickhull::run(const std::vector<Point>& points, int parallel_idx, size_t parts) {
     std::vector<std::vector<Point> > hulls;
-    hulls.resize(parallel_idx);
+    hulls.resize(parts);
 
-    omp_set_num_threads(parts);
+    omp_set_num_threads(parallel_idx);
 
     #pragma omp parallel for
     for (size_t i = 0; i < parts; ++i) {
