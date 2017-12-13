@@ -90,7 +90,7 @@ int main(int argc, char const *argv[]) {
     std::string inputFile   = argv[3];
     size_t numPoints        = (size_t)atoi(argv[4]);
     int n_iterations        = atoi(argv[5]);
-
+    std::string algorithm   = argv[6];
 
     file_read_timer.start();
     std::vector<Point> points = readPointsFromFile(inputFile, numPoints);
@@ -100,51 +100,50 @@ int main(int argc, char const *argv[]) {
     if (!parts)
         parts = 1;
 
-    for (int i = 6; i < argc; ++i) {
-        std::string algorithm = argv[i];
-        std::vector<algo>::const_iterator it = std::find_if(algos.begin(), algos.end(), [algorithm](const algo& a) {
-            return algorithm == a.name;
-        });
+    auto it = std::find_if(algos.begin(), algos.end(), [algorithm](const algo& a) {
+        return algorithm == a.name;
+    });
 
-        if (it == algos.end()) {
-            std::cout << "No such algorithm! Given " << algorithm << "\n";
-            std::exit(EXIT_FAILURE);
-        }
-
-        for (int iterIdx = 0; iterIdx < n_iterations; ++iterIdx) {
-            Timer timer;
-            Timer file_write_timer;
-            Timer total_timer;
-
-            total_timer.start();
-
-            std::vector<Point> result;
-
-            timer.start();
-            result = it->func(points, numberOfCores, parts);
-            timer.stop();
-
-            std::cout << "\n\n=========Result=========\n"
-                      << "Algorithm:     " << algorithm << "\n"
-                      << "Input size:    " << points.size() << "\n"
-                      << "N hull points: " << result.size() << "\n"
-                      << "Iteration:     " << iterIdx << "\n"
-                      << "Time used:     " << timer.get_timing() << "\n";
-
-            file_write_timer.start();
-            std::stringstream fileName;
-            fileName << "hull_points_" << iterIdx << ".dat";
-            FileWriter::writePointsToFile(result, fileName.str(), true);
-
-            timer.write_to_file(algorithm, iterIdx);
-            file_write_timer.stop();
-            std::cout << "Write time:    " << file_write_timer.get_timing() << "\n"
-                      << "Read time:     " << file_read_timer.get_timing() << "\n";
-
-            total_timer.stop();
-            std::cout << "Total time:    " << total_timer.get_timing() << "\n\n";
-        }
+    if (it == algos.end()) {
+        std::cout << "No such algorithm! Given " << algorithm << "\n";
+        std::exit(EXIT_FAILURE);
     }
+
+
+    for (int iterIdx = 0; iterIdx < n_iterations; ++iterIdx) {
+        Timer timer;
+        Timer file_write_timer;
+        Timer total_timer;
+
+        total_timer.start();
+
+        std::vector<Point> result;
+
+        timer.start();
+        result = it->func(points, numberOfCores, parts);
+        timer.stop();
+
+        std::cout << "\n\n=========Result=========\n"
+                  << "Algorithm:     " << algorithm << "\n"
+                  << "Input size:    " << points.size() << "\n"
+                  << "N hull points: " << result.size() << "\n"
+                  << "Iteration:     " << iterIdx << "\n"
+                  << "Time used:     " << timer.get_timing() << "\n";
+
+        file_write_timer.start();
+        std::stringstream fileName;
+        fileName << "hull_points_" << iterIdx << ".dat";
+        FileWriter::writePointsToFile(result, fileName.str(), true);
+
+        timer.write_to_file(algorithm, iterIdx);
+        file_write_timer.stop();
+        std::cout << "Write time:    " << file_write_timer.get_timing() << "\n"
+                  << "Read time:     " << file_read_timer.get_timing() << "\n";
+
+        total_timer.stop();
+        std::cout << "Total time:    " << total_timer.get_timing() << "\n\n";
+    }
+
 
     return 0;
 }

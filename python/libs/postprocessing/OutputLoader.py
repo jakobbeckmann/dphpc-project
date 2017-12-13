@@ -68,9 +68,10 @@ class OutputLoader:
         sub_indices = self.sub_run_params.keys()
 
         for sub_idx in sub_indices:
-            times = np.loadtxt(join_paths(self.output_dir_path, 'sub_{}'.format(sub_idx), 'timing.txt'))
+            algorithm = self.sub_run_params[sub_idx]['algorithm']
+            times = np.loadtxt(join_paths(self.output_dir_path, 'sub_{}'.format(sub_idx), 'timing_{}.txt'.format(algorithm)))
             self.all_data_dict[sub_idx]['run_times'] = list(times[:, 1])
-            self.all_data_dict[sub_idx]['mean_run_tim'] = np.mean(times[:, 1])
+            self.all_data_dict[sub_idx]['mean_run_tim'] = np.median(times[:, 1])
 
         if save_all_data:
             with open(join_paths(self.output_dir_path, 'all_data.json'), 'w') as outfile:

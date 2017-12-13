@@ -77,24 +77,22 @@ class GridRunHandler:
                     shutil.copy(join_paths(project_path, 'Input', img_file),
                                 join_paths(input_dir_path))
 
-    def run_algorithms(self, n_cores, n_points, input_dat, input_png, algorithms, sub_size, n_iterations, dir_index,
-                      sub_dir, img):
+    def run_algorithms(self, n_cores, n_points, input_dat, input_png, algorithm, sub_size, n_iterations, img, sub_dir,
+                       sub_dir_idx):
         """
         Function executing subprocess calls to .cpp executable forwarding parameter as
         command line inputs.
         """
 
-        for algorithm in algorithms:
-            # step1: store run parameters of sub run in sub run folder
-            sub_params = {'n_points': n_points, 'n_cores': n_cores, 'input_dat': input_dat, 'input_png': input_png,
-                          'algorithm': algorithm, 'sub_size': sub_size, 'n_iterations': n_iterations,
-                          'img': img, 'dir_idx': dir_index}
+        # step1: store run parameters of sub run in sub run folder
+        sub_params = {'n_points': n_points, 'n_cores': n_cores, 'input_dat': input_dat, 'input_png': input_png,
+                      'algorithm': algorithm, 'sub_size': sub_size, 'n_iterations': n_iterations,
+                      'img': img, 'dir_idx': sub_dir_idx}
 
-            self.print_dict(sub_params)
+        self.print_dict(sub_params)
 
-            with open(join_paths(sub_dir, 'params.json'), 'w') as outfile:
-                json.dump(sub_params, outfile, indent=4, sort_keys=True)
-            dir_index += 1
+        with open(join_paths(sub_dir, 'params.json'), 'w') as outfile:
+            json.dump(sub_params, outfile, indent=4, sort_keys=True)
 
         # step2: run the algorithms specified by parameter grid inside of this folder
         exe_file = glob(join_paths(project_path, self.exe_dir_name, 'dphpc_project*'))
@@ -102,7 +100,7 @@ class GridRunHandler:
 
         input_file_path = join_paths(self.output_dir_path, 'input_data', input_dat)
 
-        call_command = [exe_file[0], str(n_cores), str(sub_size), input_file_path, str(n_points), str(n_iterations), ' '.join(algorithms)]
+        call_command = [exe_file[0], str(n_cores), str(sub_size), input_file_path, str(n_points), str(n_iterations), algorithm]
         call_command_str = ' '.join(call_command)
 
         subprocess.check_call(call_command_str, shell=True, cwd=sub_dir)
@@ -140,23 +138,24 @@ class GridRunHandler:
                         sub_sizes = self.run_params['sub_size']
 
                     for sub_size in sub_sizes:
+                        for algorithm in self.run_params['algorithms']:
 
-                        sub_dir = join_paths(self.output_dir_path, 'sub_' + str(dir_index))
-                        os.mkdir(sub_dir)
+                            sub_dir = join_paths(self.output_dir_path, 'sub_' + str(dir_index))
+                            os.mkdir(sub_dir)
 
-                        n_iterations = self.run_params['n_iterations']
+                            n_iterations = self.run_params['n_iterations']
 
-                        self.run_algorithms(n_cores=n_cores,
-                                            n_points=n_points,
-                                            input_dat=input_file,
-                                            input_png=input_file.split('.')[0] + '.png',
-                                            img=img_file,
-                                            algorithms=self.run_params['algorithms'],
-                                            sub_size=sub_size,
-                                            n_iterations=n_iterations,
-                                            dir_index=dir_index,
-                                            sub_dir=sub_dir)
-                        dir_index += 1
+                            self.run_algorithms(n_cores=n_cores,
+                                                n_points=n_points,
+                                                input_dat=input_file,
+                                                input_png=input_file.split('.')[0] + '.png',
+                                                img=img_file,
+                                                algorithm=algorithm,
+                                                sub_size=sub_size,
+                                                n_iterations=n_iterations,
+                                                sub_dir=sub_dir,
+                                                sub_dir_idx=dir_index)
+                            dir_index += 1
 
         self.store_all_sub_json_params()
 
