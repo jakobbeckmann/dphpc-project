@@ -59,11 +59,10 @@ with open(filename, 'r') as infile:
 
 	input_size_per_core = sorted(per_algo_per_size_correct[assume_correct])[0]
 
-	fig, ax = plot_utils.setup_figure_1ax(size=(13, 9), x_label='# cores\nInput size (scaled with #cores): '+input_size_per_core, y_label="Run time") # scale
+	fig, ax = plot_utils.setup_figure_1ax(size=(13, 9), x_label='# cores\nInput size (scaled with #cores): '+input_size_per_core, y_label="Efficiency") # scale
 
 	# Only show integer number of cores
 	ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-
 
 	order = []
 	for algo in sorted(per_algo_per_size_correct):
@@ -73,8 +72,9 @@ with open(filename, 'r') as infile:
 		# Or just show input_sizes/input_sizes[0], which is the number of cores used
 		# and show the input size per core somewhere else
 		input_sizes = [int(i)/int(input_size_per_core) for i in sorted(per_algo_per_size_correct[algo])]
-		mean_run_times = [per_algo_per_size_correct[algo][size]['mean_run_time'] for size in sorted(per_algo_per_size_correct[algo])]
-		order.append(per_algo_per_size_correct[algo][sorted(per_algo_per_size_correct[algo])[-1]])
+		first = sorted(per_algo_per_size_correct[algo])[0]
+		mean_run_times = [per_algo_per_size_correct[algo][first]['mean_run_time']/per_algo_per_size_correct[algo][size]['mean_run_time'] for size in sorted(per_algo_per_size_correct[algo])]
+		order.append(per_algo_per_size_correct[algo][first]['mean_run_time']/per_algo_per_size_correct[algo][sorted(per_algo_per_size_correct[algo])[-1]]['mean_run_time'])
 
 		ax.plot(input_sizes, mean_run_times, linewidth=3, label=algo)
 		ax.plot(input_sizes, mean_run_times, 'o', linewidth=3, color='black', markeredgecolor='none')
@@ -84,6 +84,8 @@ with open(filename, 'r') as infile:
 
 	order = np.argsort(order)[::-1]
 	plot_utils.ordered_legend(ax, order)
+
+	plt.gca().set_ylim([0, 1])
 
 	plt.show()
 	
