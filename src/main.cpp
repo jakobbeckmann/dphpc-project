@@ -71,7 +71,7 @@ int main(int argc, char const *argv[]) {
         std::cout << "Running in DEBUG mode - writing ALL output files.\n";
     #endif
 
-    if (argc < 6) {
+    if (argc < 7) {
         std::cout << "Usage: " << " n_cores part_size input_file num_points n_iterations algorithm+\n"
                      "  algorithm := ";
         for (const algo& a : algos) {
