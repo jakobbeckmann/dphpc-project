@@ -137,9 +137,9 @@ std::pair<int, int> findLowestPoint(const std::vector<std::vector<Point>>& hulls
 std::vector<Point> SplitVector(const std::vector<Point>& vec, size_t i, size_t n)
 {
     size_t length = vec.size() / n;
-    size_t remain = vec.size() % n;
 
 #if WRITE_DEBUG
+    size_t remain = vec.size() % n;
     if (i == 0)
         std::cout << "sub vectors contain " << length << " elements with remainder " << remain << std::endl;
 #endif
@@ -162,7 +162,7 @@ std::vector<Point> MergeVectors(std::vector<std::vector<Point>>&& hulls)
     for (const std::vector<Point>& hull : hulls)
         sum_sizes += hull.size();
 
-    hull_points.resize(sum_sizes);
+    hull_points.reserve(sum_sizes);
 
     for (std::vector<Point>& hull : hulls)
         std::move(hull.begin(), hull.end(), std::back_inserter(hull_points));

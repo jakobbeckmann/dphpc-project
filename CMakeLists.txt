@@ -13,12 +13,11 @@ if(APPLE)
     set(CMAKE_CXX_COMPILER g++-7)
 endif()
 
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g")
+endif()
+
 if(WINDOWS)
-    if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g")
-    endif()
-
-
     message(STATUS "Checking OpenMP")
     find_package(OpenMP)
     IF(OPENMP_FOUND)
