@@ -26,8 +26,11 @@ public:
         return std::chrono::duration_cast<std::chrono::microseconds>(stop_time-start_time).count() * 1.0e-6;
     }
 
-    void write_to_file(int iterIdx) const {
-        std::ofstream file(TIMING_FILE, std::ios_base::app);
+    void write_to_file(const std::string algo, int iterIdx) const {
+        std::stringstream s;
+        s << "timing_" << algo << ".txt";
+
+        std::ofstream file(s.str(), std::ios_base::app);
         file << iterIdx << ' ' << get_timing() << "\n";
         file.close();
     }

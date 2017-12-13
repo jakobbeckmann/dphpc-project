@@ -94,6 +94,7 @@ class GridRunHandler:
 
             with open(join_paths(sub_dir, 'params.json'), 'w') as outfile:
                 json.dump(sub_params, outfile, indent=4, sort_keys=True)
+            dir_index += 1
 
         # step2: run the algorithms specified by parameter grid inside of this folder
         exe_file = glob(join_paths(project_path, self.exe_dir_name, 'dphpc_project*'))

@@ -136,7 +136,7 @@ int main(int argc, char const *argv[]) {
             fileName << "hull_points_" << iterIdx << ".dat";
             FileWriter::writePointsToFile(result, fileName.str(), true);
 
-            timer.write_to_file(iterIdx);
+            timer.write_to_file(algorithm, iterIdx);
             file_write_timer.stop();
             std::cout << "Write time:    " << file_write_timer.get_timing() << "\n"
                       << "Read time:     " << file_read_timer.get_timing() << "\n";
