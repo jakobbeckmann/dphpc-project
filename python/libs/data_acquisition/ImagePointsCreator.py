@@ -7,6 +7,7 @@ in the project directory.
 import cv2
 import numpy as np
 import os
+import sys
 import random
 import matplotlib
 matplotlib.use('agg')
@@ -64,6 +65,9 @@ class ImagePointsCreator:
                 y_noise = random.uniform(-1, 1)
                 points.append([x + x_noise, (self.image_shape['y'] - y) + y_noise])
                 sampled_points += 1
+                if sampled_points % 10000 == 0:
+                    print("Currently sampled "+str(sampled_points)+" points")
+                    sys.stdout.flush()
 
         if groups > 1:
             assert len(points) > groups
