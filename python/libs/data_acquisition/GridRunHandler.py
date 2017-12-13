@@ -101,7 +101,7 @@ class GridRunHandler:
 
         input_file_path = join_paths(self.output_dir_path, 'input_data', input_dat)
 
-        call_command = [exe_file[0], str(n_cores), str(sub_size), input_file_path, str(n_iterations), ' '.join(algorithms)]
+        call_command = [exe_file[0], str(n_cores), str(sub_size), input_file_path, str(n_points), str(n_iterations), ' '.join(algorithms)]
         call_command_str = ' '.join(call_command)
 
         subprocess.check_call(call_command_str, shell=True, cwd=sub_dir)

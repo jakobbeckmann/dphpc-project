@@ -70,7 +70,7 @@ int main(int argc, char const *argv[]) {
     #endif
 
     if (argc < 6) {
-        std::cout << "Usage: " << " n_cores part_size input_file n_iterations algorithm+\n"
+        std::cout << "Usage: " << " n_cores part_size input_file num_points n_iterations algorithm+\n"
                      "  algorithm := ";
         for (const algo& a : algos) {
             std::cout << a.name << " | ";
@@ -86,18 +86,19 @@ int main(int argc, char const *argv[]) {
     auto part_size          = size_t(atoi(argv[2]));
     auto numberOfCores      = (size_t)n_cores;
     std::string inputFile   = argv[3];
-    int n_iterations        = atoi(argv[4]);
+    size_t numPoints        = (size_t)atoi(argv[4]);
+    int n_iterations        = atoi(argv[5]);
 
 
     file_read_timer.start();
-    std::vector<Point> points = readPointsFromFile(inputFile);
+    std::vector<Point> points = readPointsFromFile(inputFile, numPoints);
     file_read_timer.stop();
 
     size_t parts = points.size()/part_size;
     if (!parts)
         parts = 1;
 
-    for (int i = 5; i < argc; ++i) {
+    for (int i = 6; i < argc; ++i) {
         std::string algorithm = argv[i];
         std::vector<algo>::const_iterator it = std::find_if(algos.begin(), algos.end(), [algorithm](const algo& a) {
             return algorithm == a.name;

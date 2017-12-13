@@ -94,9 +94,10 @@ std::vector<Point> createPoints(int count, double min, double max) {
 
 }
 
-std::vector<Point> readPointsFromFile(const std::string& filePath)
+std::vector<Point> readPointsFromFile(const std::string& filePath, size_t numPoints)
 {
     std::vector<Point> points;
+	points.reserve(numPoints);
 
     std::ifstream source(filePath);
     std::string line;
