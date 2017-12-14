@@ -25,9 +25,9 @@ class Benchmark:
         For now, the runtimes are the median over all iterations for a run configuration.
         """
 
-        #if len(self.run_config['run_params']['n_cores']) > 1 or len(self.run_config['run_params']['sub_size']) > 1 \
-        #        or len(self.run_config['run_params']['img_files']) > 1:
-        #    raise NotImplementedError("You can't do that. Only multiple input sizes and multiple algos.")
+        if len(self.run_config['run_params']['n_cores']) > 1 or len(self.run_config['run_params']['sub_size']) > 1 \
+                or len(self.run_config['run_params']['img_files']) > 1:
+            raise NotImplementedError("You can't do that. Only multiple input sizes and multiple algos.")
 
         fig, ax = plot_utils.setup_figure_1ax(size=(13, 9),
                                               x_label='Input size [number of points]',
@@ -172,6 +172,26 @@ class Benchmark:
         plt.xticks(ha='left')
 
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)
+
+        self.evaluate_save_show(save, show, file_name)
+
+    def plot_time_distributions(self, save=False, show=False, file_name=None):
+        fig, ax = plot_utils.setup_figure_1ax(size=(13, 9),
+                                              x_label='Run time [s]',
+                                              y_label='Probability')
+
+        assert len(self.all_data_dict.keys()) == 1
+
+        run_times = self.all_data_dict['0']['run_times']
+        weights = np.ones_like(run_times)/float(len(run_times))
+        median = np.median(run_times)
+        q5 = np.percentile(run_times, 5)
+        q95 = np.percentile(run_times, 95)
+
+        ax.hist(run_times, bins=80, facecolor='cyan', alpha=0.75, weights=weights)
+        ax.plot([q5, q5], [0.001, 0.07], linewidth=3, color='blue', alpha=0.5)
+        ax.plot([median, median], [0.001, 0.06], linewidth=3, color='red', alpha=0.5)
+        ax.plot([q95, q95], [0.001, 0.05], linewidth=3, color='blue', alpha=0.5)
 
         self.evaluate_save_show(save, show, file_name)
 

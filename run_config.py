@@ -11,18 +11,14 @@ run_config = {
 
     'run_params':
         {
-            'n_cores':              [1, 2, 4, 6, 8],
-            'n_points':             [300000],
+            'n_cores':              [8],
+            'n_points':             [60000],
             'clusters':             4,
-            'img_files':            ['bird.jpg'],
-            'algorithms':           ['chan_normal', 'chan_merge_var', 'graham', 'jarvis',
-                                     'jarvis_jarvis', 'jarvis_graham',
-                                     'jarvis_quickhull', 'graham_jarvis', 'graham_graham',
-                                     'graham_quickhull', 'quickhull_binjarvis', 'quickhull_jarvis',
-                                     'quickhull_graham', 'quickhull'],
+            'img_files':            [u'square4.PNG'],
+            'algorithms':           ['chan_normal'],
             'sub_size':             [],
             'use_sub_sizes':        False,
-            'n_iterations':         2,
+            'n_iterations':         1000,
         },
 
     'post_process_params':
