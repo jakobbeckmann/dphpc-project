@@ -22,24 +22,25 @@ class Benchmark:
         """
         Plots the absolute runtime vs input size for all algorithms in the run.
 
-        For now, the runtimes are the mean over all iterations for a run configuration.
+        For now, the runtimes are the median over all iterations for a run configuration.
         """
 
-        if len(self.run_config['run_params']['n_cores']) > 1 or len(self.run_config['run_params']['sub_size']) > 1 \
-                or len(self.run_config['run_params']['img_files']) > 1:
-            raise NotImplementedError("You can't do that. Only multiple input sizes and multiple algos.")
+        #if len(self.run_config['run_params']['n_cores']) > 1 or len(self.run_config['run_params']['sub_size']) > 1 \
+        #        or len(self.run_config['run_params']['img_files']) > 1:
+        #    raise NotImplementedError("You can't do that. Only multiple input sizes and multiple algos.")
 
         fig, ax = plot_utils.setup_figure_1ax(size=(13, 9),
                                               x_label='Input size [number of points]',
                                               y_label='Run time [s]')
 
         # set up empty data container
-        algo_runtimes = {algorithm: {'input_sizes': [], 'run_times': []}
+        algo_runtimes = {algorithm: {'input_sizes': [], 'run_times': [], 'errors': []}
                          for algorithm in self.run_config['run_params']['algorithms']}
 
         for key, data in self.all_data_dict.iteritems():
             algo_runtimes[data['algorithm']]['input_sizes'].append(data['n_points'])
-            algo_runtimes[data['algorithm']]['run_times'].append(data['mean_run_tim'])
+            algo_runtimes[data['algorithm']]['run_times'].append(data['median_run_times'])
+            algo_runtimes[data['algorithm']]['errors'].append(data['errors'])
 
         last_runtimes = []
         for algorithm, algo_data in algo_runtimes.iteritems():
@@ -48,8 +49,12 @@ class Benchmark:
             input_sizes = [algo_data['input_sizes'][i] for i in sort_indices]
             run_times = [algo_data['run_times'][i] for i in sort_indices]
 
+            errors = [algo_data['errors'][i] for i in sort_indices]
+            errors = [[err[0] for err in errors], [err[1] for err in errors]]
+
             last_runtimes.append(run_times[-1])
             ax.plot(input_sizes, run_times, linewidth=3, label=algorithm, alpha=0.5)
+            ax.errorbar(input_sizes, run_times, yerr=errors, fmt='none', alpha=0.5, color='black', capsize=3)
             # ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.3, color='black', markeredgecolor='none')
 
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)
@@ -71,22 +76,26 @@ class Benchmark:
                                               y_label='Speedup')
 
         # set up empty data container holding n cores, run times, speedup of max n cores
-        algo_t_core = {algorithm: {'n_cores': [], 'run_times': [], 'time_1core': 0.0, 'last_speedup': 0.0}
+        algo_t_core = {algorithm: {'n_cores': [], 'run_times': [], 'time_1core': 0.0,
+                                   'last_speedup': 0.0, 'errors': []}
                        for algorithm in self.run_config['run_params']['algorithms']}
 
         # sorting wrt increasing n_cores
         for _, data in self.all_data_dict.iteritems():
             algo = data['algorithm']
             algo_t_core[algo]['n_cores'].append(data['n_cores'])
-            algo_t_core[algo]['run_times'].append(data['mean_run_tim'])
+            algo_t_core[algo]['run_times'].append(data['median_run_times'])
+            algo_t_core[algo]['errors'].append(data['errors'])
             if data['n_cores'] == 1:
-                algo_t_core[algo]['time_1core'] = data['mean_run_tim']
+                algo_t_core[algo]['time_1core'] = data['median_run_times']
 
         max_n_core = 1
         last_speedups = []
         for algorithm, algo_data in algo_t_core.iteritems():
             n_cores, run_times = plot_utils.sort_two_lists_wrt_first(algo_data['n_cores'], algo_data['run_times'])
             speedups = [algo_data['time_1core'] / run_times[n] for n in range(len(run_times))]
+            errors = algo_data['errors']
+            errors = [[err[0] for err in errors], [err[1] for err in errors]]
 
             if max(n_cores) > max_n_core:
                 max_n_core = max(n_cores)
@@ -94,6 +103,8 @@ class Benchmark:
 
             ax.plot(n_cores, speedups, linewidth=3, label=algorithm, alpha=0.5)
             ax.plot(n_cores, speedups, 'o', linewidth=3, alpha=0.3, color='black', markeredgecolor='none')
+            ax.errorbar(n_cores, speedups, yerr=errors, fmt='none', alpha=0.5, color='black', capsize=3)
+
             print algorithm
         ax.plot([1, max_n_core], [1.0, max_n_core], 'k--', linewidth=1, alpha=0.5, label='linear speedup')
 
@@ -105,7 +116,7 @@ class Benchmark:
         """
         Plots the absolute runtime vs input size for all algorithms in the run.
 
-        For now, the runtimes are the mean over all iterations for a run configuration.
+        For now, the runtimes are the median over all iterations for a run configuration.
         """
 
         if len(self.run_config['run_params']['n_cores']) > 1 or len(self.run_config['run_params']['sub_size']) > 1 \
@@ -116,12 +127,13 @@ class Benchmark:
                                               y_label='Run time [s]')
 
         # set up empty data container
-        algo_runtimes = {algorithm: {'input_imgs': [], 'run_times': []}
+        algo_runtimes = {algorithm: {'input_imgs': [], 'run_times': [], 'errors': []}
                          for algorithm in self.run_config['run_params']['algorithms']}
 
         for key, data in self.all_data_dict.iteritems():
             algo_runtimes[data['algorithm']]['input_imgs'].append(data['img'])
-            algo_runtimes[data['algorithm']]['run_times'].append(data['mean_run_tim'])
+            algo_runtimes[data['algorithm']]['run_times'].append(data['median_run_times'])
+            algo_runtimes[data['algorithm']]['errors'].append(data['errors'])
 
         img_names = self.run_config['run_params']['img_files']
         img_names = [img_name.split('.')[0] for img_name in img_names]
@@ -142,6 +154,8 @@ class Benchmark:
         for algorithm, algo_data in algo_runtimes.iteritems():
             run_times = [algo_data['run_times'][i] for i in sort_indices]
             img_names = [algo_data['input_imgs'][i] for i in sort_indices]
+            errors = [algo_data['errors'][i] for i in sort_indices]
+            errors = [[err[0] for err in errors], [err[1] for err in errors]]
 
             print ''
             print '{:10} {}'.format('--- algo: ', algorithm)
@@ -149,8 +163,7 @@ class Benchmark:
             print '{:10} {}'.format('times: ', [round(t, 3) for t in run_times])
 
             ax.bar(ind_pos + offset[algorithm], run_times, width, label=algorithm, alpha=0.7)
-            # ax.plot(input_imgs, run_times, 'o', linewidth=3, label=algorithm, alpha=0.5)
-            # ax.plot(input_sizes, run_times, 'o', linewidth=3, alpha=0.3, color='black', markeredgecolor='none')
+            ax.errorbar(ind_pos + offset[algorithm], run_times, yerr=errors, fmt='.', capsize=3, alpha=0.7)
 
         ax.xaxis.set_ticks_position('none')
         ax.set_xticks(np.arange(len(img_names)))

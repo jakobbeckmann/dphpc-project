@@ -12,8 +12,8 @@ chose_latest_output_folder = True            # Overwrites run_name with latest r
 save_all_data_dict         = True
 
 do_runtime_plot            = False
-do_speedup_plot            = False
-do_shape_plot              = True
+do_speedup_plot            = True
+do_shape_plot              = False
 
 # ------------------------------------------ #
 

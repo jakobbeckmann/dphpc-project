@@ -18,7 +18,7 @@ class OutputLoader:
         self.all_data_dict = {}
         self.run_config = self.parse_run_config()
         self.sub_run_params = self.parse_sub_run_params()
-        pass
+
     def parse_run_config(self):
         """Loads the json run_config file in the output folder into a dictionary."""
         config_file_name = self.output_dir_name + '_config.json'
@@ -70,8 +70,16 @@ class OutputLoader:
         for sub_idx in sub_indices:
             algorithm = self.sub_run_params[sub_idx]['algorithm']
             times = np.loadtxt(join_paths(self.output_dir_path, 'sub_{}'.format(sub_idx), 'timing_{}.txt'.format(algorithm)))
+
+            run_times = list(times[:, 1])
+            median = np.median(times[:, 1])
+            quantiles = {'q5': np.percentile(run_times, 5), 'q95': np.percentile(run_times, 95)}
+
+            errors = [abs(median - quantiles['q5']), abs(median - quantiles['q95'])]
+
+            self.all_data_dict[sub_idx]['median_run_times'] = median
             self.all_data_dict[sub_idx]['run_times'] = list(times[:, 1])
-            self.all_data_dict[sub_idx]['mean_run_tim'] = np.median(times[:, 1])
+            self.all_data_dict[sub_idx]['errors'] = errors
 
         if save_all_data:
             with open(join_paths(self.output_dir_path, 'all_data.json'), 'w') as outfile:
