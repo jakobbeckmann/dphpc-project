@@ -5,7 +5,7 @@
 #############################################################################
 
 run_config = {
-    'run_name':              'final_strong_scaling_xps15',
+    'run_name':              'test_final_strong_scaling_xps15',
     'exe_dir_name':          'cmake-build-debug',
     'save_png_input':        False,
 
@@ -16,7 +16,7 @@ run_config = {
             'clusters':             1,
             'img_files':            ['elephant.png'],
             'algorithms':           ['chan_normal', 'chan_merge_var', 'graham', 'jarvis',
-                                     'jarvis_jarvis', 'jarvis_graham',
+                                     'jarvis_jarvis', 'jarvis_graham', 'jarvis_binjarvis',
                                      'jarvis_quickhull', 'graham_jarvis', 'graham_graham',
                                      'graham_quickhull', 'quickhull_binjarvis', 'quickhull_jarvis',
                                      'quickhull_graham', 'quickhull', 'quickhull_quickhull'],
