@@ -7,14 +7,14 @@ from python.libs.postprocessing.Benchmark import Benchmark
 
 # ------------ PARAMETER SECTION ----------- #
 
-run_name                   = 'test_1213_223835'
+run_name                   = 'test_1214_085338'
 chose_latest_output_folder = True            # Overwrites run_name with latest run in the Output folder
 save_all_data_dict         = True
 
 do_runtime_plot            = False
-do_speedup_plot            = False
+do_speedup_plot            = True
 do_shape_plot              = False
-do_time_hist               = True
+do_time_hist               = False
 
 # ------------------------------------------ #
 

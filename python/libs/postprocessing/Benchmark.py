@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 from python.libs.paths import project_path
 import plot_utils
+import scipy.stats
 
 
 class Benchmark:
@@ -178,20 +179,35 @@ class Benchmark:
     def plot_time_distributions(self, save=False, show=False, file_name=None):
         fig, ax = plot_utils.setup_figure_1ax(size=(13, 9),
                                               x_label='Run time [s]',
-                                              y_label='Probability')
+                                              y_label='Density')
 
         assert len(self.all_data_dict.keys()) == 1
 
         run_times = self.all_data_dict['0']['run_times']
-        weights = np.ones_like(run_times)/float(len(run_times))
+
         median = np.median(run_times)
+
+        # confidence intervals assuming gaussian distribution
+        '''
+        n = len(run_times)
+        se = scipy.stats.sem(run_times)
+        confidence = 0.95
+        h = se * scipy.stats.t.ppf((1+confidence)/2., n-1)
+        ci_1 = median-h
+        ci_2 = median+1
+        ax.errorbar(median, max(n) / 2., xerr=np.array([[ci_1, ci_2]]).T, linewidth=1, color='black', alpha=0.5, capsize=3, fmt='o')
+        '''
+
+        # quantile lines
         q5 = np.percentile(run_times, 5)
         q95 = np.percentile(run_times, 95)
 
-        ax.hist(run_times, bins=80, facecolor='cyan', alpha=0.75, weights=weights)
-        ax.plot([q5, q5], [0.001, 0.07], linewidth=3, color='blue', alpha=0.5)
-        ax.plot([median, median], [0.001, 0.06], linewidth=3, color='red', alpha=0.5)
-        ax.plot([q95, q95], [0.001, 0.05], linewidth=3, color='blue', alpha=0.5)
+        weights = np.ones_like(run_times)/float(len(run_times))
+        n, bins, patches = ax.hist(run_times, bins=2000, facecolor='cyan', alpha=0.75, weights=weights)
+        ax.plot([q5, q5], [0.001, 0.15], linewidth=3, color='blue', alpha=0.5)
+        ax.plot([median, median], [0.001, 0.12], linewidth=3, color='red', alpha=0.5)
+        ax.plot([q95, q95], [0.001, 0.09], linewidth=3, color='blue', alpha=0.5)
+        # ax.set_xscale('log')
 
         self.evaluate_save_show(save, show, file_name)
 
