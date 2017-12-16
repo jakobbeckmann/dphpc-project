@@ -18,24 +18,26 @@ from python.libs.postprocessing.HullPlotter import HullPlotter
 
 
 class GridRunHandler:
-    def __init__(self, reproduce_run_name=None):  # TODO: Implement custom run_config location
+    def __init__(self, custom_config='run_config.py'):
         """
-        :param reproduce_run_name: In case you want to specify another config file (e.g. to re-run a whole run),
+        :param custom_config: In case you want to specify another config file (e.g. to re-run a whole run),
                                    give the name of the run, e.g. reproduce_run_name = 'test_1130_180553'
         """
         self.this_path = os.path.abspath(__file__)
         self.run_params = run_config['run_params']
         self.post_process_params = run_config['post_process_params']
         self.run_name = self.create_run_name()
-        self.run_config_file = self.set_run_config_file(reproduce_run_name)
+        self.run_config_file = self.set_run_config_file(custom_config)
         self.output_dir_path = self.setup_output_folder()
         self.store_run_config_json()
         self.input_files = {}
         self.exe_dir_name = run_config['exe_dir_name']
 
-    def set_run_config_file(self, reproduce_run_name):
-        if reproduce_run_name is not None:
-            raise NotImplementedError
+    def set_run_config_file(self, custom_config):
+        if custom_config is not 'run_config.py':
+            custom_config = join_paths(os.path.dirname(self.this_path), 'run_config.py')
+            if os.path.isfile(custom_config):
+                return join_paths(custom_config)
         else:
             return join_paths(os.path.dirname(self.this_path), 'run_config.py')
 
