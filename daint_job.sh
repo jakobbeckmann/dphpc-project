@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH -J time_vs_input_size_1_core
-#SBATCH --output=/scratch/snx3000/mathee/dphpc-output/time_vs_input_size_1_core_%j.out
+#SBATCH --output=Output/time_vs_input_size_1_core_%j.out
 #SBATCH -C mc
 
 # resources
@@ -13,4 +13,4 @@
 
 #SBATCH --account=d83
 
-python ./python/scripts/grid_run_exe.py ./Benchmark_configs/time_vs_input_size.py
+python ./python/scripts/grid_run_exe.py
