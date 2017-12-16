@@ -24,7 +24,7 @@ std::vector<Point> JarvisAlgorithm::run(const std::vector<Point>& constPoints, i
         for (size_t idx = 0; idx < points.size(); idx++) {
             if (idx != curr_idx && idx != next_idx) {
                 int linearity = getOrientation(points[curr_idx], points[idx], points[next_idx]);
-                if (linearity == CLOCKWISE || (linearity == COLLINEAR && getDistance(points[curr_idx], points[idx]) <
+                if (linearity == ANTICLOCKWISE || (linearity == COLLINEAR && getDistance(points[curr_idx], points[idx]) <
                                                                          getDistance(points[curr_idx], points[next_idx]))) {
                     next_idx = idx;
 
@@ -34,7 +34,7 @@ std::vector<Point> JarvisAlgorithm::run(const std::vector<Point>& constPoints, i
 
         curr_idx = next_idx;
 
-    } while (curr_idx != bottomLeftPointIdx);
+    } while (next_idx != bottomLeftPointIdx);
 
     return hull;
 }
