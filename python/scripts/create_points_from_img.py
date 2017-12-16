@@ -13,11 +13,11 @@ from python.libs.data_acquisition.ImagePointsCreator import ImagePointsCreator
 
 # ------------ PARAMETER SECTION ----------- #
 
-input_image         = 'bird.jpg'
+input_image         = 'elephant.png'
 output_file         = 'bird_points.dat'
-number_of_points    = 100000
+number_of_points    = 20000
 show_points         = True
-save_png            = True
+save_png            = False
 
 # ------------------------------------------ #
 

@@ -5,10 +5,12 @@ Simple helper functions for plot generation and storage.
 import os.path
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib
 
 
 def setup_figure_1ax(x_label='', y_label='', size=(13, 9), shrink_ax=True):
     """Returns a figure and ax with legend on the right hand side, no spines."""
+    matplotlib.rcParams.update({'font.size': 22})
     fig, ax = plt.subplots()
     fig.set_size_inches(size)
     ax.set_xlabel(x_label)

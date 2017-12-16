@@ -41,7 +41,7 @@ class ImagePointsCreator:
     @staticmethod
     def create_dark_shape_mask(image):
         lower = np.array([0, 0, 0])
-        upper = np.array([10, 10, 10])
+        upper = np.array([1, 1, 1])
 
         shape_mask = cv2.inRange(image, lower, upper)
         return shape_mask
