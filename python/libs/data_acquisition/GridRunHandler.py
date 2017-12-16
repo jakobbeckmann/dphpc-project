@@ -18,7 +18,7 @@ from python.libs.postprocessing.HullPlotter import HullPlotter
 
 
 class GridRunHandler:
-    def __init__(self, custom_config='run_config.py'):
+    def __init__(self, custom_config='run_config.py', custom_out_dir='Output'):
         """
         :param custom_config: In case you want to specify another config file (e.g. to re-run a whole run),
                                    give the name of the run, e.g. reproduce_run_name = 'test_1130_180553'
@@ -28,7 +28,7 @@ class GridRunHandler:
         self.post_process_params = run_config['post_process_params']
         self.run_name = self.create_run_name()
         self.run_config_file = self.set_run_config_file(custom_config)
-        self.output_dir_path = self.setup_output_folder()
+        self.output_dir_path = self.setup_output_folder(custom_out_dir)
         self.store_run_config_json()
         self.input_files = {}
         self.exe_dir_name = run_config['exe_dir_name']
@@ -41,12 +41,16 @@ class GridRunHandler:
         else:
             return join_paths(os.path.dirname(self.this_path), 'run_config.py')
 
-    def setup_output_folder(self):
+    def setup_output_folder(self, custom_out_dir):
         """
         Creates the output directory for the current run in the projects output folder.
         Copies the run_config.py file to the new location with adapted name.
         """
-        output_dir_path = join_paths(project_path, 'Output', self.run_name)
+        if custom_out_dir is not 'Output':
+            assert os.path.exists(os.path.dirname(custom_out_dir))
+            output_dir_path = join_paths(custom_out_dir, self.run_name)
+        else:
+            output_dir_path = join_paths(project_path, custom_out_dir, self.run_name)
 
         if not os.path.isdir(output_dir_path):
             os.mkdir(output_dir_path)
