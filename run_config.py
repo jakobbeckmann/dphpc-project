@@ -6,13 +6,13 @@
 
 run_config = {
     'run_name':              'test_final_strong_scaling_xps15',
-    'exe_dir_name':          'cmake-build-debug',
+    'exe_dir_name':          'exe',
     'save_png_input':        False,
 
     'run_params':
         {
             'n_cores':              [1, 2, 4, 6, 8],
-            'n_points':             [5000000],
+            'n_points':             [50000],
             'clusters':             1,
             'img_files':            ['elephant.png'],
             'algorithms':           ['chan_normal', 'chan_merge_var', 'graham', 'jarvis',

@@ -13,4 +13,4 @@
 
 #SBATCH --account=d83
 
-python ./python/scripts/grid_run_exe.py ./Benchmark_configs/time_vs_input_size.py
+python ./python/scripts/grid_run_exe.py -c ./Benchmark_configs/time_vs_input_size.py -o /scratch/snx3000/mathee/dphpc-output/
