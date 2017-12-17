@@ -4,7 +4,7 @@
 #                                                                           #
 #############################################################################
 
-run_config = {
+{
     'run_name':              'test_final_strong_scaling_xps15',
     'exe_dir_name':          'cmake-build-debug',
     'save_png_input':        False,

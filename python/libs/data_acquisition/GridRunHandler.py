@@ -11,7 +11,6 @@ from os.path import join as join_paths
 import numpy as np
 import shutil
 
-from run_config import run_config
 from python.libs.data_acquisition.ImagePointsCreator import ImagePointsCreator
 from python.libs.paths import project_path
 from python.libs.postprocessing.HullPlotter import HullPlotter
@@ -23,15 +22,16 @@ class GridRunHandler:
         :param custom_config: In case you want to specify another config file (e.g. to re-run a whole run),
                                    give the name of the run, e.g. reproduce_run_name = 'test_1130_180553'
         """
-        self.this_path = os.path.abspath(__file__)
-        self.run_params = run_config['run_params']
-        self.post_process_params = run_config['post_process_params']
-        self.run_name = self.create_run_name()
         self.run_config_file = self.set_run_config_file(custom_config)
         self.output_dir_path = self.setup_output_folder(custom_out_dir)
+        self.run_config = self.load_run_config()
+        self.this_path = os.path.abspath(__file__)
+        self.run_params = self.run_config['run_params']
+        self.post_process_params = self.run_config['post_process_params']
+        self.run_name = self.create_run_name()
         self.store_run_config_json()
         self.input_files = {}
-        self.exe_dir_name = run_config['exe_dir_name']
+        self.exe_dir_name = self.run_config['exe_dir_name']
 
     def set_run_config_file(self, custom_config):
         if custom_config is not 'run_config.py':
@@ -42,6 +42,11 @@ class GridRunHandler:
         else:
             print "Choosing config: {}".format(os.path.dirname(self.this_path), 'run_config.py')
             return join_paths(os.path.dirname(self.this_path), 'run_config.py')
+
+    def load_run_config(self):
+        with open(self.run_config_file, 'r') as config_file:
+            run_config = eval(config_file.read())
+        return run_config
 
     def setup_output_folder(self, custom_out_dir):
         """
@@ -64,7 +69,7 @@ class GridRunHandler:
 
     def store_run_config_json(self):
         with open(join_paths(self.output_dir_path, self.run_name + '_config.json'), 'w') as outfile:
-            outfile.write('{}\n'.format(json.dumps(run_config, outfile, indent=4)))
+            outfile.write('{}\n'.format(json.dumps(self.run_config, outfile, indent=4)))
 
     def create_input_files(self, weak_scaling=False):
         input_dir_path = join_paths(self.output_dir_path, 'input_data')
@@ -81,7 +86,7 @@ class GridRunHandler:
                     print('\nCreating points for {np} points using {img}.'.format(np=n_points, img=img_file))
                     point_file_name = self.create_input_filename(n_points, img_file, 'dat')
                     point_creator = ImagePointsCreator(n_points, img_file, point_file_name, input_dir_path)
-                    point_creator.create_points_pipeline(save_png=run_config['save_png_input'], clusters=self.run_params['clusters'])
+                    point_creator.create_points_pipeline(save_png=self.run_config['save_png_input'], clusters=self.run_params['clusters'])
                     shutil.copy(join_paths(project_path, 'Input', img_file),
                                 join_paths(input_dir_path))
 
@@ -183,11 +188,10 @@ class GridRunHandler:
         with open(join_paths(self.output_dir_path, self.run_name + '_all_params.json'), 'w') as outfile:
             json.dump(all_params, outfile, indent=4)
 
-    @staticmethod
-    def create_run_name():
+    def create_run_name(self):
         dt = datetime.datetime.now()
         dt_appendix = '{:02d}{:02d}_{:02d}{:02d}{:02d}'.format(dt.month, dt.day, dt.hour, dt.minute, dt.second)
-        return run_config['run_name'] + '_' + dt_appendix
+        return self.run_config['run_name'] + '_' + dt_appendix
 
     @staticmethod
     def create_input_filename(n_points, img_name, suffix):
