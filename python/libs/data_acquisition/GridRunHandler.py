@@ -35,7 +35,7 @@ class GridRunHandler:
 
     def set_run_config_file(self, custom_config):
         if custom_config is not 'run_config.py':
-            custom_config = join_paths(os.path.dirname(self.this_path), 'run_config.py')
+            custom_config = join_paths(os.path.dirname(self.this_path), custom_config)
             if os.path.isfile(custom_config):
                 print "Choosing config: {}".format(custom_config)
                 return join_paths(custom_config)
