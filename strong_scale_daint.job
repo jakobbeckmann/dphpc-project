@@ -13,4 +13,4 @@
 
 #SBATCH --account=d83
 
-python ./python/scripts/grid_run_exe.py -c Benchmark_configs/strong_scaling.py -o /scratch/snx3000/mathee/dphpc-output/
+python ./python/scripts/grid_run_exe.py -c Benchmark_configs/strong_scaling_daint.py -o /scratch/snx3000/mathee/dphpc-output/

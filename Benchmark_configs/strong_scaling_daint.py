@@ -4,7 +4,7 @@
 #                                                                           #
 #############################################################################
 
-run_config = {
+{
     'run_name':              'final_strong_scaling_daint',
     'exe_dir_name':          'exe',
     'save_png_input':        False,

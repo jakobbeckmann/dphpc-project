@@ -22,25 +22,29 @@ class GridRunHandler:
         :param custom_config: In case you want to specify another config file (e.g. to re-run a whole run),
                                    give the name of the run, e.g. reproduce_run_name = 'test_1130_180553'
         """
-        self.run_config_file = self.set_run_config_file(custom_config)
-        self.output_dir_path = self.setup_output_folder(custom_out_dir)
-        self.run_config = self.load_run_config()
         self.this_path = os.path.abspath(__file__)
+        self.run_config_file = self.set_run_config_file(custom_config)
+        self.run_config = self.load_run_config()
+        self.run_name = self.create_run_name()
+        self.output_dir_path = self.setup_output_folder(custom_out_dir)
         self.run_params = self.run_config['run_params']
         self.post_process_params = self.run_config['post_process_params']
-        self.run_name = self.create_run_name()
         self.store_run_config_json()
         self.input_files = {}
         self.exe_dir_name = self.run_config['exe_dir_name']
 
     def set_run_config_file(self, custom_config):
+        print custom_config
         if custom_config is not 'run_config.py':
-            custom_config = join_paths(os.path.dirname(self.this_path), custom_config)
-            if os.path.isfile(custom_config):
-                print "Choosing config: {}".format(custom_config)
-                return join_paths(custom_config)
+            custom_config = join_paths(project_path, custom_config)
+            print custom_config
+            if not os.path.isfile(custom_config):
+                print "Config file {} does not exist!".format(config_file)
+                exit(1)
+            print "Choosing config: {}".format(custom_config)
+            return join_paths(custom_config)
         else:
-            print "Choosing config: {}".format(os.path.dirname(self.this_path), 'run_config.py')
+            print "Choosing config: {} {}".format(os.path.dirname(self.this_path), 'run_config.py')
             return join_paths(os.path.dirname(self.this_path), 'run_config.py')
 
     def load_run_config(self):
