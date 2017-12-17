@@ -12,12 +12,21 @@ from python.libs.paths import project_path
 
 
 class OutputLoader:
-    def __init__(self, output_dir_name, latest_output=False, save_all_data=True):
+    def __init__(self, output_dir_name, latest_output=False, save_all_data=True, custom_dir=None):
         self.output_dir_name = self.set_output_dir_name(output_dir_name, latest_output)
-        self.output_dir_path = join_paths(project_path, 'Output', self.output_dir_name)
+        self.output_dir_path = self.set_output_dir(custom_dir)
         self.all_data_dict = {}
         self.run_config = self.parse_run_config()
         self.sub_run_params = self.parse_sub_run_params()
+
+    def set_output_dir(self, custom_dir):
+        if custom_dir is not None:
+            if os.path.exists(custom_dir):
+                return join_paths(custom_dir, self.output_dir_name)
+            else:
+                print "Custom dir {} does not exist!".format(custom_dir)
+        else:
+            return join_paths(project_path, 'Output', self.output_dir_name)
 
     def parse_run_config(self):
         """Loads the json run_config file in the output folder into a dictionary."""
