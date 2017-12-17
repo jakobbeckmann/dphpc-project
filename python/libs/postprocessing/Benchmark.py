@@ -72,7 +72,7 @@ class Benchmark:
                 or len(self.run_config['run_params']['img_files']) > 1:
             raise NotImplementedError("You can't do that. Only multiple numbers of cores and multiple algos.")
 
-        fig, ax = plot_utils.setup_figure_1ax(size=(13, 9),
+        fig, ax = plot_utils.setup_figure_1ax(size=(15, 9),
                                               x_label='# cores',
                                               y_label='Speedup')
 
@@ -110,6 +110,54 @@ class Benchmark:
         ax.plot([1, max_n_core], [1.0, max_n_core], 'k--', linewidth=1, alpha=0.5, label='linear speedup')
 
         order = np.argsort(last_speedups)[::-1]
+        plot_utils.ordered_legend(ax, order)
+        self.evaluate_save_show(save, show, file_name)
+
+    def plot_runtime_vs_cores(self, save=False, show=False, file_name=None):
+        """
+        Plots the speedup vs number of cores for all algorithms in the run.
+        """
+        if len(self.run_config['run_params']['n_points']) > 1 or len(self.run_config['run_params']['sub_size']) > 1 \
+                or len(self.run_config['run_params']['img_files']) > 1:
+            raise NotImplementedError("You can't do that. Only multiple numbers of cores and multiple algos.")
+
+        fig, ax = plot_utils.setup_figure_1ax(size=(15, 9),
+                                              x_label='# cores',
+                                              y_label='Runtime [s]')
+
+        # set up empty data container holding n cores, run times, speedup of max n cores
+        algo_t_core = {algorithm: {'n_cores': [], 'run_times': [], 'time_1core': 0.0,
+                                   'last_speedup': 0.0, 'errors': []}
+                       for algorithm in self.run_config['run_params']['algorithms']}
+
+        # sorting wrt increasing n_cores
+        for _, data in self.all_data_dict.iteritems():
+            algo = data['algorithm']
+            algo_t_core[algo]['n_cores'].append(data['n_cores'])
+            algo_t_core[algo]['run_times'].append(data['median_run_times'])
+            algo_t_core[algo]['errors'].append(data['errors'])
+            if data['n_cores'] == 1:
+                algo_t_core[algo]['time_1core'] = data['median_run_times']
+
+        max_n_core = 1
+        last_runtimes = []
+        for algorithm, algo_data in algo_t_core.iteritems():
+            n_cores, run_times = plot_utils.sort_two_lists_wrt_first(algo_data['n_cores'], algo_data['run_times'])
+            speedups = [algo_data['time_1core'] / run_times[n] for n in range(len(run_times))]
+            errors = algo_data['errors']
+            errors = [[err[0] for err in errors], [err[1] for err in errors]]
+
+            if max(n_cores) > max_n_core:
+                max_n_core = max(n_cores)
+            last_runtimes.append(run_times[-1])
+
+            ax.plot(n_cores, run_times, linewidth=3, label=algorithm, alpha=0.5)
+            ax.plot(n_cores, run_times, 'o', linewidth=3, alpha=0.3, color='black', markeredgecolor='none')
+            ax.errorbar(n_cores, run_times, yerr=errors, fmt='none', alpha=0.5, color='black', capsize=3)
+
+            print algorithm
+
+        order = np.argsort(last_runtimes)[::-1]
         plot_utils.ordered_legend(ax, order)
         self.evaluate_save_show(save, show, file_name)
 
@@ -177,7 +225,7 @@ class Benchmark:
         self.evaluate_save_show(save, show, file_name)
 
     def plot_time_distributions(self, save=False, show=False, file_name=None):
-        fig, ax = plot_utils.setup_figure_1ax(size=(13, 9),
+        fig, ax = plot_utils.setup_figure_1ax(size=(15, 9),
                                               x_label='Run time [s]',
                                               y_label='Density')
 

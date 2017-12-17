@@ -12,9 +12,10 @@ chose_latest_output_folder = True            # Overwrites run_name with latest r
 save_all_data_dict         = True
 
 do_runtime_plot            = False
-do_speedup_plot            = True
+do_speedup_plot            = False
 do_shape_plot              = False
 do_time_hist               = False
+do_runtime_vs_cores        = True
 
 # ------------------------------------------ #
 
@@ -39,5 +40,7 @@ if do_shape_plot:
     post_processor.plot_shape_comparison(save=False, show=True, file_name='shape_comparison')
 if do_time_hist:
     post_processor.plot_time_distributions(save=False, show=True, file_name='time_distributions')
+if do_runtime_vs_cores:
+    post_processor.plot_runtime_vs_cores(save=False, show=True, file_name='run_time_vs_input')
 # ------------------------------------------ #
 
