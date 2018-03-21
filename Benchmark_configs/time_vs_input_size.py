@@ -4,25 +4,21 @@
 #                                                                           #
 #############################################################################
 
-run_config = {
-    'run_name':              'final_time_vs_input_size',
-    'exe_dir_name':          'exe',
+{
+    'run_name':              'final_time_vs_input_xps_15_low_iter',
+    'exe_dir_name':          'cmake-build-debug',
     'save_png_input':        False,
 
     'run_params':
         {
             'n_cores':              [1],
-            'n_points':             [10000, 100000, 500000, 1000000, 2500000, 5000000],
+            'n_points':             [1000000, 2000000, 3000000, 4000000, 5000000],
             'clusters':             1,
             'img_files':            ['elephant.png'],
-            'algorithms':           ['chan_normal', 'chan_merge_var', 'graham', 'jarvis',
-                                     'jarvis_jarvis', 'jarvis_graham', 'jarvis_binjarvis',
-                                     'jarvis_quickhull', 'graham_jarvis', 'graham_graham',
-                                     'graham_quickhull', 'quickhull_binjarvis', 'quickhull_jarvis',
-                                     'quickhull_graham', 'quickhull', 'quickhull_quickhull'],
+            'algorithms':           ['jarvis', 'graham', 'quickhull'],
             'sub_size':             [],
             'use_sub_sizes':        False,
-            'n_iterations':         100,
+            'n_iterations':         10,
         },
 
     'post_process_params':
